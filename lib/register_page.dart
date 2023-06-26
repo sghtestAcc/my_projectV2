@@ -19,9 +19,9 @@ void main() => runApp(MaterialApp(
                   child:Column(
                     children: [
                       Image.asset(
-              'assets/images/Medi_Assist-removebg-preview.png',
-              height: 175,
-              width: 175,
+              'assets/images/Grace-bg-new-edited.png',
+              height: 150,
+              width: 150,
               fit: BoxFit.cover,
             ),
             Image.asset('assets/images/sgh.png'),

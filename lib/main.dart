@@ -1,10 +1,22 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:my_project/login_page.dart';
 import 'package:my_project/register_page.dart';
-void main() => runApp(MaterialApp(
+
+import 'firebase_options.dart';
+void main() async  {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
+runApp(
+  MaterialApp(
       title: "App",
       home: HomeScreen(),
-    ));
+// ...
+)
+);
+} 
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -13,14 +25,17 @@ class HomeScreen extends StatelessWidget {
       body: Center(
           child: Column(
             children: [
-Image.asset('assets/images/Medi_Assist-removebg-preview.png', 
-            height: 175,
-            width: 175,
+              SizedBox(height: 10,),
+Image.asset('assets/images/Grace-bg-new-edited.png', 
+            height: 200,
+            width: 200,
             fit: BoxFit.cover),
-            Image.asset('assets/images/sgh.png'),
-                        Text('Welcome to SGH`s Medication', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-            Text('Tracker Application!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-            SizedBox(height: 20,),
+            Text('Guided Resources, Assistance', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+             Text('and Communication for Empowered Care', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+            Image.asset('assets/images/sgh.png', fit: BoxFit.contain,),
+                        Text('Welcome to SGH`s Medication', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Tracker Application', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+            SizedBox(height: 30,),
             ElevatedButton(onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
             },
@@ -44,7 +59,8 @@ Image.asset('assets/images/Medi_Assist-removebg-preview.png',
     ),
       ), 
       ),
-          Expanded(child: Image.asset('assets/images/sghDesign.png')),            
+      Expanded(child: Align(alignment: Alignment.bottomCenter, child: Image.asset('assets/images/sghDesign.png'),))
+      // Expanded(child: Image.asset('assets/images/sghDesign.png')),           
             ],
       )),
     );
