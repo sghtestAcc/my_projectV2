@@ -27,6 +27,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+       appBar: PreferredSize(
+         preferredSize: Size.fromHeight(50),
+         child: 
+         AppBar(        
+          backgroundColor: Colors.transparent, 
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black), 
+             ),
+       ),
       resizeToAvoidBottomInset: false,
       body: 
       Form(
@@ -63,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                     SizedBox(height: 10,),
                     TextFormField(
-                    obscureText: true,
+                    obscureText: false,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), )
                     ),
@@ -76,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                   SizedBox(height: 10,),
                   TextFormField(
-                    obscureText: true,
+                    obscureText: false,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), )
                     ),

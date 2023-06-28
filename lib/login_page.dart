@@ -32,6 +32,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+       appBar: PreferredSize(
+         preferredSize: Size.fromHeight(50),
+         child: 
+         AppBar(        
+          backgroundColor: Colors.transparent, 
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black), 
+             ),
+       ),
       resizeToAvoidBottomInset: false,
       body: Form(
         key: formData,
@@ -64,7 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
                     SizedBox(height: 10,),
                     TextFormField(
-                    obscureText: true,
+                    obscureText: false,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), 
                       ),
