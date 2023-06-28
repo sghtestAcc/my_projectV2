@@ -1,7 +1,7 @@
 
 class PatientModel {
   final String?  id;
-  final String PhoneNo;
+  final String Email;
   final String Name;
   final String Password;
   
@@ -9,7 +9,7 @@ class PatientModel {
 
   const PatientModel({
     this.id,
-    required this.PhoneNo,
+    required this.Email,
     required this.Name,
     required this.Password,
 
@@ -18,7 +18,7 @@ class PatientModel {
   toJson() {
     return {
       'Name' : Name,
-      'PhoneNo' : PhoneNo,
+      'Email' : Email,
       'Password' : Password,
     };
   }

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:my_project/utils/image_picker_class.dart';
 
 void main() => runApp(MaterialApp(
       title: "App",
@@ -118,19 +117,25 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                   ),     
             if (imageFile != null)
   Container(
-    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+    height: 200,
     // width: 225,
-    height: 225,
+    // height: 225,
     child: Image.file(File(imageFile!.path),
-    fit: BoxFit.cover,),
+    fit: BoxFit.fitWidth,),
   ), 
   SizedBox(height: 10,),
   Expanded(
     child: Column(
       children: [
          Text('Translated Medication Label:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-         SizedBox(height: 15,),
-         Text(scannedText, style: TextStyle(fontSize: 20),),
+        //  SizedBox(height: 15,),
+         Row(
+          children: [
+           Text(scannedText,textAlign: TextAlign.center,style: TextStyle(fontSize: 18)),
+          ],
+         ),
+        //  Text(scannedText, style: TextStyle(fontSize: 20),),
       ],
     ),
   ),

@@ -37,7 +37,8 @@ Image.asset('assets/images/Grace-bg-new-edited.png',
             Text('Tracker Application', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
             SizedBox(height: 30,),
             ElevatedButton(onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+              // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(loginType: LoginType.patientsLogin)));
             },
            style: ElevatedButton.styleFrom(
             primary: Color(0xFF0CE25C),
@@ -49,7 +50,8 @@ Image.asset('assets/images/Grace-bg-new-edited.png',
            child: Text('Patient Login', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
             SizedBox(height: 30,),
             ElevatedButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
+               Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(loginType: LoginType.caregiversLogin)));
+              // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
             },  
              child: Text('Caregiver  Login', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),), style: ElevatedButton.styleFrom(
             primary: Color(0xFF0CE25C),
@@ -59,8 +61,7 @@ Image.asset('assets/images/Grace-bg-new-edited.png',
     ),
       ), 
       ),
-      Expanded(child: Align(alignment: Alignment.bottomCenter, child: Image.asset('assets/images/sghDesign.png'),))
-      // Expanded(child: Image.asset('assets/images/sghDesign.png')),           
+      Expanded(child: Align(alignment: Alignment.bottomCenter, child: Image.asset('assets/images/sghDesign.png'),))       
             ],
       )),
     );
