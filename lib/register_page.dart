@@ -110,7 +110,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         Align(alignment: Alignment.bottomCenter,
                         child:  Image.asset('assets/images/sghDesign.png',),
-                        
                         ),
                         Container(
                           width:double.infinity,

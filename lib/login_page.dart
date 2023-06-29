@@ -1,5 +1,6 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:my_project/navigation.tab.dart';
 import 'package:my_project/patient_home.dart';
 import 'package:my_project/register_page.dart';
 // import 'package:my_project/patient_home.dart';
@@ -94,12 +95,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 10,),
+                  widget.loginType == LoginType.patientsLogin ?
                  Container(
                   width: double.infinity,
                   height: 50,
                   child:  ElevatedButton(onPressed: (){
-                    // Navigator.push(context, MaterialPageRoute(builder: (context)=> PatientHomeScreen()));
+                    // Navigator.push(context, MaterialPageRoute(builder: (context)=> const NavigatorBar()));
                     Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
+              },  
+               child: Text('Login', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),), style: ElevatedButton.styleFrom(
+              primary: Color(0xFF0CE25C),// NEW
+          shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Rounded corner radius
+          ),
+        ), 
+        ),
+                 )
+                 : Container(
+                  width: double.infinity,
+                  height: 50,
+                  child:  ElevatedButton(onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> const NavigatorBar()));
               },  
                child: Text('Login', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),), style: ElevatedButton.styleFrom(
               primary: Color(0xFF0CE25C),// NEW
@@ -146,19 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-                //  GestureDetector(
-                //     onTap: () {
-                //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
-                //       // Text(widget.loginType == LoginType.patientsLogin
-                //       // ? 'Patient Login'
-                //       // : 'Caregiver Login', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
-
-                //          Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(registerType: LoginType2.caregiversRegister)));
-                //     },
-                //     child: Text('Dont have an account? Sign up', style: TextStyle(
-                //   fontSize: 20,
-                //   decoration: TextDecoration.underline),),
-                //  ), 
                   ]
                 )
               ),
