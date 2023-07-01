@@ -23,11 +23,8 @@ class _NavigatorBarState extends State<NavigatorBar> {
     SelectPatientScreen()
   ];
 
-
   @override
   Widget build(BuildContext context) {
-  
-
     return Scaffold(
       body: 
       screens[selectedIndex],

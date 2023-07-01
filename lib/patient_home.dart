@@ -77,7 +77,6 @@ padding: EdgeInsets.all(10.0),
                 //     ),
                 //   ),
                 // )
-                
                ],
                )
                ),
@@ -97,16 +96,16 @@ padding: EdgeInsets.all(10.0),
                 ],
               ), 
               ),
-              Container(
-                child:  Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text('Prescriptions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  Text('Vocalization', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  Text('PhotoScanner', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
-                ],
-              ), 
-              ),
+              // Container(
+              //   child:  Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     Text('Prescriptions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              //     Text('Vocalization', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              //     Text('PhotoScanner', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
+              //   ],
+              // ), 
+              // ),
               SizedBox(height: 10,),
               Container(
                 padding:EdgeInsets.all(10.0),

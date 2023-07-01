@@ -28,6 +28,8 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
 
   String scannedText = "";
 
+  TextEditingController controller = TextEditingController();
+
   void initState() {
 
     super.initState();
@@ -119,26 +121,37 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
   Container(
     padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
     height: 200,
-    // width: 225,
-    // height: 225,
     child: Image.file(File(imageFile!.path),
     fit: BoxFit.fitWidth,),
   ), 
   SizedBox(height: 10,),
-  Expanded(
-    child: Column(
+ Column(
       children: [
          Text('Translated Medication Label:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-        //  SizedBox(height: 15,),
          Row(
           children: [
-           Text(scannedText,textAlign: TextAlign.center,style: TextStyle(fontSize: 18)),
+            Expanded(
+              child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: TextFormField(
+                     style: TextStyle(
+    color: Colors.black, // Set your desired color for disabled state
+  ),
+                    controller: controller,
+                    enabled: false,
+                        decoration: InputDecoration(
+    hintText: "Your Medication will appear here...",
+    border: InputBorder.none, // Set this to remove the border
+  ),
+  
+                  ),
+              ),
+            )
           ],
          ),
-        //  Text(scannedText, style: TextStyle(fontSize: 20),),
       ],
     ),
-  ),
+ 
             ]),
           )
       ),
@@ -173,7 +186,7 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
     scannedText = "";
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
-        scannedText = "$scannedText${line.text}\n";
+        scannedText = controller.text;
       }
     }
     textScanning = false;
