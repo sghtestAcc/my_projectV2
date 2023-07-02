@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/models/patient_user.dart';
 
+import 'caregiver_user.dart';
+
 
 class UserRepository extends GetxController {
 
@@ -13,6 +15,22 @@ class UserRepository extends GetxController {
 
   createPatientUser(PatientModel user) async {
     await patientDB.collection("patient_users").add(user.toJson()).whenComplete(() => 
+      Get.snackbar("Congrats", "A new Account has been created.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green.withOpacity(0.1),
+      colorText: Colors.green),
+    )
+    .catchError((error, StackTrace){
+      Get.snackbar("Congrats", "A new Account has been created.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red);
+      print(error.toString());
+    });
+  }
+
+  createCaregiverUser(CaregiverModel user) async {
+    await patientDB.collection("caregivers_users").add(user.toJson()).whenComplete(() => 
       Get.snackbar("Congrats", "A new Account has been created.",
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green.withOpacity(0.1),

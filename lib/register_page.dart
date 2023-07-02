@@ -134,11 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (formData.currentState!.validate()) {
-                          final user = PatientModel(
-                              Email: controller.email.text.trim(),
-                              Name: controller.fullName.text.trim(),
-                              Password: controller.password.text.trim());
-                          RegisterController.instance.createUser(user);
+                          RegisterController.instance.registerP();
                         }
                       },
                       child: Text(
