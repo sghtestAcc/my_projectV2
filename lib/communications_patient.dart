@@ -96,7 +96,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        // toolbarHeight: 30,
+        iconTheme: IconThemeData(
+    color: Colors.black, // Set the desired color here
+  ),
         elevation: 0,
         automaticallyImplyLeading: true,
         title: const Text(
@@ -115,7 +117,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           Container(
             color: const Color(0xFF9EE8BF),
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
+            padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
             child: const Text(
               'Translate Questions',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
@@ -164,27 +166,37 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               ),
             ],
           ),
-          TextFormField(
-            controller: _controller,
-            onChanged: translateTextFunction,
-            maxLines: 3,
-            keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
-              hintText: ("Enter text"),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
+     Container(
+  child: TextFormField(
+    controller: _controller,
+    onChanged: translateTextFunction,
+    maxLines: 3,
+    keyboardType: TextInputType.multiline,
+    decoration: InputDecoration(
+      hintText: 'Enter text',
+      suffixIcon: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () {
               Clipboard.getData('text/plain').then((value) {
-                _controller.text = value!.text!;
-                setState(() {
-                  typedText = value.text!;
-                  translateTextFunction(typedText);
-                });
+                if (value != null) {
+                  _controller.text = value.text!;
+                  setState(() {
+                    typedText = value.text!;
+                    translateTextFunction(typedText);
+                  });
+                }
               });
             },
-            child: const Text("Paste"),
+            child: Icon(Icons.paste),
           ),
+        ],
+      ),
+      contentPadding: EdgeInsets.all(10.0),
+    ),
+  ),
+),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -197,6 +209,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               _isLoading
                   ? 'Loading...'
                   : _translatedText ?? 'Enter text to be translated',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
           ),
 

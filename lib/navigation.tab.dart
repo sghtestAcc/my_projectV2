@@ -6,6 +6,8 @@ import 'package:my_project/select_patients.dart';
 
 class NavigatorBar extends StatefulWidget {
   const NavigatorBar({super.key});
+   
+ 
 
   @override
   State<NavigatorBar> createState() => _NavigatorBarState();
