@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MaterialApp(
-      title: "App",
-      home: PatientHomeScreen(),
-    ));
 
 
     class PatientHomeScreen extends StatefulWidget {      

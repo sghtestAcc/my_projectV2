@@ -4,10 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:my_project/models/patient_user.dart';
 import 'package:my_project/models/register_controller.dart';
 
-void main() => runApp(MaterialApp(
-      title: "App",
-      home: RegisterScreen(registerType: LoginType2.patientsRegister),
-    ));
+// 
 
 enum LoginType2 { patientsRegister, caregiversRegister }
 
