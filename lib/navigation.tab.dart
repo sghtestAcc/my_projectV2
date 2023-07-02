@@ -9,25 +9,21 @@ class NavigatorBar extends StatefulWidget {
 
   @override
   State<NavigatorBar> createState() => _NavigatorBarState();
-
 }
 
 class _NavigatorBarState extends State<NavigatorBar> {
+  int selectedIndex = 0;
 
-
-     int selectedIndex = 0;
-
-     final screens = [
-    PatientHomeScreen(),
-    communcationsScreem(),
-    SelectPatientScreen()
+  final screens = [
+    const PatientHomeScreen(),
+    const CommunicationsScreen(),
+    const SelectPatientScreen()
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: 
-      screens[selectedIndex],
+      body: screens[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: (index) {
@@ -35,15 +31,13 @@ class _NavigatorBarState extends State<NavigatorBar> {
             selectedIndex = index;
           });
         },
-        items: [
-                   BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.comment), label: 'Communications'),
-           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Patients'),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.comment), label: 'Communications'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Patients'),
         ],
       ),
     );
   }
 }
-  
-  
-   
