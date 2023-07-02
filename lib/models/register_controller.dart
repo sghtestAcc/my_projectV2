@@ -16,12 +16,10 @@ class RegisterController extends GetxController {
 
   final userRepo = Get.put(UserRepository());
   // void registerUser(String email, String fullName, String password) {
-
   //   String? error = AuthenticationRepository.instance.createUserWithEmailAndPassword(email, password) as String?;
   //   if(error != null) {
   //     Get.showSnackbar(GetSnackBar(message: error.toString(),));
   //   }
-
   // }
   Future <void> registerP() async {
     String? error = await AuthenticationRepository.instance.registerPUser(

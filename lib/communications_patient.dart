@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:my_project/add_questions_modal.dart';
+import 'package:my_project/navigation_drawer.dart';
 
 class CommunicationsScreen extends StatefulWidget {
   // LoginScreen
@@ -94,9 +96,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        toolbarHeight: 30,
+        // toolbarHeight: 30,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         title: const Text(
           'Communications',
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
@@ -231,7 +233,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               borderRadius: BorderRadius.all(Radius.circular(22)),
             ),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                addQuestionsModal(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF6F6F6),
                 shape: RoundedRectangleBorder(
@@ -249,11 +253,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               ),
             ),
           ),
-          // ElevatedButton(
-          //       onPressed: _translateText, child: Text('Translate'))
-          // ]),
         ],
       ),
+         endDrawer: AppDrawerNavigation(),
     );
   }
 }
