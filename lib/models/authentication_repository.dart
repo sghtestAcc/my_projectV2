@@ -29,11 +29,11 @@ class AuthenticationRepository extends GetxController {
     // ever(firebaseUser, _setInitialScreen);
   }
 
-  _setInitialScreen(User? user) {
-    user == null
-        ? Get.offAll(() => HomeScreen())
-        : Get.offAll(() => NavigatorBar());
-  }
+  // _setInitialScreen(User? user) {
+  //   user == null
+  //       ? Get.offAll(() => HomeScreen())
+  //       : Get.offAll(() => NavigatorBar());
+  // }
 
   Future<String?> registerPUser(String email, String password) async {
     try {
@@ -95,7 +95,7 @@ class AuthenticationRepository extends GetxController {
   Future<String?> loginCUser(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-       firebaseUser.value != null ? Get.offAll(() => NavigatorBar()) : Get.to(() => HomeScreen());
+       firebaseUser.value != null ? Get.offAll(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,)) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
       final ex = LogInFailure.fromCode(e.code);
       return ex.message;

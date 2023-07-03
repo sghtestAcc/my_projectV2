@@ -15,8 +15,7 @@ enum LoginType2 { patientsRegister, caregiversRegister }
 
 class RegisterScreen extends StatefulWidget {
   final LoginType2 registerType;
-  const RegisterScreen({Key? key, required this.registerType})
-      : super(key: key);
+  const RegisterScreen({Key? key, required this.registerType}): super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

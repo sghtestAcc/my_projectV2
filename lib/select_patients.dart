@@ -73,7 +73,6 @@ padding: EdgeInsets.all(10.0),
 ),
       body: Container(
         child: Column(
-          //  crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               color: Color(0xFF9EE8BF),
@@ -112,8 +111,6 @@ padding: EdgeInsets.all(10.0),
                  },
                ),
              ) 
-
-
         ]),
       ),
     );

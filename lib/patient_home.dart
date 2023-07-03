@@ -3,12 +3,19 @@ import 'package:my_project/navigation_drawer.dart';
 
 void main() => runApp(MaterialApp(
       title: "App",
-      home: PatientHomeScreen(),
+      home: PatientHomeScreen(loginType: loginType3.patientsHomeScreen),
     ));
 
+enum loginType3 { patientsHomeScreen, caregiversHomeScreen}
 
     class PatientHomeScreen extends StatefulWidget {      
-  const PatientHomeScreen({Key? key});
+      
+
+final loginType3 loginType;
+const PatientHomeScreen({Key? key, required this.loginType}): super(key: key);
+
+  //  final LoginType2 registerType;
+  // const RegisterScreen({Key? key, required this.registerType}): super(key: key);
 
   @override
   State<PatientHomeScreen> createState() => _PatientHomeScreenState();  
@@ -54,6 +61,7 @@ padding: EdgeInsets.all(10.0),
                 width: 100,
                 fit: BoxFit.cover,
               ),
+              widget.loginType == loginType3.patientsHomeScreen ? 
                const Positioned.fill(child: Align(
                 alignment: Alignment.bottomLeft,
                child: Padding(
@@ -62,7 +70,7 @@ padding: EdgeInsets.all(10.0),
                 mainAxisAlignment: MainAxisAlignment.end ,
                crossAxisAlignment: CrossAxisAlignment.start,
                children: [
-                Text('Hi Welcome', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
+                Text('Hi Welcome Patient', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
                 Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),   
                 // Align(
                 //   alignment: Alignment.bottomLeft,
@@ -81,7 +89,34 @@ padding: EdgeInsets.all(10.0),
                ],
                )
                ),
-               ),),
+               ),) : const Positioned.fill(child: Align(
+                alignment: Alignment.bottomLeft,
+               child: Padding(
+               padding:EdgeInsets.all(20.0),
+               child: Column(
+                mainAxisAlignment: MainAxisAlignment.end ,
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                Text('Hi Welcome Caregivers', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
+                Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),   
+                // Align(
+                //   alignment: Alignment.bottomLeft,
+                //   child: Transform.translate(
+                //     offset: const Offset(0.0, 15.0),
+                //     child: Container(
+                //       child: TextField(
+                //               decoration: InputDecoration(
+                //             hintText: 'Quick search a patient here',
+                //             prefixIcon: Icon(Icons.search),
+                //               ),
+                //              ),
+                //     ),
+                //   ),
+                // )
+               ],
+               )
+               ),
+               ),)
           
                       ]
                       ) 

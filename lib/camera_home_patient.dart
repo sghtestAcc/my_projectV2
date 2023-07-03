@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_project/navigation.tab.dart';
 
 void main() => runApp(MaterialApp(
       title: "App",
@@ -96,11 +97,15 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
            child: Text('Photo Files', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
            ),
     SizedBox(height: 20,),
+
             ElevatedButton(
           onPressed: () {
+            
               // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> NavigatorBar(loginType: LoginType4.patientsLoginBottomTab,)));
             },
            style: 
+           
            ElevatedButton.styleFrom(
           primary: Color(0xFF0CE25C),
           minimumSize: const Size(320,50), // NEW
@@ -109,7 +114,24 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
          ),
         ),
            child: Text('Continue', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
+            //  GestureDetector(
+                  //     onTap: () {
+                  //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
+                  //       // Text(widget.loginType == LoginType.patientsLogin
+                  //       // ? 'Patient Login'
+                  //       // : 'Caregiver Login', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+
+                  //          Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(registerType: LoginType2.caregiversRegister)));
+                  //     },
+                  //     child: Text('Dont have an account? Sign up', style: TextStyle(
+                  //   fontSize: 20,
+                  //   decoration: TextDecoration.underline),),
+                  //  ),
            ),
+
+
+
+
            SizedBox(height: 20,),
            if (!textScanning && imageFile == null)
            Container(
