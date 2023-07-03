@@ -9,8 +9,16 @@ class LoginController extends GetxController {
   final email = TextEditingController();
   final password = TextEditingController();
 
-  Future <void> login() async {
+  Future <void> loginP() async {
     String? error = await AuthenticationRepository.instance.loginPUser(
+      email.text.trim(), password.text.trim());
+    if(error != null) {
+      Get.showSnackbar(GetSnackBar(message: error.toString(),));
+    }
+  }
+
+  Future <void> loginC() async {
+    String? error = await AuthenticationRepository.instance.loginCUser(
       email.text.trim(), password.text.trim());
     if(error != null) {
       Get.showSnackbar(GetSnackBar(message: error.toString(),));

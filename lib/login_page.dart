@@ -10,7 +10,8 @@ import 'package:my_project/register_page.dart';
 
 import 'camera_home_patient.dart';
 
-void main() { // Add this line here
+void main() {
+  // Add this line here
   runApp(
     MaterialApp(
       title: "App",
@@ -32,7 +33,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final controller = Get.put(LoginController());
 
   // String? email;
@@ -92,16 +92,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                  TextFormField(
-                    controller: controller.email,
-                    obscureText: false,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                    ),
-                  ),
+                  widget.loginType == LoginType.patientsLogin
+                      ? TextFormField(
+                          controller: controller.email,
+                          obscureText: false,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
+                        )
+                      : TextFormField(
+                          controller: controller.email,
+                          obscureText: false,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
+                        ),
                   SizedBox(
                     height: 10,
                   ),
@@ -112,44 +123,80 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                  TextFormField(
-                    controller: controller.password,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    )),
-                  ),
+                  widget.loginType == LoginType.patientsLogin
+                      ? TextFormField(
+                          controller: controller.password,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        )
+                      : TextFormField(
+                          controller: controller.password,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        ),
                   SizedBox(
                     height: 10,
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formData.currentState!.validate()) {
-                          AuthenticationRepository.instance.loginPUser(
-                              controller.email.text.trim(),
-                              controller.password.text.trim());
-                        }
-                       
-                        // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
-                      },
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF0CE25C), // NEW
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              12), // Rounded corner radius
+                  widget.loginType == LoginType.patientsLogin
+                      ? Container(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (formData.currentState!.validate()) {
+                                AuthenticationRepository.instance.loginPUser(
+                                    controller.email.text.trim(),
+                                    controller.password.text.trim());
+                              }
+
+                              // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
+                            },
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF0CE25C), // NEW
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    12), // Rounded corner radius
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (formData.currentState!.validate()) {
+                                AuthenticationRepository.instance.loginCUser(
+                                    controller.email.text.trim(),
+                                    controller.password.text.trim());
+                              }
+                              // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
+                            },
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF0CE25C), // NEW
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    12), // Rounded corner radius
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
                   SizedBox(
                     height: 10,
                   ),

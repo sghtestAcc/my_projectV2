@@ -75,6 +75,9 @@ flutter:
     - assets/images/mic.png
     - assets/images/drugs.png
     - assets/images/photo-camera.png
+    - assets/images/logout.png
+    - assets/images/world.png
+
 
     
 

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:my_project/models/caregiver_user.dart';
 import 'package:my_project/models/patient_user.dart';
 import 'package:my_project/models/register_controller.dart';
+import 'package:my_project/models/user_repo.dart';
 
 // 
 
@@ -19,7 +21,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final controller = Get.put(RegisterController());
-  final formKey = GlobalKey<FormState>();
+  // final formKey = GlobalKey<FormState>();
 
   var formData = GlobalKey<FormState>();
   
@@ -74,7 +76,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     height: 10,
                   ),
+                   widget.registerType == LoginType2.patientsRegister ?
                   TextFormField(
+                    controller: controller.email,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    )),
+                  ) :  TextFormField(
                     controller: controller.email,
                     obscureText: false,
                     decoration: InputDecoration(
@@ -92,7 +102,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     height: 10,
                   ),
+                   widget.registerType == LoginType2.patientsRegister ?
                   TextFormField(
+                    controller: controller.fullName,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    )),
+                  ): TextFormField(
                     controller: controller.fullName,
                     obscureText: false,
                     decoration: InputDecoration(
@@ -107,6 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     alignment: Alignment.centerLeft,
                     child: Text('Password', style: TextStyle(fontSize: 20)),
                   ),
+                  widget.registerType == LoginType2.patientsRegister ?
                   TextFormField(
                      controller: controller.password,
                     obscureText: true,
@@ -114,8 +133,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     )),
-                  ),
+                  ): TextFormField(
+                     controller: controller.password,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    )),
+                  ) 
                 ])),
+                
             Expanded(
               child: Stack(
                 children: [
@@ -125,17 +152,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       'assets/images/sghDesign.png',
                     ),
                   ),
+                   widget.registerType == LoginType2.patientsRegister ?
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                     child: ElevatedButton(
                       onPressed: () {
                         if (formData.currentState!.validate()) {
-                          final user = PatientModel(
+                            final user = PatientModel(
                               Email: controller.email.text.trim(),
                               Name: controller.fullName.text.trim(),
                               Password: controller.password.text.trim());
-                          RegisterController.instance.createUser(user);
+                          UserRepository.instance.createPatientUser(user);
+                          RegisterController.instance.registerP();
+                        }
+                      },
+                      child: Text(
+                        'Register',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFF0CE25C), // NEW
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              12), // Rounded corner radius
+                        ),
+                      ),
+                    ),
+                  ): 
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (formData.currentState!.validate()) {
+                          final user2 = CaregiverModel(
+                              Email: controller.email.text.trim(),
+                              Name: controller.fullName.text.trim(),
+                              Password: controller.password.text.trim());
+                          UserRepository.instance.createCaregiverUser(user2);
+                          RegisterController.instance.registerC();
                         }
                       },
                       child: Text(

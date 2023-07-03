@@ -15,22 +15,29 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
   Widget build(BuildContext context) {
     //  List<bool> _checkedList = List.generate(10, (index) => false);
          Widget buildCard(int index) => 
-         Container(
-           child: CheckboxListTile(
-            title: Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text('Patient $index', style: TextStyle(fontSize: 15),),
-                 Text('phoneNumber $index', style: TextStyle(fontSize: 12)),
-            ]),
-            value: _checkedList[index], 
-            onChanged: (value) {
-              setState(() {
-                _checkedList[index] = value!;
-              });
-            }
-            ),
-         );
+        Container(
+  decoration: BoxDecoration(
+    border: Border.all(
+      color: Colors.black,
+      width: 1.0,
+    ),
+  ),
+  child: CheckboxListTile(
+    title: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Patient $index', style: TextStyle(fontSize: 15),),
+        Text('patientEmail $index', style: TextStyle(fontSize: 12)),
+      ],
+    ),
+    value: _checkedList[index], 
+    onChanged: (value) {
+      setState(() {
+        _checkedList[index] = value!;
+      });
+    },
+  ),
+);
 
  Widget buildCard2(int index) => Container(
 padding: EdgeInsets.all(10.0),
