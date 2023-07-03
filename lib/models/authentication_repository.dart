@@ -7,6 +7,7 @@ import 'package:my_project/models/register_failure.dart';
 import 'package:my_project/patient_home.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_project/patients_upload.dart';
 import 'package:my_project/register_page.dart';
 
 import '../navigation.tab.dart';
@@ -67,7 +68,7 @@ class AuthenticationRepository extends GetxController {
   Future<String?> loginPUser(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      firebaseUser.value != null ? Get.offAll(() => CameraHomeScreenPatient()) : Get.to(() => HomeScreen());
+      firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
       final ex = LogInFailure.fromCode(e.code);
       return ex.message;

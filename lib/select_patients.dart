@@ -39,8 +39,6 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
   ),
 );
 
-
-
  Widget buildCard2(int index) => Container(
 padding: EdgeInsets.all(10.0),
   decoration: const BoxDecoration(

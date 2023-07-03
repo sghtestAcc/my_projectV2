@@ -135,7 +135,7 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                   padding: const EdgeInsets.all(20),
                   child: TextFormField(
                      style: TextStyle(
-    color: Colors.black, // Set your desired color for disabled state
+    color: Colors.black, 
   ),
                     controller: controller,
                     enabled: false,
