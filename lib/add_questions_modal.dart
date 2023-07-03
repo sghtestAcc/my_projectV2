@@ -19,7 +19,7 @@ void addQuestionsModal(BuildContext context) {
       onPressed: () {
         // Handle the close button action here
         Navigator.push(context, MaterialPageRoute(builder: (context)=> 
-      NavigatorBar(selectedIndex: 2)));
+      NavigatorBar()));
       },
       icon: Icon(Icons.close),
     ),
