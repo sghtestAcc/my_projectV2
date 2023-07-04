@@ -106,7 +106,27 @@ class AuthenticationRepository extends GetxController {
     return null;
   }
 
-  Future<void> logout() async => await _auth.signOut();
 
-  createUserWithEmailAndPassword(String email, String password) {}
+Future<void> logout() async {
+  try {
+    if (firebaseUser.value != null) {
+      await _auth.signOut();
+      Get.offAll(HomeScreen());
+      Get.snackbar(
+        'Logout',
+        'You have been successfully logged out',
+        duration: Duration(seconds: 2),
+      );
+    }
+  } catch (e) {
+    print('Logout error: $e');
+    Get.snackbar(
+      'Error',
+      'An error occurred while logging out',
+      duration: Duration(seconds: 2),
+    );
+  }
+}
+
+  // createUserWithEmailAndPassword(String email, String password) {}
 }

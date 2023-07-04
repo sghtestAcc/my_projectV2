@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'models/authentication_repository.dart';
 
 class AppDrawerNavigation  extends StatelessWidget {
 
@@ -20,7 +21,11 @@ class AppDrawerNavigation  extends StatelessWidget {
         
           title: Text('Logout', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
           onTap: () {
-            
+           AuthenticationRepository.instance.logout();
+            // AuthenticationRepository.instance.loginPUser(
+            //                         controller.email.text.trim(),
+            //                         controller.password.text.trim());
+            //                   }
           }
         ),
         Divider(height: 3, color: Colors.blueGrey),

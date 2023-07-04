@@ -24,6 +24,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
   final screens = [
     const PatientHomeScreen(loginType: loginType3.patientsHomeScreen),
     const CommunicationsScreen(),
+    
     // RegisterScreen(registerType: LoginType2.caregiversRegister
   ];
 

@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:my_project/models/login_controller.dart';
 import 'package:my_project/navigation_drawer.dart';
 
 void main() => runApp(MaterialApp(
@@ -14,14 +17,12 @@ enum loginType3 { patientsHomeScreen, caregiversHomeScreen}
 final loginType3 loginType;
 const PatientHomeScreen({Key? key, required this.loginType}): super(key: key);
 
-  //  final LoginType2 registerType;
-  // const RegisterScreen({Key? key, required this.registerType}): super(key: key);
-
   @override
   State<PatientHomeScreen> createState() => _PatientHomeScreenState();  
 }
 
 class _PatientHomeScreenState extends State<PatientHomeScreen> {
+  final controller = Get.put(LoginController());
 
    TextEditingController searchController = TextEditingController();
   @override
@@ -70,22 +71,9 @@ padding: EdgeInsets.all(10.0),
                 mainAxisAlignment: MainAxisAlignment.end ,
                crossAxisAlignment: CrossAxisAlignment.start,
                children: [
-                Text('Hi Welcome Patient', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
+                Text("Hi Welcome Patient"),
+                // Text('Hi Welcome' + patientUser.Name!;, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
                 Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),   
-                // Align(
-                //   alignment: Alignment.bottomLeft,
-                //   child: Transform.translate(
-                //     offset: const Offset(0.0, 15.0),
-                //     child: Container(
-                //       child: TextField(
-                //               decoration: InputDecoration(
-                //             hintText: 'Quick search a patient here',
-                //             prefixIcon: Icon(Icons.search),
-                //               ),
-                //              ),
-                //     ),
-                //   ),
-                // )
                ],
                )
                ),
@@ -121,6 +109,27 @@ padding: EdgeInsets.all(10.0),
                       ]
                       ) 
               ),
+              widget.loginType == loginType3.patientsHomeScreen ? 
+              Container(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child:  Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                 onTap: () {
+
+                 },
+                  child: Image.asset(
+                'assets/images/drugs.png',
+                 height: 90,
+                width: 90,
+                ),
+                ),
+                   Image.asset('assets/images/mic.png', height: 90, width: 90, ),
+                  Image.asset('assets/images/photo-camera.png',  height: 90, width: 90,),
+                ],
+              ), 
+              ) : 
               Container(
                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                 child:  Row(
