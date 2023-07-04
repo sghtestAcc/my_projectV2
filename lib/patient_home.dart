@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:my_project/models/login_controller.dart';
 import 'package:my_project/navigation_drawer.dart';
 import 'package:my_project/patients_Vocalization.dart';
+import 'package:my_project/models/authentication_repository.dart';
 
 void main() => runApp(MaterialApp(
       title: "App",
@@ -23,7 +24,7 @@ const PatientHomeScreen({Key? key, required this.loginType}): super(key: key);
 }
 
 class _PatientHomeScreenState extends State<PatientHomeScreen> {
-  final controller = Get.put(LoginController());
+
 
    TextEditingController searchController = TextEditingController();
   @override
@@ -51,6 +52,7 @@ padding: EdgeInsets.all(10.0),
       Container(
         child: Column(
           children: [
+             widget.loginType == loginType3.patientsHomeScreen ? 
               Container(
                   child: Stack(
                      alignment: Alignment.center,
@@ -62,7 +64,6 @@ padding: EdgeInsets.all(10.0),
                 width: 100,
                 fit: BoxFit.cover,
               ),
-              widget.loginType == loginType3.patientsHomeScreen ? 
                const Positioned.fill(child: Align(
                 alignment: Alignment.bottomLeft,
                child: Padding(
@@ -73,11 +74,26 @@ padding: EdgeInsets.all(10.0),
                children: [
                 Text("Hi Welcome Patient"),
                 // Text('Hi Welcome' + patientUser.Name!;, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
-                Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),   
+                Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),  
                ],
                )
                ),
-               ),) : const Positioned.fill(child: Align(
+               ),) 
+          
+                      ]
+                      ) 
+              ) : Container(
+                  child: Stack(
+                     alignment: Alignment.center,
+                      children: [
+                        Image.asset('assets/images/new-sgh-design.png', ),
+                            Image.asset(
+                'assets/images/Grace-bg-new-edited.png',
+                height: 100,
+                width: 100,
+                fit: BoxFit.cover,
+              ),
+               const Positioned.fill(child: Align(
                 alignment: Alignment.bottomLeft,
                child: Padding(
                padding:EdgeInsets.all(20.0),
@@ -85,26 +101,22 @@ padding: EdgeInsets.all(10.0),
                 mainAxisAlignment: MainAxisAlignment.end ,
                crossAxisAlignment: CrossAxisAlignment.start,
                children: [
-                Text('Hi Welcome Caregivers', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
-                Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),   
-                // Align(
-                //   alignment: Alignment.bottomLeft,
-                //   child: Transform.translate(
-                //     offset: const Offset(0.0, 15.0),
-                //     child: Container(
-                //       child: TextField(
-                //               decoration: InputDecoration(
-                //             hintText: 'Quick search a patient here',
-                //             prefixIcon: Icon(Icons.search),
-                //               ),
-                //              ),
-                //     ),
-                //   ),
-                // )
+                Text("Hi Welcome Patient"),
+                // Text('Hi Welcome' + patientUser.Name!;, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
+                Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),  
+                Align(
+                  alignment: Alignment.bottomLeft,
+                   child: TextField(
+                              decoration: InputDecoration(
+                            hintText: 'Quick search a patient here',
+                            prefixIcon: Icon(Icons.search),
+                              ),
+                             ),
+                )
                ],
                )
                ),
-               ),)
+               ),) 
           
                       ]
                       ) 
@@ -180,7 +192,6 @@ padding: EdgeInsets.all(10.0),
                  itemBuilder: (context, index) {
                   return buildCard(index);
                  },
-             
                ),
              ) 
                 

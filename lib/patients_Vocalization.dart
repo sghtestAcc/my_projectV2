@@ -69,7 +69,7 @@ Widget buildCard(int index) => Container(
     ),
   ),
   child: Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
+    // crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Text('Medication'),
       Text('$index'),
@@ -198,6 +198,7 @@ Container(
 ),
 SizedBox(height: 10,),
 Container(
+  padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
   height: 130,
   child:   ListView.separated(
     scrollDirection: Axis.horizontal,
@@ -205,11 +206,7 @@ Container(
     separatorBuilder: (context, _) => SizedBox(width: 10,),
     itemBuilder: (context, index) => buildCard(index) ,
   ),
-),
-
-
-
-          
+),          
               ],)
           ]),
       ),

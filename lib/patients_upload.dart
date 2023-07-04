@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/camera_home_patient.dart';
 import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/upload%20Meds_schedule.dart';
 
 void main() => runApp(MaterialApp(
       title: "App",
@@ -81,6 +82,7 @@ class _PatientUploadScreenState extends State<PatientUploadScreen> {
   width: double.infinity, // Set the width to expand to the available space
   child: ElevatedButton(
     onPressed: () {
+      addMedsScheduleModal(context);
       // Add your onPressed logic here
       //  Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
     },
@@ -100,29 +102,7 @@ class _PatientUploadScreenState extends State<PatientUploadScreen> {
   ),
 ),   
  SizedBox(height: 20,),
-  Container(
-  width: double.infinity, // Set the width to expand to the available space
-  child: ElevatedButton(
-    onPressed: () {
-      // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
-      
-    },
-    style: ElevatedButton.styleFrom(
-      primary: Color(0xFF0CE25C),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-    child: Container(
-      padding: EdgeInsets.symmetric(vertical: 12), // Adjust the padding as needed
-      child: Text(
-        'Add Meds Info',
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,  color: Colors.black,),
-      ),
-    ),
-  ),
-), 
- SizedBox(height: 20,),
+
   Container(
   width: double.infinity, // Set the width to expand to the available space
   child: ElevatedButton(
@@ -190,13 +170,30 @@ SizedBox(height: 20,),
   ),
                   ),
               ),
-          
-         
-    
-
-
-
-            
+              
+                Container(
+  width: double.infinity, // Set the width to expand to the available space
+  child: ElevatedButton(
+    onPressed: () {
+      // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
+      
+    },
+    style: ElevatedButton.styleFrom(
+      primary: Color(0xFF0CE25C),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+    child: Container(
+      padding: EdgeInsets.symmetric(vertical: 12), // Adjust the padding as needed
+      child: Text(
+        'Add Medications',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,  color: Colors.black,),
+      ),
+    ),
+  ),
+), 
+                      
             ]),
           )
       ),
