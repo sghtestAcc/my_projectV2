@@ -15,7 +15,8 @@ enum LoginType2 { patientsRegister, caregiversRegister }
 
 class RegisterScreen extends StatefulWidget {
   final LoginType2 registerType;
-  const RegisterScreen({Key? key, required this.registerType}): super(key: key);
+  const RegisterScreen({Key? key, required this.registerType})
+      : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -23,10 +24,11 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final controller = Get.put(RegisterController());
-  // final formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   var formData = GlobalKey<FormState>();
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,22 +80,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                   widget.registerType == LoginType2.patientsRegister ?
-                  TextFormField(
-                    controller: controller.email,
-                    obscureText: false,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    )),
-                  ) :  TextFormField(
-                    controller: controller.email,
-                    obscureText: false,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    )),
-                  ),
+                  widget.registerType == LoginType2.patientsRegister
+                      ? TextFormField(
+                          controller: controller.email,
+                          obscureText: false,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(content: Text('Email is required.')),
+                              );
+                              return 'Email is required.';
+                            } else if (!value.contains('@')) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Invalid email format.')),
+                              );
+                              return 'Invalid email format.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        )
+                      : TextFormField(
+                          controller: controller.email,
+                          obscureText: false,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(content: Text('Email is required.')),
+                              );
+                              return 'Email is required.';
+                            } else if (!value.contains('@')) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Invalid email format.')),
+                              );
+                              return 'Invalid email format.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        ),
                   SizedBox(
                     height: 10,
                   ),
@@ -104,22 +137,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                   widget.registerType == LoginType2.patientsRegister ?
-                  TextFormField(
-                    controller: controller.fullName,
-                    obscureText: false,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    )),
-                  ): TextFormField(
-                    controller: controller.fullName,
-                    obscureText: false,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    )),
-                  ),
+                  widget.registerType == LoginType2.patientsRegister
+                      ? TextFormField(
+                          controller: controller.fullName,
+                          obscureText: false,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Full name is required.')),
+                              );
+                              return 'Full name is required.';
+                            } else if (value.trim().split(' ').length < 2) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Full name should contain at least two words.')),
+                              );
+                              return 'Full name should contain at least two words.';
+                            } else if (!RegExp(
+                                    r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
+                                .hasMatch(value.trim())) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Full name should start with capital letters.')),
+                              );
+                              return 'Full name should start with capital letters.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        )
+                      : TextFormField(
+                          controller: controller.fullName,
+                          obscureText: false,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Full name is required.')),
+                              );
+                              return 'Full name is required.';
+                            } else if (value.trim().split(' ').length < 2) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Full name should contain at least two words.')),
+                              );
+                              return 'Full name should contain at least two words.';
+                            } else if (!RegExp(
+                                    r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
+                                .hasMatch(value.trim())) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Full name should start with capital letters.')),
+                              );
+                              return 'Full name should start with capital letters.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        ),
                   SizedBox(
                     height: 10,
                   ),
@@ -127,24 +213,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     alignment: Alignment.centerLeft,
                     child: Text('Password', style: TextStyle(fontSize: 20)),
                   ),
-                  widget.registerType == LoginType2.patientsRegister ?
-                  TextFormField(
-                     controller: controller.password,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    )),
-                  ): TextFormField(
-                     controller: controller.password,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    )),
-                  ) 
+                  widget.registerType == LoginType2.patientsRegister
+                      ? TextFormField(
+                          controller: controller.password,
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Password is required.')),
+                              );
+                              return 'Password is required.';
+                            } else if (value.length < 6) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Password must be at least 6 characters long.')),
+                              );
+                              return 'Password must be at least 6 characters long.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        )
+                      : TextFormField(
+                          controller: controller.password,
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Password is required.')),
+                              );
+                              return 'Password is required.';
+                            } else if (value.length < 6) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Password must be at least 6 characters long.')),
+                              );
+                              return 'Password must be at least 6 characters long.';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          )),
+                        )
                 ])),
-                
             Expanded(
               child: Stack(
                 children: [
@@ -154,63 +274,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       'assets/images/sghDesign.png',
                     ),
                   ),
-                   widget.registerType == LoginType2.patientsRegister ?
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formData.currentState!.validate()) {
-                            final user = PatientModel(
-                              Email: controller.email.text.trim(),
-                              Name: controller.fullName.text.trim(),
-                              Password: controller.password.text.trim());
-                          UserRepository.instance.createPatientUser(user);
-                          RegisterController.instance.registerP();
-                        }
-                      },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF0CE25C), // NEW
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              12), // Rounded corner radius
+                  widget.registerType == LoginType2.patientsRegister
+                      ? Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (formData.currentState!.validate()) {
+                                final user = PatientModel(
+                                    Email: controller.email.text.trim(),
+                                    Name: controller.fullName.text.trim(),
+                                    Password: controller.password.text.trim());
+                                UserRepository.instance.createPatientUser(user);
+                                RegisterController.instance.registerP();
+                              }
+                            },
+                            child: Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF0CE25C), // NEW
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    12), // Rounded corner radius
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (formData.currentState!.validate()) {
+                                final user2 = CaregiverModel(
+                                    Email: controller.email.text.trim(),
+                                    Name: controller.fullName.text.trim(),
+                                    Password: controller.password.text.trim());
+                                UserRepository.instance
+                                    .createCaregiverUser(user2);
+                                RegisterController.instance.registerC();
+                              }
+                            },
+                            child: Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF0CE25C), // NEW
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    12), // Rounded corner radius
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ): 
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formData.currentState!.validate()) {
-                          final user2 = CaregiverModel(
-                              Email: controller.email.text.trim(),
-                              Name: controller.fullName.text.trim(),
-                              Password: controller.password.text.trim());
-                          UserRepository.instance.createCaregiverUser(user2);
-                          RegisterController.instance.registerC();
-                        }
-                      },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF0CE25C), // NEW
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              12), // Rounded corner radius
-                        ),
-                      ),
-                    ),
-                  ),
                   const Positioned.fill(
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

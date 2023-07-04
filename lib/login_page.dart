@@ -34,6 +34,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final controller = Get.put(LoginController());
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   // String? email;
   // String? password;
@@ -97,6 +99,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: controller.email,
                           obscureText: false,
                           keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(content: Text('Email is required.')),
+                              );
+                              return 'Email is required.';
+                            } else if (!value.contains('@')) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Invalid email format.')),
+                              );
+                              return 'Invalid email format.';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -107,6 +124,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: controller.email,
                           obscureText: false,
                           keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(content: Text('Email is required.')),
+                              );
+                              return 'Email is required.';
+                            } else if (!value.contains('@')) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Invalid email format.')),
+                              );
+                              return 'Invalid email format.';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -127,6 +159,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? TextFormField(
                           controller: controller.password,
                           obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Password is required.')),
+                              );
+                              return 'Password is required.';
+                            } else if (value.length < 6) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Password must be at least 6 characters long.')),
+                              );
+                              return 'Password must be at least 6 characters long.';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                               border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
@@ -135,6 +184,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       : TextFormField(
                           controller: controller.password,
                           obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Password is required.')),
+                              );
+                              return 'Password is required.';
+                            } else if (value.length < 6) {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Password must be at least 6 characters long.')),
+                              );
+                              return 'Password must be at least 6 characters long.';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                               border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
