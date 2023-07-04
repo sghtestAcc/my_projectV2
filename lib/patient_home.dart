@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/models/login_controller.dart';
 import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/patients_Vocalization.dart';
 
 void main() => runApp(MaterialApp(
       title: "App",
@@ -44,7 +45,6 @@ padding: EdgeInsets.all(10.0),
         Text('View more for medication info', style: TextStyle(fontSize: 10))
       ],),
 );
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body:
@@ -115,6 +115,7 @@ padding: EdgeInsets.all(10.0),
                 child:  Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+
                   GestureDetector(
                  onTap: () {
 
@@ -125,7 +126,15 @@ padding: EdgeInsets.all(10.0),
                 width: 90,
                 ),
                 ),
-                   Image.asset('assets/images/mic.png', height: 90, width: 90, ),
+                // PatientsVocalScreen
+                   GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> PatientsVocalScreen()));
+                 },
+                    child: 
+                    Image.asset('assets/images/mic.png', height: 90, width: 90, )
+                    ),
+
                   Image.asset('assets/images/photo-camera.png',  height: 90, width: 90,),
                 ],
               ), 

@@ -154,7 +154,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     controller.email.text.trim(),
                                     controller.password.text.trim());
                               }
-
                               // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                             },
                             child: Text(
