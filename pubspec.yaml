@@ -43,6 +43,8 @@ dependencies:
   google_mlkit_text_recognition: ^0.8.0
   get: ^4.6.5
   google_mlkit_translation: ^0.7.0
+  avatar_glow: ^2.0.2
+  speech_to_text: ^6.3.0
 
 
 dev_dependencies:
