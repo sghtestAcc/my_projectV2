@@ -128,10 +128,6 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                   //   decoration: TextDecoration.underline),),
                   //  ),
            ),
-
-
-
-
            SizedBox(height: 20,),
            if (!textScanning && imageFile == null)
            Container(
@@ -150,6 +146,7 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
  Column(
       children: [
          Text('Translated Medication Label:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+        // Text(scannedText),
          Row(
           children: [
             Expanded(
@@ -157,9 +154,10 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                   padding: const EdgeInsets.all(20),
                   child: TextFormField(
                      style: TextStyle(
-    color: Colors.black, 
-  ),
+                    color: Colors.black, 
+                  ),
                     controller: controller,
+                    maxLines: 1,
                     enabled: false,
                         decoration: InputDecoration(
     hintText: "Your Medication will appear here...",
@@ -197,22 +195,27 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
     }
   }
 
-   void getRecognisedText(XFile image) async {
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+void getRecognisedText(XFile image) async {
+  final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
-    final inputImage = InputImage.fromFilePath(image.path);
+  final inputImage = InputImage.fromFilePath(image.path);
 
-    final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
-  
-    await textRecognizer.close();
-    scannedText = "";
-    for (TextBlock block in recognizedText.blocks) {
-      for (TextLine line in block.lines) {
-        scannedText = controller.text;
-      }
+  final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+
+  await textRecognizer.close();
+
+  scannedText = "";
+  for (TextBlock block in recognizedText.blocks) {
+    for (TextLine line in block.lines) {
+      scannedText += line.text + " ";
     }
-    textScanning = false;
-    setState(() {});
   }
+
+  controller.text = scannedText; // Set the value of the TextEditingController to the scanned text
+
+  textScanning = false;
+  setState(() {});
+}
+
 
 }

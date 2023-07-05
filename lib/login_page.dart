@@ -42,6 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   var formData = GlobalKey<FormState>();
 
+//   void _resetForm() {
+//   formData.currentState?.reset();
+// }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -219,7 +223,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 AuthenticationRepository.instance.loginPUser(
                                     controller.email.text.trim(),
                                     controller.password.text.trim());
-                              }
+                                    formData.currentState?.reset();
+                              } 
                               // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                             },
                             child: Text(
@@ -245,6 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 AuthenticationRepository.instance.loginCUser(
                                     controller.email.text.trim(),
                                     controller.password.text.trim());
+                                     formData.currentState?.reset();
                               }
                               // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                             },

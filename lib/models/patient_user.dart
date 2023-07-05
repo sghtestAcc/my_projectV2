@@ -6,20 +6,12 @@ class PatientModel {
   final String? Email;
   final String? Name;
    final String? Password;
-  // final String? Labels;
-  // final Image? Pills;
-  // final String? Quantity;
-  // final String? Schedules;
   
   const PatientModel({
     this.id,
     required this.Email,
     required this.Name,
     required this.Password,
-    // this.Labels,
-    // this.Pills,
-    // this.Quantity,
-    // this.Schedules
   });
 
   toJson() {
@@ -30,3 +22,16 @@ class PatientModel {
     };
   }
 }
+
+
+  // final String? Labels;
+  // final Image? Pills;
+  // final String? Quantity;
+  // final String? Schedules;
+
+  // this.Labels,
+    // this.Pills,
+    // this.Quantity,
+    // this.Schedules
+
+

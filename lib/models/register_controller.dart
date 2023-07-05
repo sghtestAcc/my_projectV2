@@ -28,6 +28,7 @@ class RegisterController extends GetxController {
       Get.showSnackbar(GetSnackBar(message: error.toString(),));
     }
   }
+  
 
   Future <void> registerC() async {
     String? error = await AuthenticationRepository.instance.registerCUser(

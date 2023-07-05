@@ -287,6 +287,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Password: controller.password.text.trim());
                                 UserRepository.instance.createPatientUser(user);
                                 RegisterController.instance.registerP();
+                                formData.currentState?.reset();
                               }
                             },
                             child: Text(
@@ -313,9 +314,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Email: controller.email.text.trim(),
                                     Name: controller.fullName.text.trim(),
                                     Password: controller.password.text.trim());
-                                UserRepository.instance
-                                    .createCaregiverUser(user2);
+                                UserRepository.instance.createCaregiverUser(user2);
                                 RegisterController.instance.registerC();
+                                formData.currentState?.reset();
                               }
                             },
                             child: Text(

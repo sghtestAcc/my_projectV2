@@ -13,36 +13,114 @@ class UserRepository extends GetxController {
 
   final patientDB = FirebaseFirestore.instance;
 
-  createPatientUser(PatientModel user) async {
-    await patientDB.collection("patient_users").add(user.toJson()).whenComplete(() => 
-      Get.snackbar("Congrats", "A new Account has been created.",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green),
-    )
-    .catchError((error, StackTrace){
-      Get.snackbar("Congrats", "A new Account has been created.",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red);
-      print(error.toString());
-    });
-  }
 
-  createCaregiverUser(CaregiverModel user) async {
-    await patientDB.collection("caregivers_users").add(user.toJson()).whenComplete(() => 
-      Get.snackbar("Congrats", "A new Account has been created.",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green),
-    )
-    .catchError((error, StackTrace){
-      Get.snackbar("Congrats", "A new Account has been created.",
+Future<bool> isCaregiversEmailExists(String email) async {
+  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('caregivers_users');
+  final QuerySnapshot snapshot = await usersCollection.where('Email', isEqualTo: email).get();
+  return snapshot.docs.isNotEmpty; // If the snapshot has documents, email exists
+}
+
+Future<bool> isCaregiversEmailAndPasswordExists(String email, String password) async {
+  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('caregivers_users');
+  final QuerySnapshot snapshot = await usersCollection
+      .where('Email', isEqualTo: email)
+      .where('Password', isEqualTo: password)
+      .get();
+
+  return snapshot.docs.isNotEmpty; // If the snapshot has documents, email and password exist
+}
+
+Future<void> createCaregiverUser(CaregiverModel user) async {
+  final String email = user.Email!;
+  
+  final bool emailExists = await isCaregiversEmailExists(email);
+  if (emailExists) {
+    Get.snackbar(
+      "Error",
+      "Email already exists.",
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red);
-      print(error.toString());
-    });
+      colorText: Colors.red,
+    );
+    return;
   }
+  try {
+    patientDB.collection("caregivers_users").add(user.toJson()).whenComplete(() {
+      Get.snackbar(
+        "Congrats",
+        "A new account has been created.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.1),
+        colorText: Colors.green,
+      );
+    });
+  } catch (error) {
+    Get.snackbar(
+      "Error",
+      "Failed to create a new account.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+    print(error.toString());
+  }
+}
+
+
+
+Future<bool> isEmailExists(String email) async {
+  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('patient_users');
+  final QuerySnapshot snapshot = await usersCollection.where('Email', isEqualTo: email).get();
+  
+  return snapshot.docs.isNotEmpty; // If the snapshot has documents, email exists
+}
+
+
+Future<bool> isPatientEmailAndPasswordExists(String email, String password) async {
+  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('patient_users');
+  final QuerySnapshot snapshot = await usersCollection
+      .where('Email', isEqualTo: email)
+      .where('Password', isEqualTo: password)
+      .get();
+
+  return snapshot.docs.isNotEmpty; // If the snapshot has documents, email and password exist
+}
+
+
+Future<void> createPatientUser(PatientModel user) async {
+  final String email = user.Email!;
+  
+  final bool emailExists = await isEmailExists(email);
+  if (emailExists) {
+    Get.snackbar(
+      "Error",
+      "Email already exists.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+    return;
+  }
+  try {
+    patientDB.collection("patient_users").add(user.toJson()).whenComplete(() {
+      Get.snackbar(
+        "Congrats",
+        "A new account has been created.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.1),
+        colorText: Colors.green,
+      );
+    });
+  } catch (error) {
+    Get.snackbar(
+      "Error",
+      "Failed to create a new account.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+    print(error.toString());
+  }
+}
 
 }

@@ -1,16 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:my_project/camera_home_patient.dart';
 import 'package:my_project/main.dart';
 import 'package:my_project/models/login_failure.dart';
 import 'package:my_project/models/register_failure.dart';
-import 'package:my_project/patient_home.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_project/patients_upload.dart';
 import 'package:my_project/register_page.dart';
 
 import '../navigation.tab.dart';
+import 'package:my_project/models/user_repo.dart';
 
 void main() {
   Get.put(AuthenticationRepository());
@@ -21,6 +20,8 @@ class AuthenticationRepository extends GetxController {
 
   final _auth = FirebaseAuth.instance;
   late final Rx<User?> firebaseUser;
+
+    final  userRepofiles = Get.put(UserRepository());
 
   @override
   void onReady() {
@@ -35,40 +36,83 @@ class AuthenticationRepository extends GetxController {
   //       : Get.offAll(() => NavigatorBar());
   // }
 
-  Future<String?> registerPUser(String email, String password) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-          firebaseUser.value != null ? Get.offAll(() => HomeScreen()) : Get.to(() => RegisterScreen(registerType: LoginType2.patientsRegister));
-    } on FirebaseAuthException catch (e) {
-      final ex = RegisterFailure.fromCode(e.code);
-      return ex.message;
-    } catch (ex) {
-      const ex = RegisterFailure();
-      return ex.message;
-    }
-    return null;
-  }
 
-  Future<String?> registerCUser(String email, String password) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-          firebaseUser.value != null ? Get.offAll(() => HomeScreen()) : Get.to(() => RegisterScreen(registerType: LoginType2.caregiversRegister));
-    } on FirebaseAuthException catch (e) {
-      final ex = RegisterFailure.fromCode(e.code);
-      return ex.message;
-    } catch (ex) {
-      const ex = RegisterFailure();
-      return ex.message;
+Future<String?> registerPUser(String email, String password) async {
+  try {
+    final bool emailExists = await userRepofiles.isEmailExists(email);
+
+    if (emailExists) {
+      return null;
     }
-    return null;
+
+    await _auth.createUserWithEmailAndPassword(email: email, password: password);
+
+    if (firebaseUser.value != null) {
+      Get.offAll(() => HomeScreen());
+    }
+  } on FirebaseAuthException catch (e) {
+    final ex = RegisterFailure.fromCode(e.code);
+    return ex.message;
+  } catch (ex) {
+    const ex = RegisterFailure();
+    return ex.message;
   }
+  return null;
+}
+
+Future<String?> registerCUser(String email, String password) async {
+  try {
+    // Perform email validation
+    // if (!userRepofiles.validateEmail(email)) {
+    //   return 'Invalid email format.';
+    // }
+
+    // Check if the email already exists
+    final bool emailExists = await userRepofiles.isCaregiversEmailExists(email);
+
+    if (emailExists) {
+      return null;
+      
+      
+    }
+
+    await _auth.createUserWithEmailAndPassword(email: email, password: password);
+
+    if (firebaseUser.value != null) {
+      Get.offAll(() => HomeScreen());
+    }
+  } on FirebaseAuthException catch (e) {
+    final ex = RegisterFailure.fromCode(e.code);
+    return ex.message;
+  } catch (ex) {
+    const ex = RegisterFailure();
+    return ex.message;
+  }
+  return null;
+}
+
+
 
   Future<String?> loginPUser(String email, String password) async {
     try {
+
+      final bool emailExists = await userRepofiles.isPatientEmailAndPasswordExists(email,password);
+
+    if (!emailExists) {
+      Get.snackbar(
+       'Invalid',
+      'Login information, please sign an account',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+      return null;
+    }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
+      if(firebaseUser.value != null) {
+            Get.to(() => PatientUploadScreen());
+      }
+      // firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
       final ex = LogInFailure.fromCode(e.code);
       return ex.message;
@@ -77,25 +121,29 @@ class AuthenticationRepository extends GetxController {
       return ex.message;
     }
     return null;
-
-    // Future<String?> loginPUser(String email, String password) async {
-    //   try {
-    //     await auth.signInWithEmailAndPassword(email: email, password: password);
-    //   } on FirebaseAuthException catch (e){
-    //     final ex = LogInFailure.fromCode(e.code);
-    //     return ex.message;
-    //   } catch () {
-    //     const ex = LogInFailure();
-    //     return ex.message;
-    //   }
-    //   return null;
-    // }
   }
+
 
   Future<String?> loginCUser(String email, String password) async {
     try {
+
+      final bool emailExists = await userRepofiles.isCaregiversEmailAndPasswordExists(email,password);
+
+    if (!emailExists) {
+      Get.snackbar(
+       'Invalid',
+      'Login information, please sign an account',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+      return null;
+    }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-       firebaseUser.value != null ? Get.offAll(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,)) : Get.to(() => HomeScreen());
+      if(firebaseUser.value != null) {
+            Get.to(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,));
+      }
+      // firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
       final ex = LogInFailure.fromCode(e.code);
       return ex.message;
@@ -105,6 +153,21 @@ class AuthenticationRepository extends GetxController {
     }
     return null;
   }
+  // isCaregiversEmailAndPasswordExists
+
+  // Future<String?> loginCUser(String email, String password) async {
+  //   try {
+  //     await _auth.signInWithEmailAndPassword(email: email, password: password);
+  //      firebaseUser.value != null ? Get.offAll(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,)) : Get.to(() => HomeScreen());
+  //   } on FirebaseAuthException catch (e) {
+  //     final ex = LogInFailure.fromCode(e.code);
+  //     return ex.message;
+  //   } catch (ex) {
+  //     const ex = LogInFailure();
+  //     return ex.message;
+  //   }
+  //   return null;
+  // }
 
 
 Future<void> logout() async {
@@ -128,7 +191,4 @@ Future<void> logout() async {
   }
 }
 
-
-
-  // createUserWithEmailAndPassword(String email, String password) {}
 }

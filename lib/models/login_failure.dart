@@ -18,6 +18,5 @@ class LogInFailure {
         return const LogInFailure();
     }
   }
-
   static fromCode(String code) {}
 }
