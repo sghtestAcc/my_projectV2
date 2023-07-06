@@ -41,7 +41,6 @@ class _LoginScreenState extends State<LoginScreen> {
   // String? password;
 
   var formData = GlobalKey<FormState>();
-
 //   void _resetForm() {
 //   formData.currentState?.reset();
 // }

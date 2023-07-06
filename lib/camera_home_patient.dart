@@ -23,6 +23,7 @@ void main() => runApp(MaterialApp(
 class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
   @override
 
+
   bool textScanning = false;
 
   XFile? imageFile;

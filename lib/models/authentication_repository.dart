@@ -5,7 +5,7 @@ import 'package:my_project/main.dart';
 import 'package:my_project/models/login_failure.dart';
 import 'package:my_project/models/register_failure.dart';
 
-import 'package:my_project/patients_upload.dart';
+import 'package:my_project/patients_upload_meds.dart';
 import 'package:my_project/register_page.dart';
 
 import '../navigation.tab.dart';
@@ -110,7 +110,7 @@ Future<String?> registerCUser(String email, String password) async {
     }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if(firebaseUser.value != null) {
-            Get.to(() => PatientUploadScreen());
+            Get.to(() => PatientUploadMedsScreen());
       }
       // firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {

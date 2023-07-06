@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:my_project/navigation_drawer.dart';
 
 class PatientsVocalScreen extends StatefulWidget {
   const PatientsVocalScreen({super.key});
@@ -89,10 +90,14 @@ Widget buildCard(int index) => Container(
    @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Vocalization'),
-      centerTitle: true,
-      ),
+      appBar: 
+      AppBar(
+          title: Text('Vocalization', style: TextStyle(color: Colors.black),),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black),
+          centerTitle: true,
+        ),
       body: Container(
         child: Column(
           children: [
@@ -210,6 +215,7 @@ Container(
               ],)
           ]),
       ),
+      endDrawer: AppDrawerNavigation(loginType: LoginType5.caregiversNavgation),
     );
   }
 }

@@ -95,22 +95,15 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-    color: Colors.black, // Set the desired color here
-  ),
-        elevation: 0,
-        automaticallyImplyLeading: true,
-        title: const Text(
-          'Communications',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+      appBar: 
+       AppBar(
+          title: Text('Communications', style: TextStyle(color: Colors.black,fontSize: 25),),
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black),
+          centerTitle: true,
         ),
-        titleTextStyle: const TextStyle(
-          color: Colors.black,
-        ),
-        centerTitle: true, // Set centerTitle to false for left alignment
-      ),
-// resizeToAvoidBottomInset: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -268,7 +261,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           ),
         ],
       ),
-         endDrawer: AppDrawerNavigation(),
+         endDrawer: AppDrawerNavigation(loginType: LoginType5.patientsNavgation),
     );
   }
 }

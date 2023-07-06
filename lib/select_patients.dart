@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:my_project/navigation_drawer.dart';
 
 class SelectPatientScreen extends StatefulWidget {
   const SelectPatientScreen({super.key});
@@ -42,9 +43,17 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
  Widget buildCard2(int index) => Container(
 padding: EdgeInsets.all(10.0),
   decoration: const BoxDecoration(
-    borderRadius: BorderRadius.all(Radius.circular(22)),
-    color: Colors.grey,
-  ),
+          borderRadius: BorderRadius.all(Radius.circular(22)),
+          color: Color(0xDDF6F6F6),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.25),
+              offset: Offset(0, 1),
+              blurRadius: 4,
+              spreadRadius: 0,
+            ),
+          ],
+        ),
   height: 75,
     child: Column(
              crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,18 +68,13 @@ padding: EdgeInsets.all(10.0),
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar:AppBar(
-  toolbarHeight: 40,
-  elevation: 0,
-  automaticallyImplyLeading: false,
-  title: Text(
-    'Patients',
-    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-  ),
-  titleTextStyle: TextStyle(
-    color: Colors.black,
-  ),
-  centerTitle: true, // Set centerTitle to false for left alignment
-),
+          title: Text('Patients', style: TextStyle(color: Colors.black,fontSize: 25),),
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black),
+          centerTitle: true,
+        ),
       body: Container(
         child: Column(
           children: [
@@ -113,6 +117,7 @@ padding: EdgeInsets.all(10.0),
              ) 
         ]),
       ),
+      endDrawer: AppDrawerNavigation(loginType: LoginType5.caregiversNavgation),
     );
   }
 }

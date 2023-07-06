@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/models/login_controller.dart';
 import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/patients_Prescriptions.dart';
 import 'package:my_project/patients_Vocalization.dart';
 import 'package:my_project/models/authentication_repository.dart';
 
@@ -33,9 +34,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
      Widget buildCard(int index) => Container(
 padding: EdgeInsets.all(10.0),
   decoration: const BoxDecoration(
-    borderRadius: BorderRadius.all(Radius.circular(22)),
-    color: Colors.grey,
-  ),
+          borderRadius: BorderRadius.all(Radius.circular(22)),
+          color: Color(0xDDF6F6F6),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.5),
+              offset: Offset(0, 1),
+              blurRadius: 4,
+              spreadRadius: 0,
+            ),
+          ],
+        ),
   height: 75,
     child: Column(
              crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,6 +56,16 @@ padding: EdgeInsets.all(10.0),
       ],),
 );
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(50),
+        child: AppBar(
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black),
+        ),
+      ),
       resizeToAvoidBottomInset: false,
       body:
       Container(
@@ -72,7 +91,7 @@ padding: EdgeInsets.all(10.0),
                 mainAxisAlignment: MainAxisAlignment.end ,
                crossAxisAlignment: CrossAxisAlignment.start,
                children: [
-                Text("Hi Welcome Patient"),
+                Text("Hi Welcome Patient", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                 // Text('Hi Welcome' + patientUser.Name!;, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
                 Text('How can I help you today?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),  
                ],
@@ -130,7 +149,7 @@ padding: EdgeInsets.all(10.0),
 
                   GestureDetector(
                  onTap: () {
-
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> PatientsPrescripScreen()));
                  },
                   child: Image.asset(
                 'assets/images/drugs.png',
@@ -198,7 +217,11 @@ padding: EdgeInsets.all(10.0),
           ],
         ),
       ),
-       drawer: AppDrawerNavigation(),
+    endDrawer: widget.loginType == loginType3.patientsHomeScreen
+  ? AppDrawerNavigation(loginType: LoginType5.patientsNavgation)
+  : AppDrawerNavigation(loginType: LoginType5.caregiversNavgation),
+      //  NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,));
+
     );
   }
 }
