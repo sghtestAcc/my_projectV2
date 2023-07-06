@@ -1,8 +1,9 @@
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_project/navigation.tab.dart';
 
@@ -29,6 +30,7 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
   XFile? imageFile;
 
   String scannedText = "";
+  File? croppedImageFile;
 
   TextEditingController controller = TextEditingController();
 
@@ -70,7 +72,13 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
 
          ElevatedButton(
           onPressed: () {
-              getImage(ImageSource.camera);
+              // getImage(ImageSource.camera);
+              // getImage(ImageSource.camera);
+              pickImage(source: ImageSource.camera).then((value) {
+                if(value != '') {
+                  imageCropperView(value, context);
+                }
+              });
             },
            style: 
            ElevatedButton.styleFrom(
@@ -85,7 +93,13 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
     SizedBox(height: 20,),
            ElevatedButton(
           onPressed: () {        
-              getImage(ImageSource.gallery);
+              // getImage(ImageSource.gallery);
+              // pickImage(source: ImageSource.gallery);
+              pickImage(source: ImageSource.gallery).then((value) {
+                if(value != '') {
+                  imageCropperView(value, context);
+                }
+              });
             },
            style: 
            ElevatedButton.styleFrom(
@@ -98,10 +112,8 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
            child: Text('Photo Files', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
            ),
     SizedBox(height: 20,),
-
             ElevatedButton(
           onPressed: () {
-            
               // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
               Navigator.push(context, MaterialPageRoute(builder: (context)=> NavigatorBar(loginType: LoginType4.patientsLoginBottomTab,)));
             },
@@ -115,19 +127,6 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
          ),
         ),
            child: Text('Continue', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
-            //  GestureDetector(
-                  //     onTap: () {
-                  //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
-                  //       // Text(widget.loginType == LoginType.patientsLogin
-                  //       // ? 'Patient Login'
-                  //       // : 'Caregiver Login', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
-
-                  //          Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(registerType: LoginType2.caregiversRegister)));
-                  //     },
-                  //     child: Text('Dont have an account? Sign up', style: TextStyle(
-                  //   fontSize: 20,
-                  //   decoration: TextDecoration.underline),),
-                  //  ),
            ),
            SizedBox(height: 20,),
            if (!textScanning && imageFile == null)
@@ -143,6 +142,29 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
     child: Image.file(File(imageFile!.path),
     fit: BoxFit.fitWidth,),
   ), 
+  //  if (imageFile != null) 
+  //     Container(
+  //       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+  //       height: 200,
+  //       child: Image.file(
+  //         File(imageFile!.path),
+  //         fit: BoxFit.fitWidth,
+  //       ),
+  //     ),
+  //   if (croppedImageFile != null) 
+  //     Container(
+  //       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+  //       height: 200,
+  //       child: Image.file(File(croppedImageFile!.path),
+  //         fit: BoxFit.fitWidth,
+  //       ),
+  //     ),
+  //      Container(
+  //       width: 200,
+  //       height: 200,
+  //       color: Colors.grey[300]!,
+  //     ),
+    
   SizedBox(height: 10,),
  Column(
       children: [
@@ -179,22 +201,76 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
     );
   }
 
-  void getImage(ImageSource? source) async {
-     try {
-      final pickedImage = await ImagePicker().pickImage(source: source!);
-      if (pickedImage != null) {
-        textScanning = true;
-        imageFile = pickedImage;
-        setState(() {});
-        getRecognisedText(pickedImage);
-      }
-    } catch (e) {
-      textScanning = false;
-      imageFile = null;
-	  scannedText = "Error occured while scanning";
-      setState(() {});
+// ({ImageSource? source})
+
+ Future<void> imageCropperView(String? path,BuildContext context) async {
+
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: path!,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Cropper for first image',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'cropper',
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if(croppedFile != null) {
+      log('image cropped');
+      // return imageFile =croppedFile.path;
+      // setState(() {
+      //   imageFile = null;
+      //   croppedImageFile = croppedFile;
+      // });
+    } else {
+      // return '';
+      log('do nothing');
     }
   }
+
+
+
+  Future<String> pickImage({ImageSource? source}) async {
+  final picker = ImagePicker();
+  String path = '';
+  try {
+    final getImage = await picker.pickImage(source: source!);
+    if (getImage != null) {
+      path = '' ;
+      textScanning = true;
+      imageFile = getImage;
+      path = getImage.path;
+      setState(() {});
+      getRecognisedText(getImage);
+    } else {
+      path = '';
+    }
+  } catch (e) {
+    textScanning = false;
+     imageFile = null;
+	    scannedText = "Error occured while scanning";
+      setState(() {});
+
+    log(e.toString());
+  }
+
+  return path;
+}
 
 void getRecognisedText(XFile image) async {
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
@@ -211,7 +287,7 @@ void getRecognisedText(XFile image) async {
       scannedText += line.text + " ";
     }
   }
-
+  
   controller.text = scannedText; // Set the value of the TextEditingController to the scanned text
 
   textScanning = false;
@@ -219,4 +295,21 @@ void getRecognisedText(XFile image) async {
 }
 
 
+  // Future<String> getImage({ImageSource? source}) async {
+  //    String path = '';
+  //    try {
+  //     final pickedImage = await ImagePicker().pickImage(source: source!);
+  //     if (pickedImage != null) {
+  //       textScanning = true;
+  //       imageFile = pickedImage;
+  //       setState(() {});
+  //       getRecognisedText(pickedImage);
+  //     }
+  //   } catch (e) {
+  //     textScanning = false;
+  //     imageFile = null;
+	//     scannedText = "Error occured while scanning";
+  //     setState(() {});
+  //   }
+  // }
 }

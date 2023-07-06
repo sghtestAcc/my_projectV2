@@ -37,6 +37,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         _checkedList[index] = value!;
       });
     },
+    activeColor: Color(0xFF0CE25C), 
   ),
 );
 
@@ -79,25 +80,48 @@ padding: EdgeInsets.all(10.0),
         child: Column(
           children: [
             Container(
-              color: Color(0xFF9EE8BF),
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(20, 30, 0, 30),
-              child: Text('Select Patient', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold) ,),),
-              Container(
-                height: 200,
-                child: Expanded(
-                   child: ListView.builder(
-                     itemCount: 5,
-                     itemBuilder: (context, index) {
-                      return buildCard(index);
-                     },
-                   ),    
-                ),
-              ),
+  color: Color(0xFF9EE8BF),
+  width: double.infinity,
+  padding: EdgeInsets.fromLTRB(20, 30, 0, 30),
+  child: Text(
+    'Select Patient',
+    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+  ),
+),
+Expanded(
+  child: ListView.builder(
+    itemCount: 6,
+    itemBuilder: (context, index) {
+      return buildCard(index);
+    },
+  ),
+),
+
               
-             ElevatedButton(onPressed: () {}, child: Text('add Patients')),
               Container(
-                padding: EdgeInsets.all(20.0),
+  padding: EdgeInsets.fromLTRB(50, 20, 50, 20),
+  child: ElevatedButton(
+    onPressed: () {
+      // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
+    },
+    child: Text(
+      'Add Patients',
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    style: ElevatedButton.styleFrom(
+      primary: Color(0xFF0CE25C), // Button background color
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Rounded corner radius
+      ),
+      minimumSize: Size(double.infinity, 40), // Adjust the width by modifying the minimumSize property
+    ),
+  ),
+),
+              Container(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text('Patient Info Medication List', style: TextStyle(fontSize: 20)),
