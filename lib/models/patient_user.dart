@@ -1,4 +1,5 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class PatientModel {
@@ -20,6 +21,17 @@ class PatientModel {
       'Email' : Email,
       'Password' : Password,
     };
+  }
+
+  factory PatientModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document){
+    final data = document.data()!;
+    
+    return PatientModel(
+      id: document.id,
+      Email: data["Email"],
+      Password: data["Password"],
+      Name: data["Name"]
+    );
   }
 }
 
