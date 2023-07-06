@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/camera_home_patient.dart';
 import 'package:my_project/navigation_drawer.dart';
-import 'package:my_project/upload%20Meds_schedule.dart';
 
 void main() => runApp(MaterialApp(
       title: "App",
@@ -122,6 +121,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
