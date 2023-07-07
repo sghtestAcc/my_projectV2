@@ -15,7 +15,8 @@ enum LoginType2 { patientsRegister, caregiversRegister }
 
 class RegisterScreen extends StatefulWidget {
   final LoginType2 registerType;
-  const RegisterScreen({Key? key, required this.registerType}): super(key: key);
+  const RegisterScreen({Key? key, required this.registerType})
+      : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -313,7 +314,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Email: controller.email.text.trim(),
                                     Name: controller.fullName.text.trim(),
                                     Password: controller.password.text.trim());
-                                UserRepository.instance.createCaregiverUser(user2);
+                                UserRepository.instance
+                                    .createCaregiverUser(user2);
                                 RegisterController.instance.registerC();
                                 formData.currentState?.reset();
                               }

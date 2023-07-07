@@ -21,7 +21,7 @@ class AuthenticationRepository extends GetxController {
   final _auth = FirebaseAuth.instance;
   late final Rx<User?> firebaseUser;
 
-    final  userRepofiles = Get.put(UserRepository());
+  final userRepofiles = Get.put(UserRepository());
 
   @override
   void onReady() {
@@ -36,81 +36,79 @@ class AuthenticationRepository extends GetxController {
   //       : Get.offAll(() => NavigatorBar());
   // }
 
+  Future<String?> registerPUser(String email, String password) async {
+    try {
+      final bool emailExists = await userRepofiles.isEmailExists(email);
 
-Future<String?> registerPUser(String email, String password) async {
-  try {
-    final bool emailExists = await userRepofiles.isEmailExists(email);
+      if (emailExists) {
+        return null;
+      }
 
-    if (emailExists) {
-      return null;
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+
+      if (firebaseUser.value != null) {
+        Get.offAll(() => HomeScreen());
+      }
+    } on FirebaseAuthException catch (e) {
+      final ex = RegisterFailure.fromCode(e.code);
+      return ex.message;
+    } catch (ex) {
+      const ex = RegisterFailure();
+      return ex.message;
     }
-
-    await _auth.createUserWithEmailAndPassword(email: email, password: password);
-
-    if (firebaseUser.value != null) {
-      Get.offAll(() => HomeScreen());
-    }
-  } on FirebaseAuthException catch (e) {
-    final ex = RegisterFailure.fromCode(e.code);
-    return ex.message;
-  } catch (ex) {
-    const ex = RegisterFailure();
-    return ex.message;
+    return null;
   }
-  return null;
-}
 
-Future<String?> registerCUser(String email, String password) async {
-  try {
-    // Perform email validation
-    // if (!userRepofiles.validateEmail(email)) {
-    //   return 'Invalid email format.';
-    // }
+  Future<String?> registerCUser(String email, String password) async {
+    try {
+      // Perform email validation
+      // if (!userRepofiles.validateEmail(email)) {
+      //   return 'Invalid email format.';
+      // }
 
-    // Check if the email already exists
-    final bool emailExists = await userRepofiles.isCaregiversEmailExists(email);
+      // Check if the email already exists
+      final bool emailExists =
+          await userRepofiles.isCaregiversEmailExists(email);
 
-    if (emailExists) {
-      return null;
-      
-      
+      if (emailExists) {
+        return null;
+      }
+
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+
+      if (firebaseUser.value != null) {
+        Get.offAll(() => HomeScreen());
+      }
+    } on FirebaseAuthException catch (e) {
+      final ex = RegisterFailure.fromCode(e.code);
+      return ex.message;
+    } catch (ex) {
+      const ex = RegisterFailure();
+      return ex.message;
     }
-
-    await _auth.createUserWithEmailAndPassword(email: email, password: password);
-
-    if (firebaseUser.value != null) {
-      Get.offAll(() => HomeScreen());
-    }
-  } on FirebaseAuthException catch (e) {
-    final ex = RegisterFailure.fromCode(e.code);
-    return ex.message;
-  } catch (ex) {
-    const ex = RegisterFailure();
-    return ex.message;
+    return null;
   }
-  return null;
-}
-
-
 
   Future<String?> loginPUser(String email, String password) async {
     try {
+      final bool emailExists =
+          await userRepofiles.isPatientEmailAndPasswordExists(email, password);
 
-      final bool emailExists = await userRepofiles.isPatientEmailAndPasswordExists(email,password);
-
-    if (!emailExists) {
-      Get.snackbar(
-       'Invalid',
-      'Login information, please sign an account',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
-    );
-      return null;
-    }
+      if (!emailExists) {
+        Get.snackbar(
+          'Invalid',
+          'Login information, please sign an account',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent.withOpacity(0.1),
+          colorText: Colors.red,
+        );
+        return null;
+      }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      if(firebaseUser.value != null) {
-            Get.to(() => PatientUploadMedsScreen());
+      if (firebaseUser.value != null) {
+        Get.to(() => PatientUploadMedsScreen());
       }
       // firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
@@ -123,25 +121,26 @@ Future<String?> registerCUser(String email, String password) async {
     return null;
   }
 
-
   Future<String?> loginCUser(String email, String password) async {
     try {
+      final bool emailExists = await userRepofiles
+          .isCaregiversEmailAndPasswordExists(email, password);
 
-      final bool emailExists = await userRepofiles.isCaregiversEmailAndPasswordExists(email,password);
-
-    if (!emailExists) {
-      Get.snackbar(
-       'Invalid',
-      'Login information, please sign an account',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
-    );
-      return null;
-    }
+      if (!emailExists) {
+        Get.snackbar(
+          'Invalid',
+          'Login information, please sign an account',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent.withOpacity(0.1),
+          colorText: Colors.red,
+        );
+        return null;
+      }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      if(firebaseUser.value != null) {
-            Get.to(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,));
+      if (firebaseUser.value != null) {
+        Get.to(() => NavigatorBar(
+              loginType: LoginType4.caregiversLoginBottomTab,
+            ));
       }
       // firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
@@ -169,26 +168,24 @@ Future<String?> registerCUser(String email, String password) async {
   //   return null;
   // }
 
-
-Future<void> logout() async {
-  try {
-    if (firebaseUser.value != null) {
-      await _auth.signOut();
-      Get.offAll(HomeScreen());
+  Future<void> logout() async {
+    try {
+      if (firebaseUser.value != null) {
+        await _auth.signOut();
+        Get.offAll(HomeScreen());
+        Get.snackbar(
+          'Logout',
+          'You have been successfully logged out',
+          duration: Duration(seconds: 2),
+        );
+      }
+    } catch (e) {
+      print('Logout error: $e');
       Get.snackbar(
-        'Logout',
-        'You have been successfully logged out',
+        'Error',
+        'An error occurred while logging out',
         duration: Duration(seconds: 2),
       );
     }
-  } catch (e) {
-    print('Logout error: $e');
-    Get.snackbar(
-      'Error',
-      'An error occurred while logging out',
-      duration: Duration(seconds: 2),
-    );
   }
-}
-
 }

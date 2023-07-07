@@ -21,26 +21,27 @@ class RegisterController extends GetxController {
   //     Get.showSnackbar(GetSnackBar(message: error.toString(),));
   //   }
   // }
-  Future <void> registerP() async {
-    String? error = await AuthenticationRepository.instance.registerPUser(
-      email.text.trim(), password.text.trim());
-    if(error != null) {
-      Get.showSnackbar(GetSnackBar(message: error.toString(),));
+  Future<void> registerP() async {
+    String? error = await AuthenticationRepository.instance
+        .registerPUser(email.text.trim(), password.text.trim());
+    if (error != null) {
+      Get.showSnackbar(GetSnackBar(
+        message: error.toString(),
+      ));
     }
   }
-  
 
-  Future <void> registerC() async {
-    String? error = await AuthenticationRepository.instance.registerCUser(
-      email.text.trim(), password.text.trim());
-    if(error != null) {
-      Get.showSnackbar(GetSnackBar(message: error.toString(),));
+  Future<void> registerC() async {
+    String? error = await AuthenticationRepository.instance
+        .registerCUser(email.text.trim(), password.text.trim());
+    if (error != null) {
+      Get.showSnackbar(GetSnackBar(
+        message: error.toString(),
+      ));
     }
   }
 
   // Future<void> createUser(PatientModel user) async {
   //   await userRepo.createPatientUser(user);
   // }
-
-
 }

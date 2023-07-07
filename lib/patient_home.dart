@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:my_project/caregiver_prescription.dart';
+import 'package:my_project/caregiver_vocal.dart';
 import 'package:my_project/models/login_controller.dart';
 import 'package:my_project/models/patient_user.dart';
 import 'package:my_project/models/select_patient_controller.dart';
@@ -349,15 +351,33 @@ Container(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Image.asset(
-                          'assets/images/drugs.png',
-                          height: 90,
-                          width: 90,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        CaregiverPrescription()));
+                          },
+                          child: Image.asset(
+                            'assets/images/drugs.png',
+                            height: 90,
+                            width: 90,
+                          ),
                         ),
-                        Image.asset(
-                          'assets/images/mic.png',
-                          height: 90,
-                          width: 90,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        CaregviersVocalScreen()));
+                          },
+                          child: Image.asset(
+                            'assets/images/mic.png',
+                            height: 90,
+                            width: 90,
+                          ),
                         ),
                         Image.asset(
                           'assets/images/photo-camera.png',

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_project/navigation.tab.dart';
 import 'package:my_project/navigation_drawer.dart';
 
-class PatientsPrescripScreen extends StatelessWidget {
-  const PatientsPrescripScreen({super.key});
+class CaregiverPrescription extends StatelessWidget {
+  const CaregiverPrescription({super.key});
   // PatientHomeScreen
 
   @override
