@@ -32,7 +32,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   final controller = Get.put(SelectPatientController());
 
 bool isDropdownOpen = false;
-  //  List<int> values = [2, 4, 6, 8, 10];
+
 
   @override
   Widget build(BuildContext context) {
@@ -119,68 +119,6 @@ Container(
   ),
 );
 
-// Container(
-//   padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-//   decoration: const BoxDecoration(
-//     borderRadius: BorderRadius.all(Radius.circular(22)),
-//     color: Color(0xDDF6F6F6),
-//     boxShadow: [
-//       BoxShadow(
-//         color: Color.fromRGBO(0, 0, 0, 0.5),
-//         offset: Offset(0, 1),
-//         blurRadius: 4,
-//         spreadRadius: 0,
-//       ),
-//     ],
-//   ),
-//   child: Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Text(
-//         'Patient $index',
-//         style: TextStyle(fontSize: 15),
-//       ),
-//       Text('phoneNumber $index', style: TextStyle(fontSize: 12)),
-//       Row(
-//         children: [
-//           Text(
-//             'View more for medication info',
-//             style: TextStyle(fontSize: 10),
-//           ),
-//           IconButton(
-//             onPressed: () {
-//               setState(() {
-//                 isDropdownOpen = !isDropdownOpen;
-//               });
-//             },
-//             icon: Icon(isDropdownOpen ? Icons.expand_less : Icons.expand_more),
-//           ),
-//         ],
-//       ),
-//       if (isDropdownOpen)
-//         Column(
-//   crossAxisAlignment: CrossAxisAlignment.start,
-//   children: [
-//     ListView.builder(
-//       shrinkWrap: true,
-//       physics: NeverScrollableScrollPhysics(),
-//       itemCount: values.length,
-//       itemBuilder: (context, index) {
-//         int multipliedValue = values[index] * index;
-//         return Text(
-//           'Value at index $index: $multipliedValue',
-//           style: TextStyle(fontSize: 12),
-//         );
-//       },
-//     ),
-//   ],
-// ),
-
-//     ],
-//   ),
-// );
-
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
@@ -259,7 +197,6 @@ Container(
     }
   },
 )
-
                 : Container(
                     child: Stack(alignment: Alignment.center, children: [
                     Image.asset(

@@ -35,7 +35,6 @@ class UserRepository extends GetxController {
 
   Future<void> createCaregiverUser(CaregiverModel user) async {
     final String email = user.Email!;
-
     final bool emailExists = await isCaregiversEmailExists(email);
     if (emailExists) {
       Get.snackbar(
@@ -72,6 +71,8 @@ class UserRepository extends GetxController {
     }
   }
 
+
+
   Future<bool> isEmailExists(String email) async {
     final CollectionReference usersCollection =
         FirebaseFirestore.instance.collection('patient_users');
@@ -95,6 +96,8 @@ class UserRepository extends GetxController {
         .isNotEmpty; // If the snapshot has documents, email and password exist
   }
 
+
+//Create patient users function
   Future<void> createPatientUser(PatientModel user) async {
     final String email = user.Email!;
 
@@ -130,6 +133,72 @@ class UserRepository extends GetxController {
       print(error.toString());
     }
   }
+
+
+//  Future<bool> isEmailExists2(String email) async {
+//     final CollectionReference usersCollection =
+//         FirebaseFirestore.instance.collection('patient_users');
+//     final QuerySnapshot snapshot =
+//         await usersCollection.where('Email', isEqualTo: email).get();
+
+//     return snapshot.docs.isNotEmpty; // If the snapshot has documents, email exists
+//   }
+
+//   Future<void> addUserEmailToCollection(String email) async {
+//   User? currentUser = FirebaseAuth.instance.currentUser;
+//   String? currentEmail = currentUser?.email;
+
+//   CollectionReference patientUsersCollection =
+//       FirebaseFirestore.instance.collection('patient_users');
+//   CollectionReference questionsUsersCollection =
+//       FirebaseFirestore.instance.collection('questions_users');
+
+//   if (email == currentEmail) {
+//     await patientUsersCollection.add({'email': email});
+//   } else {
+//     await questionsUsersCollection.add({'email': email});
+//   }
+// }
+
+
+// //create patients questions function
+//    Future<void> createPatientUserQuestions(PatientModel user) async {
+//     final String email = user.Email!;
+//     final addUserEmailToCollection = await isEmailExists(email);
+//     if(addUserEmailToCollection) {
+//     try {
+//       patientDB.collection("patient_users/questions_users").add(user.toJson()).whenComplete(() {
+//         Get.snackbar(
+//           "Congrats",
+//           "A new question has been created.",
+//           snackPosition: SnackPosition.BOTTOM,
+//           backgroundColor: Colors.green.withOpacity(0.1),
+//           colorText: Colors.green,
+//         );
+//       });
+//     } catch (error) {
+//       Get.snackbar(
+//         "Error",
+//         "Failed to create a new question.",
+//         snackPosition: SnackPosition.BOTTOM,
+//         backgroundColor: Colors.redAccent.withOpacity(0.1),
+//         colorText: Colors.red,
+//       );
+//       print(error.toString());
+//     }
+//     return;
+//    }
+//   }
+
+  // Future<PatientModel> getPatientDetailsQuestions(String Questions) async {
+  //   final snapshot = await patientDB
+  //       .collection("patient_users")
+  //       .where("Questions", isEqualTo: Questions)
+  //       .get();
+  //   final patientData =
+  //       snapshot.docs.map((e) => PatientModel.fromSnapshot(e)).single;
+  //   return patientData;
+  // }
 
   Future<PatientModel> getPatientDetails(String Email) async {
     final snapshot = await patientDB
