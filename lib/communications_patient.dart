@@ -5,13 +5,21 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:my_project/add_questions_modal.dart';
 import 'package:my_project/navigation_drawer.dart';
 
+
+enum loginType6 { patientsCommunicationScreen, caregiversCommunicationScreen }
+
 class CommunicationsScreen extends StatefulWidget {
   // LoginScreen
-  const CommunicationsScreen({super.key});
+    final loginType6 loginType;
+  // const CommunicationsScreen({super.key});
+   const CommunicationsScreen({Key? key, required this.loginType})
+      : super(key: key);
 
   @override
   State<CommunicationsScreen> createState() => _CommunicationsScreenState();
 }
+
+// enum loginType6 { patientsCommunicationScreen, caregiversCommunicationScreen }
 
 class _CommunicationsScreenState extends State<CommunicationsScreen> {
   String? _translatedText;
@@ -44,7 +52,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
       _translatedText = result;
       _isLoading = false;
     });
-  }
+  } 
 
   final languagePicker = TranslateLanguage.values
       .map(
@@ -90,6 +98,8 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           ],
         ),
       );
+
+      
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +215,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
           ),
-
+     widget.loginType == loginType6.patientsCommunicationScreen ?
           Container(
             decoration: BoxDecoration(
                 border: Border.all(
@@ -214,7 +224,19 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
             child: const Text(
-              'Common / Saved questions for caregivers',
+              'Common / Saved questions for Patients',
+              style: TextStyle(fontSize: 20),
+            ),
+          ) : 
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(
+              width: 2,
+            )),
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
+            child: const Text(
+              'Common / Saved questions for Caregivers',
               style: TextStyle(fontSize: 20),
             ),
           ),

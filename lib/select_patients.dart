@@ -96,8 +96,7 @@ Expanded(
     },
   ),
 ),
-
-              
+  
               Container(
   padding: EdgeInsets.fromLTRB(50, 20, 50, 20),
   child: ElevatedButton(
