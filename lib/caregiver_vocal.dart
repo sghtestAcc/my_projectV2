@@ -3,14 +3,14 @@ import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:my_project/navigation_drawer.dart';
 
-class PatientsVocalScreen extends StatefulWidget {
-  const PatientsVocalScreen({super.key});
+class CaregviersVocalScreen extends StatefulWidget {
+  const CaregviersVocalScreen({super.key});
 
   @override
-  State<PatientsVocalScreen> createState() => _PatientsVocalScreenState();
+  State<CaregviersVocalScreen> createState() => _CaregviersVocalScreenState();
 }
 
-class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
+class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
   String? _translatedText;
   final _controller = TextEditingController();
   String sourceSelect = 'English';

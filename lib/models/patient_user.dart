@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -6,8 +5,8 @@ class PatientModel {
   final String? id;
   final String? Email;
   final String? Name;
-   final String? Password;
-  
+  final String? Password;
+
   const PatientModel({
     this.id,
     required this.Email,
@@ -17,21 +16,21 @@ class PatientModel {
 
   toJson() {
     return {
-      'Name' : Name,
-      'Email' : Email,
-      'Password' : Password,
+      'Name': Name,
+      'Email': Email,
+      'Password': Password,
     };
   }
 
-  factory PatientModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document){
+  factory PatientModel.fromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> document) {
     final data = document.data()!;
-    
+
     return PatientModel(
-      id: document.id,
-      Email: data["Email"],
-      Password: data["Password"],
-      Name: data["Name"]
-    );
+        id: document.id,
+        Email: data["Email"],
+        Password: data["Password"],
+        Name: data["Name"]);
   }
 }
 

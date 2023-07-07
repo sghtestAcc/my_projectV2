@@ -95,15 +95,17 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: 
-       AppBar(
-          title: Text('Communications', style: TextStyle(color: Colors.black,fontSize: 25),),
-          backgroundColor: Colors.transparent,
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
-          centerTitle: true,
+      appBar: AppBar(
+        title: Text(
+          'Communications',
+          style: TextStyle(color: Colors.black, fontSize: 25),
         ),
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
+        centerTitle: true,
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -159,37 +161,37 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               ),
             ],
           ),
-     Container(
-  child: TextFormField(
-    controller: _controller,
-    onChanged: translateTextFunction,
-    maxLines: 3,
-    keyboardType: TextInputType.multiline,
-    decoration: InputDecoration(
-      hintText: 'Enter text',
-      suffixIcon: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () {
-              Clipboard.getData('text/plain').then((value) {
-                if (value != null) {
-                  _controller.text = value.text!;
-                  setState(() {
-                    typedText = value.text!;
-                    translateTextFunction(typedText);
-                  });
-                }
-              });
-            },
-            child: Icon(Icons.paste),
+          Container(
+            child: TextFormField(
+              controller: _controller,
+              onChanged: translateTextFunction,
+              maxLines: 3,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(
+                hintText: 'Enter text',
+                suffixIcon: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Clipboard.getData('text/plain').then((value) {
+                          if (value != null) {
+                            _controller.text = value.text!;
+                            setState(() {
+                              typedText = value.text!;
+                              translateTextFunction(typedText);
+                            });
+                          }
+                        });
+                      },
+                      child: Icon(Icons.paste),
+                    ),
+                  ],
+                ),
+                contentPadding: EdgeInsets.all(10.0),
+              ),
+            ),
           ),
-        ],
-      ),
-      contentPadding: EdgeInsets.all(10.0),
-    ),
-  ),
-),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -202,10 +204,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               _isLoading
                   ? 'Loading...'
                   : _translatedText ?? 'Enter text to be translated',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
           ),
-
           Container(
             decoration: BoxDecoration(
                 border: Border.all(
@@ -261,7 +262,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           ),
         ],
       ),
-         endDrawer: AppDrawerNavigation(loginType: LoginType5.patientsNavgation),
+      endDrawer: AppDrawerNavigation(loginType: LoginType5.patientsNavgation),
     );
   }
 }
