@@ -1,24 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 class PatientModel {
   final String? id;
-  final String? Email;
-  final String? Name;
-  final String? Password;
+  final String? email;
+  final String? name;
+  final String? password;
 
   const PatientModel({
     this.id,
-    required this.Email,
-    required this.Name,
-    required this.Password,
+    required this.email,
+    required this.name,
+    required this.password,
   });
 
   toJson() {
     return {
-      'Name': Name,
-      'Email': Email,
-      'Password': Password,
+      'Name': name,
+      'Email': email,
+      'Password': password,
     };
   }
 
@@ -28,9 +27,9 @@ class PatientModel {
 
     return PatientModel(
         id: document.id,
-        Email: data["Email"],
-        Password: data["Password"],
-        Name: data["Name"]);
+        email: data["Email"],
+        password: data["Password"],
+        name: data["Name"]);
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:my_project/login_page.dart';
 
 import 'firebase_options.dart';
 import 'models/authentication_repository.dart';
+import 'models/login_type.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,11 +14,13 @@ void main() async {
       .then((value) => Get.put(AuthenticationRepository()));
   // Get.lazyPut(()=>AuthenticationRepository());
 
-  runApp(const GetMaterialApp(
-    title: "App",
-    home: HomeScreen(),
+  runApp(
+    const GetMaterialApp(
+      title: "App",
+      home: HomeScreen(),
 // ...
-  ));
+    ),
+  );
 }
 
 class HomeScreen extends StatelessWidget {
@@ -27,40 +30,72 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-          child: Column(
-        children: [
-          const SizedBox(
-            height: 10,
-          ),
-          Image.asset('assets/images/Grace-bg-new-edited.png',
-              height: 200, width: 200, fit: BoxFit.cover),
-          const Text(
-            'Guided Resources, Assistance',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          ),
-          const Text(
-            'and Communication for Empowered Care',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          ),
-          Image.asset(
-            'assets/images/sgh.png',
-            fit: BoxFit.contain,
-          ),
-          const Text('Welcome to SGH`s Medication',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-          const Text('Tracker Application',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-          const SizedBox(
-            height: 30,
-          ),
-          ElevatedButton(
-              onPressed: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
-                Navigator.push(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Image.asset('assets/images/Grace-bg-new-edited.png',
+                height: 200, width: 200, fit: BoxFit.cover),
+            const Text(
+              'Guided Resources, Assistance',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+            const Text(
+              'and Communication for Empowered Care',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+            Image.asset(
+              'assets/images/sgh.png',
+              fit: BoxFit.contain,
+            ),
+            const Text('Welcome to SGH`s Medication',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            const Text('Tracker Application',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+            const SizedBox(
+              height: 30,
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const LoginScreen(
-                            loginType: LoginType.patientsLogin)));
+                      builder: (context) {
+                        return const LoginScreen(loginType: LoginType.patient);
+                      },
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0CE25C),
+                  minimumSize: const Size(320, 50), // NEW
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(12), // Rounded corner radius
+                  ),
+                ),
+                child: const Text(
+                  'Patient Login',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                )),
+            const SizedBox(
+              height: 30,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const LoginScreen(
+                        loginType: LoginType.caregiver,
+                      );
+                    },
+                  ),
+                );
+                // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0CE25C),
@@ -71,41 +106,19 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                'Patient Login',
+                'Caregiver  Login',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              )),
-          const SizedBox(
-            height: 30,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const LoginScreen(
-                          loginType: LoginType.caregiversLogin)));
-              // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0CE25C),
-              minimumSize: const Size(320, 50), // NEW
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(12), // Rounded corner radius
               ),
             ),
-            child: const Text(
-              'Caregiver  Login',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
+            Expanded(
               child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Image.asset('assets/images/sghDesign.png'),
-          ))
-        ],
-      )),
+                alignment: Alignment.bottomCenter,
+                child: Image.asset('assets/images/sghDesign.png'),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

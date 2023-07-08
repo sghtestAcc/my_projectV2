@@ -24,7 +24,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                iconTheme: IconThemeData(
+                iconTheme: const IconThemeData(
                   color: Colors.black, // Set the desired color here
                 ),
               ),
@@ -34,7 +34,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: Text(
+                  title: const Text(
                     'Logout',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
@@ -45,58 +45,58 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     //                         controller.password.text.trim());
                     //                   }
                   }),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/world.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('Change Language',
+                  title: const Text('Change Language',
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   onTap: () {
                     // Navigator.of(context).pushReplacementNamed(WeatherScreen.routeName);
                   }),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/drugs.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('Prescriptions'),
+                  title: const Text('Prescriptions'),
                   onTap: () {
                     // Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
                   }
                   // Navigator.of(context).pushReplacementNamed(GalleryScreen.routeName),
                   ),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/mic.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('Vocalizations'),
+                  title: const Text('Vocalizations'),
                   onTap:
                       () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/photo-camera.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('PhotoScanner'),
+                  title: const Text('PhotoScanner'),
                   onTap:
                       () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Communications'),
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Communications'),
                   onTap:
                       () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
@@ -115,7 +115,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                iconTheme: IconThemeData(
+                iconTheme: const IconThemeData(
                   color: Colors.black, // Set the desired color here
                 ),
               ),
@@ -125,7 +125,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: Text(
+                  title: const Text(
                     'Logout',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
@@ -136,65 +136,65 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     //                         controller.password.text.trim());
                     //                   }
                   }),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/world.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('Change Language',
+                  title: const Text('Change Language',
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   onTap: () {
                     // Navigator.of(context).pushReplacementNamed(WeatherScreen.routeName);
                   }),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/drugs.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('Prescriptions'),
+                  title: const Text('Prescriptions'),
                   onTap: () {
                     // Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
                   }
                   // Navigator.of(context).pushReplacementNamed(GalleryScreen.routeName),
                   ),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/mic.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('Vocalizations'),
+                  title: const Text('Vocalizations'),
                   onTap:
                       () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
                     'assets/images/photo-camera.png',
                     height: 28,
                     width: 28,
                   ),
-                  title: Text('PhotoScanner'),
+                  title: const Text('PhotoScanner'),
                   onTap:
                       () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Communications'),
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Communications'),
                   onTap:
                       () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
-              Divider(height: 3, color: Colors.blueGrey),
+              const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Patients'),
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Patients'),
                   onTap:
                       () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),

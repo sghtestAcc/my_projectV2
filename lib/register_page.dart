@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:my_project/models/caregiver_user.dart';
 import 'package:my_project/models/patient_user.dart';
 import 'package:my_project/models/register_controller.dart';
 import 'package:my_project/models/user_repo.dart';
 
-void main() => runApp(MaterialApp(
+void main() => runApp(const MaterialApp(
       title: "App",
       home: RegisterScreen(registerType: LoginType2.patientsRegister),
     ));
@@ -34,11 +33,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50),
+        preferredSize: const Size.fromHeight(50),
         child: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: Colors.black),
         ),
       ),
       resizeToAvoidBottomInset: false,
@@ -46,9 +45,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         key: formData,
         child: Column(
           children: [
-            Container(
-              child: Center(
-                  child: Column(
+            Center(
+              child: Column(
                 children: [
                   Image.asset(
                     'assets/images/Grace-bg-new-edited.png',
@@ -57,27 +55,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fit: BoxFit.cover,
                   ),
                   Image.asset('assets/images/sgh.png'),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Text(
                       widget.registerType == LoginType2.patientsRegister
                           ? 'Patient Register'
                           : 'Caregiver Register',
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                      style: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.bold)),
                   // Text('Caregiver Register', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
                 ],
-              )),
+              ),
             ),
             Container(
-                padding: EdgeInsets.all(20),
-                child: Column(children: [
-                  Align(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text('Email', style: TextStyle(fontSize: 20)),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   widget.registerType == LoginType2.patientsRegister
@@ -87,12 +86,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(content: Text('Email is required.')),
+                                const SnackBar(
+                                    content: Text('Email is required.')),
                               );
                               return 'Email is required.';
                             } else if (!value.contains('@')) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Invalid email format.')),
                               );
                               return 'Invalid email format.';
@@ -100,9 +100,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         )
                       : TextFormField(
                           controller: controller.email,
@@ -110,12 +111,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(content: Text('Email is required.')),
+                                const SnackBar(
+                                    content: Text('Email is required.')),
                               );
                               return 'Email is required.';
                             } else if (!value.contains('@')) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Invalid email format.')),
                               );
                               return 'Invalid email format.';
@@ -123,18 +125,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text('Full name', style: TextStyle(fontSize: 20)),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   widget.registerType == LoginType2.patientsRegister
@@ -144,13 +147,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Full name is required.')),
                               );
                               return 'Full name is required.';
                             } else if (value.trim().split(' ').length < 2) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Full name should contain at least two words.')),
                               );
@@ -159,7 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
                                 .hasMatch(value.trim())) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Full name should start with capital letters.')),
                               );
@@ -178,13 +181,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Full name is required.')),
                               );
                               return 'Full name is required.';
                             } else if (value.trim().split(' ').length < 2) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Full name should contain at least two words.')),
                               );
@@ -193,7 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
                                 .hasMatch(value.trim())) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Full name should start with capital letters.')),
                               );
@@ -202,14 +205,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text('Password', style: TextStyle(fontSize: 20)),
                   ),
@@ -220,13 +224,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Password is required.')),
                               );
                               return 'Password is required.';
                             } else if (value.length < 6) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Password must be at least 6 characters long.')),
                               );
@@ -235,9 +239,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         )
                       : TextFormField(
                           controller: controller.password,
@@ -245,13 +250,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Password is required.')),
                               );
                               return 'Password is required.';
                             } else if (value.length < 6) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Password must be at least 6 characters long.')),
                               );
@@ -260,11 +265,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         )
-                ])),
+                ],
+              ),
+            ),
             Expanded(
               child: Stack(
                 children: [
@@ -277,74 +285,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   widget.registerType == LoginType2.patientsRegister
                       ? Container(
                           width: double.infinity,
-                          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                           child: ElevatedButton(
                             onPressed: () {
                               if (formData.currentState!.validate()) {
                                 final user = PatientModel(
-                                    Email: controller.email.text.trim(),
-                                    Name: controller.fullName.text.trim(),
-                                    Password: controller.password.text.trim());
+                                    email: controller.email.text.trim(),
+                                    name: controller.fullName.text.trim(),
+                                    password: controller.password.text.trim());
                                 UserRepository.instance.createPatientUser(user);
                                 RegisterController.instance.registerP();
                                 formData.currentState?.reset();
                               }
                             },
-                            child: Text(
-                              'Register',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF0CE25C), // NEW
+                              backgroundColor: const Color(0xFF0CE25C), // NEW
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                     12), // Rounded corner radius
                               ),
                             ),
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         )
                       : Container(
                           width: double.infinity,
-                          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                           child: ElevatedButton(
                             onPressed: () {
                               if (formData.currentState!.validate()) {
                                 final user2 = CaregiverModel(
-                                    Email: controller.email.text.trim(),
-                                    Name: controller.fullName.text.trim(),
-                                    Password: controller.password.text.trim());
+                                    email: controller.email.text.trim(),
+                                    name: controller.fullName.text.trim(),
+                                    password: controller.password.text.trim());
                                 UserRepository.instance
                                     .createCaregiverUser(user2);
                                 RegisterController.instance.registerC();
                                 formData.currentState?.reset();
                               }
                             },
-                            child: Text(
-                              'Register',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF0CE25C), // NEW
+                              backgroundColor: const Color(0xFF0CE25C), // NEW
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                     12), // Rounded corner radius
                               ),
                             ),
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
                   const Positioned.fill(
                     child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Already have an account? Login',
-                            style: TextStyle(
-                                fontSize: 20,
-                                decoration: TextDecoration.underline),
-                          ),
-                        ]),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Already have an account? Login',
+                          style: TextStyle(
+                              fontSize: 20,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

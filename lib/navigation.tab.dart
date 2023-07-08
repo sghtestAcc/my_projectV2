@@ -1,16 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_project/communications_patient.dart';
-import 'package:my_project/login_page.dart';
+import 'package:my_project/models/login_type.dart';
 import 'package:my_project/patient_home.dart';
 import 'package:my_project/select_patients.dart';
-
-enum LoginType4 { patientsLoginBottomTab, caregiversLoginBottomTab }
 
 class NavigatorBar extends StatefulWidget {
   // const NavigatorBar({super.key});
 
-  final LoginType4 loginType;
+  final LoginType loginType;
   const NavigatorBar({Key? key, required this.loginType}) : super(key: key);
   @override
   State<NavigatorBar> createState() => _NavigatorBarState();
@@ -20,22 +17,24 @@ class _NavigatorBarState extends State<NavigatorBar> {
   int selectedIndex = 0;
 
   final screens = [
-    const PatientHomeScreen(loginType: loginType3.patientsHomeScreen),
-
-    const CommunicationsScreen(loginType: loginType6.patientsCommunicationScreen,),
-
+    const PatientHomeScreen(loginType: LoginType.patient),
+    const CommunicationsScreen(
+      loginType: LoginType.patient,
+    ),
     // RegisterScreen(registerType: LoginType2.caregiversRegister
   ];
 
   final screens2 = [
-    const PatientHomeScreen(loginType: loginType3.caregiversHomeScreen),
-    const CommunicationsScreen(loginType: loginType6.caregiversCommunicationScreen,),
+    const PatientHomeScreen(loginType: LoginType.caregiver),
+    const CommunicationsScreen(
+      loginType: LoginType.caregiver,
+    ),
     const SelectPatientScreen()
   ];
 
   @override
   Widget build(BuildContext context) {
-    return widget.loginType == LoginType4.patientsLoginBottomTab
+    return widget.loginType == LoginType.patient
         ? Scaffold(
             body: screens[selectedIndex],
             bottomNavigationBar: BottomNavigationBar(
@@ -62,11 +61,18 @@ class _NavigatorBarState extends State<NavigatorBar> {
                 });
               },
               items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.comment), label: 'Communications'),
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.person), label: 'Patients'),
+                  icon: Icon(Icons.comment),
+                  label: 'Communications',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: 'Patients',
+                ),
               ],
             ),
           );

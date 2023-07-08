@@ -1,16 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_project/models/login_type.dart';
 import 'package:my_project/navigation.tab.dart';
-
-void main() => runApp(MaterialApp(
-      title: "App",
-      home: CameraHomeScreenPatient(),
-    ));
 
 class CameraHomeScreenPatient extends StatefulWidget {
   final String? path;
@@ -22,7 +17,6 @@ class CameraHomeScreenPatient extends StatefulWidget {
 }
 
 class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
-  @override
   bool textScanning = false;
 
   XFile? imageFile;
@@ -32,17 +26,19 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
 
   TextEditingController controller = TextEditingController();
 
+  @override
   void initState() {
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage(
                     'assets/images/Grace-bg-new-edited.png',
@@ -50,34 +46,33 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                   fit: BoxFit.contain)),
         ),
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Container(
-          child: Center(
+      body: Center(
         child: Column(children: [
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             ' Upload for Medication Labels',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             'First Time users must',
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          Text(
+          const Text(
             'upload a photo or',
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          Text(
+          const Text(
             'snap a photo',
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
 
@@ -92,18 +87,18 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                 });
               },
               style: ElevatedButton.styleFrom(
-                primary: Color(0xFF0CE25C),
+                backgroundColor: const Color(0xFF0CE25C),
                 minimumSize: const Size(320, 50), // NEW
                 shape: RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.circular(12), // Rounded corner radius
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Capture Photo',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               )),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           ElevatedButton(
@@ -117,18 +112,18 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                 });
               },
               style: ElevatedButton.styleFrom(
-                primary: Color(0xFF0CE25C),
+                backgroundColor: const Color(0xFF0CE25C),
                 minimumSize: const Size(320, 50), // NEW
                 shape: RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.circular(12), // Rounded corner radius
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Photo Files',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               )),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           ElevatedButton(
@@ -137,23 +132,23 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => NavigatorBar(
-                              loginType: LoginType4.patientsLoginBottomTab,
+                        builder: (context) => const NavigatorBar(
+                              loginType: LoginType.patient,
                             )));
               },
               style: ElevatedButton.styleFrom(
-                primary: Color(0xFF0CE25C),
+                backgroundColor: const Color(0xFF0CE25C),
                 minimumSize: const Size(320, 50), // NEW
                 shape: RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.circular(12), // Rounded corner radius
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Continue',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               )),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           if (!textScanning && imageFile == null)
@@ -164,7 +159,7 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
             ),
           if (imageFile != null)
             Container(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               height: 200,
               child: Image.file(
                 File(imageFile!.path),
@@ -194,12 +189,12 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
           //       color: Colors.grey[300]!,
           //     ),
 
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Column(
             children: [
-              Text(
+              const Text(
                 'Translated Medication Label:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -210,13 +205,13 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
                     child: Container(
                       padding: const EdgeInsets.all(20),
                       child: TextFormField(
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                         ),
                         controller: controller,
                         maxLines: 1,
                         enabled: false,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Your Medication will appear here...",
                           border:
                               InputBorder.none, // Set this to remove the border
@@ -229,7 +224,7 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
             ],
           ),
         ]),
-      )),
+      ),
     );
   }
 
@@ -314,7 +309,7 @@ class _CameraHomeScreenPatientState extends State<CameraHomeScreenPatient> {
     scannedText = "";
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
-        scannedText += line.text + " ";
+        scannedText += "${line.text} ";
       }
     }
 

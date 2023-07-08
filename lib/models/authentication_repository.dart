@@ -3,17 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/main.dart';
 import 'package:my_project/models/login_failure.dart';
+import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/register_failure.dart';
 
 import 'package:my_project/patients_upload_meds.dart';
-import 'package:my_project/register_page.dart';
 
 import '../navigation.tab.dart';
 import 'package:my_project/models/user_repo.dart';
-
-void main() {
-  Get.put(AuthenticationRepository());
-}
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -48,7 +44,7 @@ class AuthenticationRepository extends GetxController {
           email: email, password: password);
 
       if (firebaseUser.value != null) {
-        Get.offAll(() => HomeScreen());
+        Get.offAll(() => const HomeScreen());
       }
     } on FirebaseAuthException catch (e) {
       final ex = RegisterFailure.fromCode(e.code);
@@ -79,7 +75,7 @@ class AuthenticationRepository extends GetxController {
           email: email, password: password);
 
       if (firebaseUser.value != null) {
-        Get.offAll(() => HomeScreen());
+        Get.offAll(() => const HomeScreen());
       }
     } on FirebaseAuthException catch (e) {
       final ex = RegisterFailure.fromCode(e.code);
@@ -108,7 +104,7 @@ class AuthenticationRepository extends GetxController {
       }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (firebaseUser.value != null) {
-        Get.to(() => PatientUploadMedsScreen());
+        Get.to(() => const PatientUploadMedsScreen());
       }
       // firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
@@ -138,8 +134,8 @@ class AuthenticationRepository extends GetxController {
       }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (firebaseUser.value != null) {
-        Get.to(() => NavigatorBar(
-              loginType: LoginType4.caregiversLoginBottomTab,
+        Get.to(() => const NavigatorBar(
+              loginType: LoginType.caregiver,
             ));
       }
       // firebaseUser.value != null ? Get.offAll(() => PatientUploadScreen()) : Get.to(() => HomeScreen());
@@ -172,11 +168,11 @@ class AuthenticationRepository extends GetxController {
     try {
       if (firebaseUser.value != null) {
         await _auth.signOut();
-        Get.offAll(HomeScreen());
+        Get.offAll(const HomeScreen());
         Get.snackbar(
           'Logout',
           'You have been successfully logged out',
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         );
       }
     } catch (e) {
@@ -184,7 +180,7 @@ class AuthenticationRepository extends GetxController {
       Get.snackbar(
         'Error',
         'An error occurred while logging out',
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       );
     }
   }

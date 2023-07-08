@@ -1,28 +1,10 @@
-import 'package:country_picker/country_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/models/authentication_repository.dart';
 import 'package:my_project/models/login_controller.dart';
-import 'package:my_project/patient_home.dart';
 import 'package:my_project/register_page.dart';
-// import 'package:my_project/patient_home.dart';
 
-import 'camera_home_patient.dart';
-
-void main() {
-  // Add this line here
-  runApp(
-    MaterialApp(
-      title: "App",
-      home: LoginScreen(
-        loginType: LoginType.patientsLogin,
-      ),
-    ),
-  );
-}
-
-enum LoginType { patientsLogin, caregiversLogin }
+import 'models/login_type.dart';
 
 class LoginScreen extends StatefulWidget {
   final LoginType loginType;
@@ -50,11 +32,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50),
+        preferredSize: const Size.fromHeight(50),
         child: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: Colors.black),
         ),
       ),
       resizeToAvoidBottomInset: false,
@@ -62,8 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         key: formData,
         child: Column(
           children: [
-            Container(
-                child: Column(
+            Column(
               children: [
                 Image.asset(
                   'assets/images/Grace-bg-new-edited.png',
@@ -76,28 +57,32 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 100,
                   width: 180,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Text(
-                    widget.loginType == LoginType.patientsLogin
-                        ? 'Patient Login'
-                        : 'Caregiver Login',
-                    style:
-                        TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                  widget.loginType == LoginType.patient
+                      ? 'Patient Login'
+                      : 'Caregiver Login',
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
-            )),
+            ),
             Container(
-                padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-                child: Column(children: [
-                  Align(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+              child: Column(
+                children: [
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text('Email', style: TextStyle(fontSize: 20)),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  widget.loginType == LoginType.patientsLogin
+                  widget.loginType == LoginType.patient
                       ? TextFormField(
                           controller: controller.email,
                           obscureText: false,
@@ -105,12 +90,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(content: Text('Email is required.')),
+                                const SnackBar(
+                                    content: Text('Email is required.')),
                               );
                               return 'Email is required.';
                             } else if (!value.contains('@')) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Invalid email format.')),
                               );
                               return 'Invalid email format.';
@@ -130,12 +116,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(content: Text('Email is required.')),
+                                const SnackBar(
+                                    content: Text('Email is required.')),
                               );
                               return 'Email is required.';
                             } else if (!value.contains('@')) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Invalid email format.')),
                               );
                               return 'Invalid email format.';
@@ -148,30 +135,30 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text('Password', style: TextStyle(fontSize: 20)),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  widget.loginType == LoginType.patientsLogin
+                  widget.loginType == LoginType.patient
                       ? TextFormField(
                           controller: controller.password,
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Password is required.')),
                               );
                               return 'Password is required.';
                             } else if (value.length < 6) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Password must be at least 6 characters long.')),
                               );
@@ -180,9 +167,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         )
                       : TextFormField(
                           controller: controller.password,
@@ -190,13 +178,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Password is required.')),
                               );
                               return 'Password is required.';
                             } else if (value.length < 6) {
                               scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         'Password must be at least 6 characters long.')),
                               );
@@ -205,15 +193,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  widget.loginType == LoginType.patientsLogin
-                      ? Container(
+                  widget.loginType == LoginType.patient
+                      ? SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
@@ -226,21 +215,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
                               // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                             },
-                            child: Text(
-                              'Login',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF0CE25C), // NEW
+                              backgroundColor: const Color(0xFF0CE25C), // NEW
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                     12), // Rounded corner radius
                               ),
                             ),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         )
-                      : Container(
+                      : SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
@@ -253,36 +242,36 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
                               // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                             },
-                            child: Text(
-                              'Login',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF0CE25C), // NEW
+                              backgroundColor: const Color(0xFF0CE25C), // NEW
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                     12), // Rounded corner radius
                               ),
                             ),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
 
-                  widget.loginType == LoginType.patientsLogin
+                  widget.loginType == LoginType.patient
                       ? GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RegisterScreen(
+                                builder: (context) => const RegisterScreen(
                                     registerType: LoginType2.patientsRegister),
                               ),
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             'Don\'t have an account? Sign up',
                             style: TextStyle(
                               fontSize: 20,
@@ -295,13 +284,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RegisterScreen(
+                                builder: (context) => const RegisterScreen(
                                     registerType:
                                         LoginType2.caregiversRegister),
                               ),
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             'Don\'t have an account? Sign up',
                             style: TextStyle(
                               fontSize: 20,
@@ -312,7 +301,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   //  GestureDetector(
                   //     onTap: () {
                   //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
-                  //       // Text(widget.loginType == LoginType.patientsLogin
+                  //       // Text(widget.loginType == LoginType.patient
                   //       // ? 'Patient Login'
                   //       // : 'Caregiver Login', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
 
@@ -322,12 +311,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   //   fontSize: 20,
                   //   decoration: TextDecoration.underline),),
                   //  ),
-                ])),
+                ],
+              ),
+            ),
             Expanded(
-                child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Image.asset('assets/images/sghDesign.png'),
-            )),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Image.asset('assets/images/sghDesign.png'),
+              ),
+            ),
           ],
         ),
       ),

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 void addQuestionsModal(BuildContext context) {
   showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(40.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+    context: context,
+    builder: (context) {
+      return Container(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -17,15 +18,15 @@ void addQuestionsModal(BuildContext context) {
                     //   Navigator.push(context, MaterialPageRoute(builder: (context)=>
                     // NavigatorBar()));
                   },
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                 ),
               ],
             ),
-            Text(
+            const Text(
               'Add Questions',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(
@@ -40,32 +41,34 @@ void addQuestionsModal(BuildContext context) {
               child: TextFormField(
                 maxLines: 6,
                 keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter your question here...',
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(10.0),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             ElevatedButton(
                 onPressed: () {},
-                child: Text(
+                child: const Text(
                   'Add',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 )),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             ElevatedButton(
                 onPressed: () {},
-                child: Text(
+                child: const Text(
                   'Close',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 )),
-          ]),
-        );
-      });
+          ],
+        ),
+      );
+    },
+  );
 }

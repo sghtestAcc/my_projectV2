@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/models/patient_user.dart';
@@ -34,7 +33,7 @@ class UserRepository extends GetxController {
   }
 
   Future<void> createCaregiverUser(CaregiverModel user) async {
-    final String email = user.Email!;
+    final String email = user.email!;
     final bool emailExists = await isCaregiversEmailExists(email);
     if (emailExists) {
       Get.snackbar(
@@ -71,8 +70,6 @@ class UserRepository extends GetxController {
     }
   }
 
-
-
   Future<bool> isEmailExists(String email) async {
     final CollectionReference usersCollection =
         FirebaseFirestore.instance.collection('patient_users');
@@ -96,10 +93,9 @@ class UserRepository extends GetxController {
         .isNotEmpty; // If the snapshot has documents, email and password exist
   }
 
-
 //Create patient users function
   Future<void> createPatientUser(PatientModel user) async {
-    final String email = user.Email!;
+    final String email = user.email!;
 
     final bool emailExists = await isEmailExists(email);
     if (emailExists) {
@@ -134,7 +130,6 @@ class UserRepository extends GetxController {
     }
   }
 
-
 //  Future<bool> isEmailExists2(String email) async {
 //     final CollectionReference usersCollection =
 //         FirebaseFirestore.instance.collection('patient_users');
@@ -159,7 +154,6 @@ class UserRepository extends GetxController {
 //     await questionsUsersCollection.add({'email': email});
 //   }
 // }
-
 
 // //create patients questions function
 //    Future<void> createPatientUserQuestions(PatientModel user) async {
@@ -200,10 +194,10 @@ class UserRepository extends GetxController {
   //   return patientData;
   // }
 
-  Future<PatientModel> getPatientDetails(String Email) async {
+  Future<PatientModel> getPatientDetails(String email) async {
     final snapshot = await patientDB
         .collection("patient_users")
-        .where("Email", isEqualTo: Email)
+        .where("Email", isEqualTo: email)
         .get();
     final patientData =
         snapshot.docs.map((e) => PatientModel.fromSnapshot(e)).single;
@@ -217,10 +211,10 @@ class UserRepository extends GetxController {
     return patientData;
   }
 
-  Future<CaregiverModel> getCaregiverDetails(String Email) async {
+  Future<CaregiverModel> getCaregiverDetails(String email) async {
     final snapshot = await patientDB
         .collection("caregivers_users")
-        .where("Email", isEqualTo: Email)
+        .where("Email", isEqualTo: email)
         .get();
     final caregiverData =
         snapshot.docs.map((e) => CaregiverModel.fromSnapshot(e)).single;

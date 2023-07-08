@@ -51,12 +51,12 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
   // PatientHomeScreen
 
   Widget buildCard(int index) => Container(
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         width: 100,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(22)),
-          color: Color(0xFFF6F6F6),
-          boxShadow: [
+          borderRadius: const BorderRadius.all(Radius.circular(22)),
+          color: const Color(0xFFF6F6F6),
+          boxShadow: const [
             BoxShadow(
               color: Color.fromRGBO(0, 0, 0, 0.2),
               offset: Offset(0, 1),
@@ -72,9 +72,9 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
         child: Column(
           // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Medication'),
+            const Text('Medication'),
             Text('$index'),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             GestureDetector(
               onTap: () {},
               child: Image.asset('assets/images/mic.png',
@@ -88,137 +88,135 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Vocalization',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
         centerTitle: true,
       ),
-      body: Container(
-        child: Column(children: [
-          Column(
-            children: [
-              Container(
-                color: const Color(0xFF9EE8BF),
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
-                child: const Text(
-                  'Translate Medication',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
+      body: Column(children: [
+        Column(
+          children: [
+            Container(
+              color: const Color(0xFF9EE8BF),
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
+              child: const Text(
+                'Translate Medication',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    child: DropdownButton(
-                      hint: const Text('English'),
-                      value: sourceSelect,
-                      onChanged: (newValue) {
-                        setState(() {
-                          sourceSelect = newValue ?? '';
-                          translateTextFunction(typedText);
-                        });
-                      },
-                      items: languagePicker.map((valueItem) {
-                        return DropdownMenuItem(
-                          value: valueItem,
-                          child: Text(valueItem),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    child: DropdownButton(
-                      hint: const Text('English'),
-                      value: targetSelect,
-                      onChanged: (newValue) {
-                        setState(() {
-                          targetSelect = newValue ?? '';
-                          translateTextFunction(typedText);
-                        });
-                      },
-                      items: languagePicker.map((valueItem) {
-                        return DropdownMenuItem(
-                          value: valueItem,
-                          child: Text(valueItem),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                child: TextFormField(
-                  controller: _controller,
-                  onChanged: translateTextFunction,
-                  maxLines: 4,
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    hintText: 'Enter text',
-                    suffixIcon: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // InkWell(
-                        //   onTap: () {
-                        //     Clipboard.getData('text/plain').then((value) {
-                        //       if (value != null) {
-                        //         _controller.text = value.text!;
-                        //         setState(() {
-                        //           typedText = value.text!;
-                        //           translateTextFunction(typedText);
-                        //         });
-                        //       }
-                        //     });
-                        //   },
-                        //   child: Icon(Icons.paste),
-                        // ),
-                      ],
-                    ),
-                    contentPadding: EdgeInsets.all(10.0),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: DropdownButton(
+                    hint: const Text('English'),
+                    value: sourceSelect,
+                    onChanged: (newValue) {
+                      setState(() {
+                        sourceSelect = newValue ?? '';
+                        translateTextFunction(typedText);
+                      });
+                    },
+                    items: languagePicker.map((valueItem) {
+                      return DropdownMenuItem(
+                        value: valueItem,
+                        child: Text(valueItem),
+                      );
+                    }).toList(),
                   ),
                 ),
-              ),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 2,
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: DropdownButton(
+                    hint: const Text('English'),
+                    value: targetSelect,
+                    onChanged: (newValue) {
+                      setState(() {
+                        targetSelect = newValue ?? '';
+                        translateTextFunction(typedText);
+                      });
+                    },
+                    items: languagePicker.map((valueItem) {
+                      return DropdownMenuItem(
+                        value: valueItem,
+                        child: Text(valueItem),
+                      );
+                    }).toList(),
                   ),
                 ),
-                child: Text(
-                  _isLoading
-                      ? 'Loading...'
-                      : _translatedText ?? 'Enter text to be translated',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ],
+            ),
+            TextFormField(
+              controller: _controller,
+              onChanged: translateTextFunction,
+              maxLines: 4,
+              keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                hintText: 'Enter text',
+                suffixIcon: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // InkWell(
+                    //   onTap: () {
+                    //     Clipboard.getData('text/plain').then((value) {
+                    //       if (value != null) {
+                    //         _controller.text = value.text!;
+                    //         setState(() {
+                    //           typedText = value.text!;
+                    //           translateTextFunction(typedText);
+                    //         });
+                    //       }
+                    //     });
+                    //   },
+                    //   child: Icon(Icons.paste),
+                    // ),
+                  ],
+                ),
+                contentPadding: EdgeInsets.all(10.0),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 2,
                 ),
               ),
-              SizedBox(
-                height: 10,
+              child: Text(
+                _isLoading
+                    ? 'Loading...'
+                    : _translatedText ?? 'Enter text to be translated',
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
-              Container(
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                height: 130,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 6,
-                  separatorBuilder: (context, _) => SizedBox(
-                    width: 10,
-                  ),
-                  itemBuilder: (context, index) => buildCard(index),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              height: 130,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: 6,
+                separatorBuilder: (context, _) => const SizedBox(
+                  width: 10,
                 ),
+                itemBuilder: (context, index) => buildCard(index),
               ),
-            ],
-          )
-        ]),
-      ),
-      endDrawer: AppDrawerNavigation(loginType: LoginType5.caregiversNavgation),
+            ),
+          ],
+        )
+      ]),
+      endDrawer:
+          const AppDrawerNavigation(loginType: LoginType5.caregiversNavgation),
     );
   }
 }

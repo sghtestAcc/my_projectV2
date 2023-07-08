@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:my_project/navigation_drawer.dart';
 
 class SelectPatientScreen extends StatefulWidget {
@@ -28,9 +27,10 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               children: [
                 Text(
                   'Patient $index',
-                  style: TextStyle(fontSize: 15),
+                  style: const TextStyle(fontSize: 15),
                 ),
-                Text('patientEmail $index', style: TextStyle(fontSize: 12)),
+                Text('patientEmail $index',
+                    style: const TextStyle(fontSize: 12)),
               ],
             ),
             value: _checkedList[index],
@@ -39,12 +39,12 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                 _checkedList[index] = value!;
               });
             },
-            activeColor: Color(0xFF0CE25C),
+            activeColor: const Color(0xFF0CE25C),
           ),
         );
 
     Widget buildCard2(int index) => Container(
-          padding: EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(10.0),
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(22)),
             color: Color(0xDDF6F6F6),
@@ -63,13 +63,13 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             children: [
               Text(
                 'Patient $index',
-                style: TextStyle(fontSize: 15),
+                style: const TextStyle(fontSize: 15),
               ),
-              Text('phoneNumber $index', style: TextStyle(fontSize: 12)),
-              SizedBox(
+              Text('phoneNumber $index', style: const TextStyle(fontSize: 12)),
+              const SizedBox(
                 height: 10,
               ),
-              Text('View more for medication info',
+              const Text('View more for medication info',
                   style: TextStyle(fontSize: 10))
             ],
           ),
@@ -78,23 +78,23 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Patients',
           style: TextStyle(color: Colors.black, fontSize: 25),
         ),
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
         centerTitle: true,
       ),
-      body: Container(
-        child: Column(children: [
+      body: Column(
+        children: [
           Container(
-            color: Color(0xFF9EE8BF),
+            color: const Color(0xFF9EE8BF),
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(20, 30, 0, 30),
-            child: Text(
+            padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
+            child: const Text(
               'Select Patient',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
@@ -108,32 +108,33 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             ),
           ),
           Container(
-            padding: EdgeInsets.fromLTRB(50, 20, 50, 20),
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
             child: ElevatedButton(
               onPressed: () {
                 // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
               },
-              child: Text(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    const Color(0xFF0CE25C), // Button background color
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(12), // Rounded corner radius
+                ),
+                minimumSize: const Size(double.infinity,
+                    40), // Adjust the width by modifying the minimumSize property
+              ),
+              child: const Text(
                 'Add Patients',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xFF0CE25C), // Button background color
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(12), // Rounded corner radius
-                ),
-                minimumSize: Size(double.infinity,
-                    40), // Adjust the width by modifying the minimumSize property
-              ),
             ),
           ),
           Container(
-            padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Align(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: const Align(
               alignment: Alignment.centerLeft,
               child: Text('Patient Info Medication List',
                   style: TextStyle(fontSize: 20)),
@@ -141,7 +142,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
           ),
           Expanded(
             child: ListView.separated(
-              padding: EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(10.0),
               itemCount: 5,
               separatorBuilder: (context, index) {
                 return const SizedBox(
@@ -153,9 +154,11 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               },
             ),
           )
-        ]),
+        ],
       ),
-      endDrawer: AppDrawerNavigation(loginType: LoginType5.caregiversNavgation),
+      endDrawer: const AppDrawerNavigation(
+        loginType: LoginType5.caregiversNavgation,
+      ),
     );
   }
 }

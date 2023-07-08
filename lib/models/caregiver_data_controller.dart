@@ -9,9 +9,9 @@ class CaregiverDataController extends GetxController {
   final _userRepo = Get.put(UserRepository());
 
   getCaregiverData() {
-    final Email = _authRepo.firebaseUser.value?.email;
-    if (Email != null) {
-      return _userRepo.getCaregiverDetails(Email);
+    final email = _authRepo.firebaseUser.value?.email;
+    if (email != null) {
+      return _userRepo.getCaregiverDetails(email);
     } else {
       Get.snackbar("Error", "Could not show email.");
     }

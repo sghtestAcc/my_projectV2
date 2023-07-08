@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:my_project/models/patient_user.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:my_project/models/authentication_repository.dart';
-import 'package:my_project/models/patient_user.dart';
 import 'package:my_project/models/user_repo.dart';
 
 class RegisterController extends GetxController {

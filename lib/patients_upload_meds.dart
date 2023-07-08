@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/camera_home_patient.dart';
-import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/models/login_type.dart';
 import 'package:my_project/patient_home.dart';
 
-void main() => runApp(MaterialApp(
-      title: "App",
-      home: PatientUploadMedsScreen(),
-    ));
-
 class PatientUploadMedsScreen extends StatefulWidget {
-  const PatientUploadMedsScreen({Key? key});
+  const PatientUploadMedsScreen({Key? key}) : super(key: key);
 
   @override
   State<PatientUploadMedsScreen> createState() =>
@@ -42,19 +37,19 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                           // Handle the close button action here
                           Navigator.of(context).pop();
                         },
-                        icon: Icon(Icons.close),
+                        icon: const Icon(Icons.close),
                       ),
                     ],
                   ),
-                  Text(
+                  const Text(
                     'Upload Medications schedules',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Quantity',
@@ -62,7 +57,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Container(
@@ -77,16 +72,16 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                     ),
                     child: TextFormField(
                       controller: medsQuantity,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: '2 tabs/tablets',
                         contentPadding: EdgeInsets.all(10.0),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Schedule',
@@ -94,7 +89,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Container(
@@ -108,28 +103,28 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       ),
                     ),
                     child: TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Morning After meal...',
                         contentPadding: EdgeInsets.all(10.0),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   ElevatedButton(
                       onPressed: () {},
-                      child: Text(
+                      child: const Text(
                         'Add',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       )),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   ElevatedButton(
                       onPressed: () {},
-                      child: Text(
+                      child: const Text(
                         'Close',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
@@ -147,7 +142,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage(
                     'assets/images/Grace-bg-new-edited.png',
@@ -155,39 +150,40 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                   fit: BoxFit.contain)),
         ),
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Form(
         key: formData,
         child: Container(
-            padding: EdgeInsets.fromLTRB(40, 10, 40, 0),
-            child: Center(
-              child: Column(children: [
-                Text(
+          padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
+          child: Center(
+            child: Column(
+              children: [
+                const Text(
                   'New Patients Must',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
-                Text(
+                const Text(
                   'upload your medication',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                Text(
+                const Text(
                   'These information would assist caregivers',
                   style: TextStyle(fontSize: 15),
                 ),
-                Text(
+                const Text(
                   'in managing your medication effectively',
                   style: TextStyle(fontSize: 15),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
 
                 //upload images button
-                Container(
+                SizedBox(
                   width: double
                       .infinity, // Set the width to expand to the available space
                   child: ElevatedButton(
@@ -196,18 +192,19 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => CameraHomeScreenPatient()));
+                              builder: (context) =>
+                                  const CameraHomeScreenPatient()));
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color(0xFF0CE25C),
+                      backgroundColor: const Color(0xFF0CE25C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           vertical: 12), // Adjust the padding as needed
-                      child: Text(
+                      child: const Text(
                         'Upload Images',
                         style: TextStyle(
                           fontSize: 20,
@@ -219,12 +216,12 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                   ),
                 ),
 
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
 
                 //upload schdules button
-                Container(
+                SizedBox(
                   width: double
                       .infinity, // Set the width to expand to the available space
                   child: ElevatedButton(
@@ -234,15 +231,15 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       //  Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color(0xFF0CE25C),
+                      backgroundColor: const Color(0xFF0CE25C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           vertical: 12), // Adjust the padding as needed
-                      child: Text(
+                      child: const Text(
                         'Upload Schedules',
                         style: TextStyle(
                           fontSize: 20,
@@ -253,30 +250,32 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
 
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => PatientHomeScreen(
-                                loginType: loginType3.patientsHomeScreen)),
+                          builder: (context) => const PatientHomeScreen(
+                            loginType: LoginType.patient,
+                          ),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color(0xFF0CE25C),
+                      backgroundColor: const Color(0xFF0CE25C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: const Text(
                         'Proceed to homepage',
                         style: TextStyle(
                           fontSize: 20,
@@ -288,66 +287,66 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                   ),
                 ),
 
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                Text(
+                const Text(
                   'Medication Label:',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                   child: TextFormField(
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                     ),
                     // controller: controller,
                     enabled: false,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Your Medication Label... ",
                       border: InputBorder.none, // Set this to remove the border
                     ),
                   ),
                 ),
-                Text(
+                const Text(
                   'Medication Quantity:',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                   child: TextFormField(
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                     ),
                     // controller: controller,
                     enabled: false,
                     controller: medsQuantity,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Your Medication Quantity...",
                       border: InputBorder.none, // Set this to remove the border
                     ),
                   ),
                 ),
-                Text(
+                const Text(
                   'Medication Schedules:',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                   child: TextFormField(
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                     ),
                     // controller: controller,
                     enabled: false,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Your Medication Schedule...",
                       border: InputBorder.none, // Set this to remove the border
                     ),
                   ),
                 ),
 
-                Container(
+                SizedBox(
                   width: double
                       .infinity, // Set the width to expand to the available space
                   child: ElevatedButton(
@@ -355,15 +354,16 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color(0xFF0CE25C),
+                      backgroundColor: const Color(0xFF0CE25C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 12), // Adjust the padding as needed
-                      child: Text(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                      ), // Adjust the padding as needed
+                      child: const Text(
                         'Add Medications',
                         style: TextStyle(
                           fontSize: 20,
@@ -374,8 +374,10 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                     ),
                   ),
                 ),
-              ]),
-            )),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

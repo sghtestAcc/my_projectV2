@@ -5,14 +5,13 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:my_project/add_questions_modal.dart';
 import 'package:my_project/navigation_drawer.dart';
 
-
-enum loginType6 { patientsCommunicationScreen, caregiversCommunicationScreen }
+import 'models/login_type.dart';
 
 class CommunicationsScreen extends StatefulWidget {
   // LoginScreen
-    final loginType6 loginType;
+  final LoginType loginType;
   // const CommunicationsScreen({super.key});
-   const CommunicationsScreen({Key? key, required this.loginType})
+  const CommunicationsScreen({Key? key, required this.loginType})
       : super(key: key);
 
   @override
@@ -52,7 +51,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
       _translatedText = result;
       _isLoading = false;
     });
-  } 
+  }
 
   final languagePicker = TranslateLanguage.values
       .map(
@@ -99,21 +98,19 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
         ),
       );
 
-      
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Communications',
           style: TextStyle(color: Colors.black, fontSize: 25),
         ),
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
         centerTitle: true,
       ),
       body: Column(
@@ -171,35 +168,33 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               ),
             ],
           ),
-          Container(
-            child: TextFormField(
-              controller: _controller,
-              onChanged: translateTextFunction,
-              maxLines: 3,
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                hintText: 'Enter text',
-                suffixIcon: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Clipboard.getData('text/plain').then((value) {
-                          if (value != null) {
-                            _controller.text = value.text!;
-                            setState(() {
-                              typedText = value.text!;
-                              translateTextFunction(typedText);
-                            });
-                          }
-                        });
-                      },
-                      child: Icon(Icons.paste),
-                    ),
-                  ],
-                ),
-                contentPadding: EdgeInsets.all(10.0),
+          TextFormField(
+            controller: _controller,
+            onChanged: translateTextFunction,
+            maxLines: 3,
+            keyboardType: TextInputType.multiline,
+            decoration: InputDecoration(
+              hintText: 'Enter text',
+              suffixIcon: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Clipboard.getData('text/plain').then((value) {
+                        if (value != null) {
+                          _controller.text = value.text!;
+                          setState(() {
+                            typedText = value.text!;
+                            translateTextFunction(typedText);
+                          });
+                        }
+                      });
+                    },
+                    child: const Icon(Icons.paste),
+                  ),
+                ],
               ),
+              contentPadding: const EdgeInsets.all(10.0),
             ),
           ),
           Container(
@@ -214,36 +209,34 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               _isLoading
                   ? 'Loading...'
                   : _translatedText ?? 'Enter text to be translated',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
           ),
-
-     widget.loginType == loginType6.patientsCommunicationScreen ?
-
-          Container(
-            decoration: BoxDecoration(
-                border: Border.all(
-              width: 2,
-            )),
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
-            child: const Text(
-              'Common / Saved questions for Patients',
-              style: TextStyle(fontSize: 20),
-            ),
-          ) : 
-          Container(
-            decoration: BoxDecoration(
-                border: Border.all(
-              width: 2,
-            )),
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
-            child: const Text(
-              'Common / Saved questions for Caregivers',
-              style: TextStyle(fontSize: 20),
-            ),
-          ),
+          widget.loginType == LoginType.patient
+              ? Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                    width: 2,
+                  )),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
+                  child: const Text(
+                    'Common / Saved questions for Patients',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                    width: 2,
+                  )),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
+                  child: const Text(
+                    'Common / Saved questions for Caregivers',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(10.0),
@@ -287,7 +280,8 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           ),
         ],
       ),
-      endDrawer: AppDrawerNavigation(loginType: LoginType5.patientsNavgation),
+      endDrawer:
+          const AppDrawerNavigation(loginType: LoginType5.patientsNavgation),
     );
   }
 }
