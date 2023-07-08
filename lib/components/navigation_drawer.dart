@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'models/authentication_repository.dart';
+import 'package:my_project/models/login_type.dart';
 
-enum LoginType5 { patientsNavgation, caregiversNavgation }
+import '../repos/authentication_repository.dart';
 
 class AppDrawerNavigation extends StatefulWidget {
-  final LoginType5 loginType;
+  final LoginType loginType;
 
   // const AppDrawerNavigation({super.key});
 
@@ -18,7 +18,7 @@ class AppDrawerNavigation extends StatefulWidget {
 class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
   @override
   Widget build(BuildContext context) {
-    return widget.loginType == LoginType5.patientsNavgation
+    return widget.loginType == LoginType.patient
         ? Drawer(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

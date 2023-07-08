@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:my_project/caregiver_prescription.dart';
-import 'package:my_project/caregiver_vocal.dart';
+import 'package:my_project/components/navigation_drawer.dart';
+import 'package:my_project/screens/communications/caregiver/caregiver_prescription.dart';
+import 'package:my_project/screens/communications/caregiver/caregiver_vocal.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/models/patient_user.dart';
-import 'package:my_project/models/select_patient_controller.dart';
-import 'package:my_project/navigation_drawer.dart';
-import 'package:my_project/patients_prescriptions.dart';
-import 'package:my_project/patients_vocalization.dart';
+import 'package:my_project/controllers/select_patient_controller.dart';
+import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
+import 'package:my_project/screens/communications/patient/patients_vocalization.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -140,8 +139,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData) {
-                        PatientModel patientsInfo =
-                            snapshot.data as PatientModel;
+                        var patientsInfo = snapshot.data;
                         return Stack(
                           alignment: Alignment.center,
                           children: [
@@ -163,7 +161,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Hi welcome ${patientsInfo.name}",
+                                        "Hi welcome ${patientsInfo?.name}",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
@@ -369,10 +367,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           )
         ],
       ),
-      endDrawer: widget.loginType == LoginType.patient
-          ? const AppDrawerNavigation(loginType: LoginType5.patientsNavgation)
-          : const AppDrawerNavigation(
-              loginType: LoginType5.caregiversNavgation),
+      endDrawer: AppDrawerNavigation(loginType: widget.loginType),
     );
   }
 }

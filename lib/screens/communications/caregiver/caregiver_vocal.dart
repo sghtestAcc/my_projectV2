@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/components/navigation_drawer.dart';
+import 'package:my_project/models/login_type.dart';
 
 class CaregviersVocalScreen extends StatefulWidget {
   const CaregviersVocalScreen({super.key});
@@ -215,8 +216,7 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
           ],
         )
       ]),
-      endDrawer:
-          const AppDrawerNavigation(loginType: LoginType5.caregiversNavgation),
+      endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
     );
   }
 }

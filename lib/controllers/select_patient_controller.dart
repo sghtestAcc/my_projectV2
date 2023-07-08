@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:my_project/models/authentication_repository.dart';
-import 'package:my_project/models/patient_user.dart';
-import 'package:my_project/models/user_repo.dart';
+import 'package:my_project/repos/authentication_repository.dart';
+import 'package:my_project/models/grace_user.dart';
+import 'package:my_project/repos/user_repo.dart';
 
 class SelectPatientController extends GetxController {
   static SelectPatientController get instance => Get.find();
@@ -9,16 +9,16 @@ class SelectPatientController extends GetxController {
   final _authRepo = Get.put(AuthenticationRepository());
   final _userRepo = Get.put(UserRepository());
 
-  getPatientData() {
+  Future<GraceUser?> getPatientData() async {
     final email = _authRepo.firebaseUser.value?.email;
-    if (email != null) {
-      return _userRepo.getPatientDetails(email);
-    } else {
+    if (email == null) {
       Get.snackbar("Error", "Could not show email.");
+      return null;
     }
+    return await _userRepo.getUser(email);
   }
 
-  Future<List<PatientModel>> getPatients() async {
+  Future<List<GraceUser>> getPatients() async {
     return await _userRepo.getAllPatients();
   }
 }

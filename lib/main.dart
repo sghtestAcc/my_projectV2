@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:my_project/login_page.dart';
+import 'package:my_project/screens/auth/login_page.dart';
 
 import 'firebase_options.dart';
-import 'models/authentication_repository.dart';
+import 'repos/authentication_repository.dart';
 import 'models/login_type.dart';
 
 void main() async {

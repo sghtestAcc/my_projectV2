@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/components/navigation_drawer.dart';
+import 'package:my_project/models/login_type.dart';
 
 class PatientsPrescripScreen extends StatelessWidget {
   const PatientsPrescripScreen({super.key});
@@ -164,8 +165,7 @@ class PatientsPrescripScreen extends StatelessWidget {
           ),
         ],
       ),
-      endDrawer:
-          const AppDrawerNavigation(loginType: LoginType5.patientsNavgation),
+      endDrawer: const AppDrawerNavigation(loginType: LoginType.patient),
       // bottomNavigationBar: NavigatorBar(loginType: LoginType4.patientsLoginBottomTab,),
       // Get.to(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,));
     );

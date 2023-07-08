@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/communications_patient.dart';
+import 'package:my_project/screens/communications/communications_patient.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/patient_home.dart';
-import 'package:my_project/select_patients.dart';
+import 'package:my_project/screens/home/patient_home.dart';
+import 'package:my_project/screens/patients/select_patients.dart';
 
 class NavigatorBar extends StatefulWidget {
   // const NavigatorBar({super.key});

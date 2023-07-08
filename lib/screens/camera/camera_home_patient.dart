@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/navigation.tab.dart';
 
 class CameraHomeScreenPatient extends StatefulWidget {
   final String? path;

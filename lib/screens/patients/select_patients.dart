@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/models/login_type.dart';
+
+import '../../components/navigation_drawer.dart';
 
 class SelectPatientScreen extends StatefulWidget {
   const SelectPatientScreen({super.key});
@@ -157,7 +159,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         ],
       ),
       endDrawer: const AppDrawerNavigation(
-        loginType: LoginType5.caregiversNavgation,
+        loginType: LoginType.caregiver,
       ),
     );
   }

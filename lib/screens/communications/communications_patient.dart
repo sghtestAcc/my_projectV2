@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:my_project/add_questions_modal.dart';
-import 'package:my_project/navigation_drawer.dart';
+import 'package:my_project/components/navigation_drawer.dart';
+import 'package:my_project/screens/camera/components/add_questions_modal.dart';
 
-import 'models/login_type.dart';
+import '../../models/login_type.dart';
 
 class CommunicationsScreen extends StatefulWidget {
   // LoginScreen
@@ -280,8 +280,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           ),
         ],
       ),
-      endDrawer:
-          const AppDrawerNavigation(loginType: LoginType5.patientsNavgation),
+      endDrawer: const AppDrawerNavigation(loginType: LoginType.patient),
     );
   }
 }
