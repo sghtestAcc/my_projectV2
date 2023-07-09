@@ -7,6 +7,7 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/error/register_failure.dart';
 
 import 'package:my_project/repos/user_repo.dart';
+import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -81,9 +82,7 @@ class AuthenticationRepository extends GetxController {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       Get.to(
         () => loginType == LoginType.patient
-            ? const NavigatorBar(
-                loginType: LoginType.patient,
-              )
+            ? const PatientUploadMedsScreen()
             : const NavigatorBar(
                 loginType: LoginType.caregiver,
               ),

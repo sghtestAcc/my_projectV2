@@ -40,10 +40,6 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   ),
                   onTap: () {
                     AuthenticationRepository.instance.logout();
-                    // AuthenticationRepository.instance.loginPUser(
-                    //                         controller.email.text.trim(),
-                    //                         controller.password.text.trim());
-                    //                   }
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(

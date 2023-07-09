@@ -21,4 +21,8 @@ class SelectPatientController extends GetxController {
   Future<List<GraceUser>> getPatients() async {
     return await _userRepo.getAllPatients();
   }
+  // Future<List<String?>> getPatientsQuestions() async {
+  //   final email = _authRepo.firebaseUser.value?.email;
+  //   return await _userRepo.getQuestionsofPatient(email!);
+  // }
 }

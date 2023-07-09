@@ -6,12 +6,15 @@ class GraceUser {
   final String? id;
   final String? email;
   final String? name;
+  // final String? question;
   final LoginType loginType;
+  
 
   const GraceUser({
     this.id,
     required this.email,
     required this.name,
+    // this.question,
     required this.loginType,
   });
 
@@ -19,12 +22,14 @@ class GraceUser {
     String? id,
     String? email,
     String? name,
+    // String? Question,
     LoginType? loginType,
   }) =>
       GraceUser(
         id: id ?? this.id,
         email: email ?? this.email,
         name: name ?? this.name,
+        // question: question ?? this.question,
         loginType: loginType ?? this.loginType,
       );
 
@@ -32,6 +37,7 @@ class GraceUser {
     return {
       'Name': name,
       'Email': email,
+      // 'Question': question,
       'LoginType': loginType.name,
     };
   }
@@ -45,6 +51,7 @@ class GraceUser {
       id: document.id,
       email: data["Email"],
       name: data["Name"],
+      // question: data["Question"],
       loginType: LoginType.values.firstWhere(
         (element) => element.name == data['LoginType'],
       ),
