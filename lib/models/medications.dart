@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class Medication {
   final String? id;
+  final Image image;
   final String labels;
   final String pills;
   final String quantity;
@@ -10,6 +12,7 @@ class Medication {
 
   const Medication({
     this.id,
+    required this.image,
     required this.labels,
     required this.pills,
     required this.quantity,
@@ -24,6 +27,7 @@ class Medication {
       'Quantity': quantity,
       'Schedule': schedule,
       'Email': email,
+      'image' : image,
     };
   }
 
@@ -34,6 +38,7 @@ class Medication {
 
     return Medication(
       id: document.id,
+      image: data["image"],
       labels: data["Labels"],
       pills: data["Pills"],
       quantity: data["Quantity"],
@@ -44,6 +49,7 @@ class Medication {
 
   Medication copy({
     String? id,
+    Image? image,
     String? labels,
     String? pills,
     String? quantity,
@@ -52,6 +58,7 @@ class Medication {
   }) =>
       Medication(
         id: id ?? this.id,
+        image: image ?? this.image,
         labels: labels ?? this.labels,
         pills: pills ?? this.pills,
         quantity: quantity ?? this.quantity,
