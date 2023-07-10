@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:avatar_glow/avatar_glow.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:my_project/components/navigation_drawer.dart';
@@ -14,6 +16,7 @@ class PatientsVocalScreen extends StatefulWidget {
 class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
   String? _translatedText;
   final _controller = TextEditingController();
+  final controller2 = TextEditingController();
   String sourceSelect = 'English';
   String targetSelect = 'English';
   bool _isLoading = false;
@@ -85,9 +88,55 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
         ),
       );
 
+  SpeechToText speechToText = SpeechToText();
+
+  var isListening = false;
+  var text = 'Enter Text';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AvatarGlow(
+          endRadius: 75.0,
+          animate: isListening,
+          duration: Duration(milliseconds: 2000),
+          glowColor: Color(0xff00A67E),
+          repeat: true,
+          repeatPauseDuration: Duration(milliseconds: 100),
+          showTwoGlows: true,
+          child: GestureDetector(
+            onTapDown: (details) async {
+              if (!isListening) {
+                var available = await speechToText.initialize();
+                if (available) {
+                  setState(() {
+                    isListening = true;
+                    speechToText.listen(
+                      onResult: (result) {
+                        setState(() {
+                          controller2.text = result.recognizedWords;
+                          // text = result.recognizedWords;
+                        });
+                      },
+                    );
+                  });
+                }
+              }
+            },
+            onTapUp: (details) {
+              setState(() {
+                isListening = false;
+              });
+              speechToText.stop();
+            },
+            child: CircleAvatar(
+              backgroundColor: Color(0xff00A67E),
+              radius: 35,
+              child: Icon(isListening ? Icons.mic : Icons.mic_none,
+                  color: Colors.white),
+            ),
+          )),
       appBar: AppBar(
         title: const Text(
           'Vocalization',
@@ -154,12 +203,12 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
               ],
             ),
             TextFormField(
-              controller: _controller,
+              controller: controller2,
               onChanged: translateTextFunction,
               maxLines: 4,
               keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
-                hintText: 'Enter text',
+                hintText: "Enter Text",
                 suffixIcon: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -182,6 +231,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                 contentPadding: EdgeInsets.all(10.0),
               ),
             ),
+
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -201,19 +251,33 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
             const SizedBox(
               height: 10,
             ),
+            // Container(
+            //   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            //   height: 130,
+            //   child: ListView.separated(
+            //     scrollDirection: Axis.horizontal,
+            //     itemCount: 6,
+            //     separatorBuilder: (context, _) => const SizedBox(
+            //       width: 10,
+            //     ),
+            //     itemBuilder: (context, index) => buildCard(index),
+            //   ),
+            // ),
             Container(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              height: 130,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: 6,
-                separatorBuilder: (context, _) => const SizedBox(
-                  width: 10,
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                height: 130,
+                child: Text(
+                  text,
+                  style:TextStyle(fontSize: 24, color: isListening ? Colors.black87 : Colors.black54, fontWeight: FontWeight.w600),
                 ),
-                itemBuilder: (context, index) => buildCard(index),
+                // ListView.separated(
+                //   scrollDirection: Axis.horizontal,
+                //   itemCount: 6,
+                //   separatorBuilder: (context, _) => SizedBox(width: 10,),
+                //   itemBuilder: (context, index) => buildCard(index) ,
+                // )
               ),
-            ),
-          ],
+            ],
         )
       ]),
       endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
