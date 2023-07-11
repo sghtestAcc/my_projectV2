@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:my_project/repos/authentication_repository.dart';
+import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/camera_home_patient.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/patient_home.dart';
 
 class PatientUploadMedsScreen extends StatefulWidget {
-  const PatientUploadMedsScreen({Key? key}) : super(key: key);
+  // final XFile? image;
+  const PatientUploadMedsScreen({Key? key,this.imagetaken,this.imagetakenPill}) : super(key: key);
+
+  final XFile? imagetaken;
+  final XFile? imagetakenPill;
 
   @override
-  State<PatientUploadMedsScreen> createState() =>
-      _PatientUploadMedsScreenState();
+  State<PatientUploadMedsScreen> createState() => _PatientUploadMedsScreenState();
 }
 
-class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
-  final email = TextEditingController();
-  final fullName = TextEditingController();
+XFile? imageFile2;
 
-  //  TextEditingController searchController = TextEditingController();
+final _authRepo = Get.put(AuthenticationRepository());
+final userRepo = Get.put(UserRepository());
+
+class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
+  final currentEmail = _authRepo.firebaseUser.value?.email;
   TextEditingController medsQuantity = TextEditingController();
   TextEditingController medsSchedule = TextEditingController();
-
   var formData = GlobalKey<FormState>();
+  XFile? receivedImage;
 
   void addMedsScheduleModal(BuildContext context) {
     showModalBottomSheet(
@@ -103,6 +112,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       ),
                     ),
                     child: TextFormField(
+                      controller: medsSchedule,
                       decoration: const InputDecoration(
                         hintText: 'Morning After meal...',
                         contentPadding: EdgeInsets.all(10.0),
@@ -181,7 +191,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-
                 //upload images button
                 SizedBox(
                   width: double
@@ -193,7 +202,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  const CameraHomeScreenPatient()));
+                                  const CameraHomePatientScreen()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0CE25C),
@@ -334,6 +343,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                 Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                   child: TextFormField(
+                    controller: medsSchedule,
                     style: const TextStyle(
                       color: Colors.black,
                     ),
@@ -350,8 +360,22 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                   width: double
                       .infinity, // Set the width to expand to the available space
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
+                    onPressed: () async {
+                    
+                      // if (await UserRepository.instance.createUser(user)) {
+                      //       await AuthenticationRepository.instance
+                      //           .registerUser(
+                      //         email.text.trim(),
+                      //         password.text.trim(),
+                      //         widget.registerType,
+                      //       );
+                      //     }
+                     await userRepo.createPatientMedications(
+                        widget.imagetaken, 
+                        widget.imagetakenPill, 
+                        medsQuantity.text.trim(), 
+                        medsSchedule.text.trim(), 
+                        currentEmail!);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0CE25C),
@@ -382,3 +406,4 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
     );
   }
 }
+

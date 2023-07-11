@@ -65,44 +65,44 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
       )
       .toList();
 
-  Widget buildCard2(int index) => Container(
-        padding: const EdgeInsets.all(10.0),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(22)),
-          color: Color(0xFFF6F6F6),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.2),
-              offset: Offset(0, 1),
-              blurRadius: 4,
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SelectableText(
-              'Question $index',
-              style: const TextStyle(fontSize: 20),
-            ),
-            IconButton(
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: 'Question $index')).then(
-                  (_) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Copied to your clipboard !'),
-                      ),
-                    );
-                  },
-                );
-              },
-              icon: const Icon(Icons.copy),
-            ),
-          ],
-        ),
-      );
+  // Widget buildCard2(int index) => Container(
+  //       padding: const EdgeInsets.all(10.0),
+  //       decoration: const BoxDecoration(
+  //         borderRadius: BorderRadius.all(Radius.circular(22)),
+  //         color: Color(0xFFF6F6F6),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Color.fromRGBO(0, 0, 0, 0.2),
+  //             offset: Offset(0, 1),
+  //             blurRadius: 4,
+  //             spreadRadius: 0,
+  //           ),
+  //         ],
+  //       ),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           SelectableText(
+  //             'Question $index',
+  //             style: const TextStyle(fontSize: 20),
+  //           ),
+  //           IconButton(
+  //             onPressed: () {
+  //               Clipboard.setData(ClipboardData(text: 'Question $index')).then(
+  //                 (_) {
+  //                   ScaffoldMessenger.of(context).showSnackBar(
+  //                     const SnackBar(
+  //                       content: Text('Copied to your clipboard !'),
+  //                     ),
+  //                   );
+  //                 },
+  //               );
+  //             },
+  //             icon: const Icon(Icons.copy),
+  //           ),
+  //         ],
+  //       ),
+  //     );
 
   @override
   Widget build(BuildContext context) {
@@ -243,6 +243,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
+                //patients view questions
             widget.loginType == LoginType.patient ?     
           Expanded(
             child: FutureBuilder<List<String>>(
@@ -314,19 +315,76 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
             } 
             )
           ) :
+          //caregivers view questions
            Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(10.0),
-              itemCount: 4,
-              separatorBuilder: (context, index) {
-                return const SizedBox(
+            child: FutureBuilder<List<String>>(
+              future: userRepo.getQuestionsofCaregiver(currentEmail!),
+            builder: (context, snapshot) {
+              if(snapshot.connectionState == ConnectionState.done) {
+                // var patientInfo2 = snapshot.data;
+                if(snapshot.hasData) {
+                  return ListView.separated(
+                    padding: const EdgeInsets.all(10.0),
+                    itemCount: snapshot.data!.length,
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(
                   height: 15,
                 );
-              },
-              itemBuilder: (context, index) {
-                return buildCard2(index);
-              },
+                    },
+                    itemBuilder: (context, i) {
+                        return Container(
+        padding: const EdgeInsets.all(10.0),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(22)),
+          color: Color(0xFFF6F6F6),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.2),
+              offset: Offset(0, 1),
+              blurRadius: 4,
+              spreadRadius: 0,
             ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SelectableText(
+              snapshot.data![i],
+              // patientInfo2[index].Question,
+              style: const TextStyle(fontSize: 20),
+            ),
+            IconButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: snapshot.data![i],)).then(
+                  (_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied to your clipboard !'),
+                      ),
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.copy),
+            ),
+          ],
+        ),
+      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                        return Center(child: Text(snapshot.error.toString()));
+              } else {
+                        return const Center(
+                            child: Text('Something went wrong'));
+                      }
+              }
+              else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+            } 
+            )
           ),
           widget.loginType == LoginType.patient ?
           Container(

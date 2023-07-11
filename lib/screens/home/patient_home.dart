@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
@@ -10,6 +8,7 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
 import 'package:my_project/screens/communications/patient/patients_vocalization.dart';
+import 'package:my_project/screens/home/patient_card.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -28,7 +27,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // bool isDropdownOpen = false;
     List<int> values = [
       2,
       4,
@@ -354,7 +352,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   ),
                 ]),
           ),
-widget.loginType == LoginType.patient
+        widget.loginType == LoginType.patient
               ? 
           Expanded(
             child: ListView.separated(
@@ -367,6 +365,7 @@ widget.loginType == LoginType.patient
               },
               itemBuilder: (context, index) {
                 return buildCard(index);
+                // return patientcard(index);
               },
             ),
           ) :  
@@ -476,22 +475,7 @@ widget.loginType == LoginType.patient
                       }
             }  else {
                       return const Center(child: CircularProgressIndicator());
-                    }
-          // Expanded(
-          //   child: ListView.separated(
-          //     padding: const EdgeInsets.all(10.0),
-          //     itemCount: 10,
-          //     separatorBuilder: (context, index) {
-          //       return const SizedBox(
-          //         height: 10,
-          //       );
-          //     },
-          //     itemBuilder: (context, index) {
-          //       return buildCard(index);
-          //     },
-          //   ),
-          // )
-        
+                    } 
           },) 
        
         ],

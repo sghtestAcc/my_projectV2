@@ -6,24 +6,26 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/screens/camera/camera_home_patient_pill.dart';
 import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
-class CameraHomePatientScreen extends StatefulWidget {
+class CameraHomePatientPillScreen extends StatefulWidget {
   final String? path;
 
-  const CameraHomePatientScreen({Key? key, this.path}) : super(key: key);
+  final XFile? imagetaken;
+  final XFile? imagetakenPill;
+
+  const CameraHomePatientPillScreen({Key? key, this.path, this.imagetaken,this.imagetakenPill}) : super(key: key);
   @override
-  State<CameraHomePatientScreen> createState() =>
-      _CameraHomePatientScreenState();
+  State<CameraHomePatientPillScreen> createState() =>
+      _CameraHomePatientPillScreenState();
 }
 
-class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
+class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScreen> {
   bool textScanning = false;
 
-  XFile? imageFile;
+  XFile? imageFilepills;
 
-  String scannedText = "";
+  String scannedTextpills = "";
   File? croppedImageFile;
 
   TextEditingController controller = TextEditingController();
@@ -56,12 +58,10 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
             height: 20,
           ),
           const Text(
-            ' Upload for Medication Labels',
+            ' Upload for Medication Pills',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-           const SizedBox(
-            height: 20,
-          ),
+
           ElevatedButton(
               onPressed: () {
                 pickImage(source: ImageSource.camera).then((value) {
@@ -120,16 +120,14 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 //               loginType: LoginType.patient,
                 //             )));
                 // Navigator.of(context)
-                // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFile)));  
-                if (imageFile == null) {
+                // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFilepills)));  
+                if (imageFilepills == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Please select an Medication Label image')),
+                SnackBar(content: Text('Please select an image')),
                 );
                 } else {
-                // Navigator.of(context)
-                // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFile))); 
-                // Navigator.of(context)
-                // .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetakenLabel: imageFile)));  
+                Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: widget.imagetaken ,imagetakenPill: imageFilepills)));  
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -144,48 +142,21 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 'Continue',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               )),
-              const SizedBox(
-              height: 20,
-              ),
-              ElevatedButton(
-              onPressed: () { 
-                if (imageFile == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Please select an Medication Label image')),
-                );
-                } else {
-                Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetaken: imageFile)));  
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0CE25C),
-                minimumSize: const Size(320, 50), // NEW
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(12), // Rounded corner radius
-                ),
-              ),
-              child: const Text(
-                'go to pills',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              )),
-
           const SizedBox(
             height: 20,
           ),
-          if (!textScanning && imageFile == null)
+          if (!textScanning && imageFilepills == null)
             Container(
               width: 200,
               height: 200,
               color: Colors.grey[300]!,
             ),
-          if (imageFile != null)
+          if (imageFilepills != null)
             Container(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               height: 200,
               child: Image.file(
-                File(imageFile!.path),
+                File(imageFilepills!.path),
                 fit: BoxFit.fitWidth,
               ),
             ),
@@ -199,6 +170,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 'Translated Medication Label:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
+              // Text(scannedText),
               Row(
                 children: [
                   Expanded(
@@ -227,6 +199,8 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       ),
     );
   }
+
+
 
   Future<void> imageCropperView(String? path, BuildContext context) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
@@ -259,8 +233,8 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
 
     if (croppedFile != null) {
       log('image cropped');
-      imageFile = XFile(croppedFile.path);
-      getRecognisedText(imageFile!);
+      imageFilepills = XFile(croppedFile.path);
+      getRecognisedText(imageFilepills!);
       // });
     } else {
       // return '';
@@ -278,20 +252,19 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
 
     await textRecognizer.close();
 
-    scannedText = "";
+    scannedTextpills = "";
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
-        scannedText += "${line.text} ";
+        scannedTextpills += "${line.text} ";
       }
     }
-    controller.text = scannedText; // Set the value of the TextEditingController to the scanned text
+    controller.text = scannedTextpills; // Set the value of the TextEditingController to the scanned text
   
     textScanning = false;
     setState(() {});
   }
-  // imageQuality: 50
 
-  Future<String> pickImage({ImageSource? source,}) async {
+  Future<String> pickImage({ImageSource? source}) async {
     final picker = ImagePicker();
     String path = '';
     try {
@@ -299,12 +272,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       if (getImage != null) {
         path = '';
         textScanning = true;
-        imageFile = getImage;
-        XFile? file = XFile(imageFile!.path); 
-        String fileName = file.path.split('/').last;
-        print(file);
-        print(fileName);
-        // String fileName = path.split('/').last;
+        imageFilepills = getImage;
         path = getImage.path;
         setState(() {});
         // getRecognisedText(getImage);
@@ -313,12 +281,12 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       }
     } catch (e) {
       textScanning = false;
-      imageFile = null;
-      scannedText = "Error occured while scanning";
+      imageFilepills = null;
+      scannedTextpills = "Error occured while scanning";
       setState(() {});
+
       log(e.toString());
     }
-
     return path;
   }
 

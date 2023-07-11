@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/models/grace_user.dart';
-import 'package:my_project/models/login_type.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/communications/communications_patient.dart';
 
