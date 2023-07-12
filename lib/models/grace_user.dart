@@ -57,4 +57,6 @@ class GraceUser {
       ),
     );
   }
+
+  get(String s) {}
 }
