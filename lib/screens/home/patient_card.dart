@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 
-class patientcard extends StatefulWidget {
+class viewpatientcard extends StatefulWidget {
   int index;
-  patientcard(this.index,{super.key});
+  viewpatientcard(this.index,{super.key});
 
   @override
-  State<patientcard> createState() => _patientcardState();
+  State<viewpatientcard> createState() => _viewpatientcardState();
 }
 
-class _patientcardState extends State<patientcard> {
+class _viewpatientcardState extends State<viewpatientcard> {
       bool isDropdownOpen = false;
   @override
   Widget build(BuildContext context) {

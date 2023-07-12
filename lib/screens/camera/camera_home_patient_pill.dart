@@ -10,11 +10,10 @@ import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
 class CameraHomePatientPillScreen extends StatefulWidget {
   final String? path;
-
-  final XFile? imagetaken;
+  final String? imagetakenText;
   final XFile? imagetakenPill;
 
-  const CameraHomePatientPillScreen({Key? key, this.path, this.imagetaken,this.imagetakenPill}) : super(key: key);
+  const CameraHomePatientPillScreen({Key? key, this.path, this.imagetakenText,this.imagetakenPill}) : super(key: key);
   @override
   State<CameraHomePatientPillScreen> createState() =>
       _CameraHomePatientPillScreenState();
@@ -24,6 +23,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
   bool textScanning = false;
 
   XFile? imageFilepills;
+
 
   String scannedTextpills = "";
   File? croppedImageFile;
@@ -61,7 +61,9 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
             ' Upload for Medication Pills',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-
+           const SizedBox(
+            height: 20,
+          ),
           ElevatedButton(
               onPressed: () {
                 pickImage(source: ImageSource.camera).then((value) {
@@ -87,8 +89,6 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
           ),
           ElevatedButton(
               onPressed: () {
-                // getImage(ImageSource.gallery);
-                // pickImage(source: ImageSource.gallery);
                 pickImage(source: ImageSource.gallery).then((value) {
                   if (value != '') {
                     imageCropperView(value, context);
@@ -123,11 +123,11 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                 // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFilepills)));  
                 if (imageFilepills == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Please select an image')),
+                SnackBar(content: Text('Please select an image Pill')),
                 );
                 } else {
                 Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: widget.imagetaken ,imagetakenPill: imageFilepills)));  
+                .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetakenText: widget.imagetakenText,imagetakenPill: imageFilepills)));  
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -161,40 +161,36 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               ),
             ),
         
-          const SizedBox(
-            height: 10,
-          ),
-          Column(
-            children: [
-              const Text(
-                'Translated Medication Label:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              // Text(scannedText),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      child: TextFormField(
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                        controller: controller,
-                        maxLines: 1,
-                        enabled: false,
-                        decoration: const InputDecoration(
-                          hintText: "Your Medication will appear here...",
-                          border:
-                              InputBorder.none, // Set this to remove the border
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
+          // const SizedBox(
+          //   height: 10,
+          // ),
+          // Column(
+          //   children: [
+          //     // Text(scannedText),
+          //     Row(
+          //       children: [
+          //         Expanded(
+          //           child: Container(
+          //             padding: const EdgeInsets.all(20),
+          //             child: TextFormField(
+          //               style: const TextStyle(
+          //                 color: Colors.black,
+          //               ),
+          //               controller: controller,
+          //               maxLines: 1,
+          //               enabled: false,
+          //               decoration: const InputDecoration(
+          //                 hintText: "Your Medication will appear here...",
+          //                 border:
+          //                     InputBorder.none, // Set this to remove the border
+          //               ),
+          //             ),
+          //           ),
+          //         )
+          //       ],
+          //     ),
+          //   ],
+          // ),
         ]),
       ),
     );
@@ -234,7 +230,6 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     if (croppedFile != null) {
       log('image cropped');
       imageFilepills = XFile(croppedFile.path);
-      getRecognisedText(imageFilepills!);
       // });
     } else {
       // return '';
@@ -275,7 +270,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
         imageFilepills = getImage;
         path = getImage.path;
         setState(() {});
-        // getRecognisedText(getImage);
+        getRecognisedText(getImage);
       } else {
         path = '';
       }

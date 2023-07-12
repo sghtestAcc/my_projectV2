@@ -110,43 +110,43 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
           const SizedBox(
             height: 20,
           ),
-          ElevatedButton(
-              onPressed: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const NavigatorBar(
-                //               loginType: LoginType.patient,
-                //             )));
-                // Navigator.of(context)
-                // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFile)));  
-                if (imageFile == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Please select an Medication Label image')),
-                );
-                } else {
-                // Navigator.of(context)
-                // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFile))); 
-                // Navigator.of(context)
-                // .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetakenLabel: imageFile)));  
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0CE25C),
-                minimumSize: const Size(320, 50), // NEW
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(12), // Rounded corner radius
-                ),
-              ),
-              child: const Text(
-                'Continue',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              )),
-              const SizedBox(
-              height: 20,
-              ),
+          // ElevatedButton(
+          //     onPressed: () {
+          //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+          //       // Navigator.push(
+          //       //     context,
+          //       //     MaterialPageRoute(
+          //       //         builder: (context) => const NavigatorBar(
+          //       //               loginType: LoginType.patient,
+          //       //             )));
+          //       // Navigator.of(context)
+          //       // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFile)));  
+          //       if (imageFile == null) {
+          //       ScaffoldMessenger.of(context).showSnackBar(
+          //       SnackBar(content: Text('Please select an Medication Label image')),
+          //       );
+          //       } else {
+          //       // Navigator.of(context)
+          //       // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFile))); 
+          //       // Navigator.of(context)
+          //       // .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetakenLabel: imageFile)));  
+          //       }
+          //     },
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: const Color(0xFF0CE25C),
+          //       minimumSize: const Size(320, 50), // NEW
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius:
+          //             BorderRadius.circular(12), // Rounded corner radius
+          //       ),
+          //     ),
+          //     child: const Text(
+          //       'Continue',
+          //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          //     )),
+              // const SizedBox(
+              // height: 20,
+              // ),
               ElevatedButton(
               onPressed: () { 
                 if (imageFile == null) {
@@ -155,7 +155,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 );
                 } else {
                 Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetaken: imageFile)));  
+                .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetakenText: controller.text)));  
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -167,7 +167,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 ),
               ),
               child: const Text(
-                'go to pills',
+                'Select Medication Pills',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               )),
 

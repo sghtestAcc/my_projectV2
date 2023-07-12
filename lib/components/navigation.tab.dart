@@ -17,7 +17,8 @@ class _NavigatorBarState extends State<NavigatorBar> {
   int selectedIndex = 0;
 
   final screens = [
-    const PatientHomeScreen(loginType: LoginType.patient),
+    const PatientHomeScreen(
+      loginType: LoginType.patient),
     const CommunicationsScreen(
       loginType: LoginType.patient,
     ),
@@ -25,7 +26,8 @@ class _NavigatorBarState extends State<NavigatorBar> {
   ];
 
   final screens2 = [
-    const PatientHomeScreen(loginType: LoginType.caregiver),
+    const PatientHomeScreen(
+      loginType: LoginType.caregiver),
     const CommunicationsScreen(
       loginType: LoginType.caregiver,
     ),

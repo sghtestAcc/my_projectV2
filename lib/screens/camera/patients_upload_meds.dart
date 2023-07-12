@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/repos/user_repo.dart';
+import 'package:my_project/screens/camera/Add_questions_modal.dart';
 import 'package:my_project/screens/camera/camera_home_patient.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/patient_home.dart';
 
 class PatientUploadMedsScreen extends StatefulWidget {
   // final XFile? image;
-  const PatientUploadMedsScreen({Key? key,this.imagetaken,this.imagetakenPill}) : super(key: key);
+  const PatientUploadMedsScreen({Key? key,this.imagetakenText,this.imagetakenPill}) : super(key: key);
 
-  final XFile? imagetaken;
+  final String? imagetakenText;
   final XFile? imagetakenPill;
 
   @override
@@ -22,127 +24,130 @@ XFile? imageFile2;
 
 final _authRepo = Get.put(AuthenticationRepository());
 final userRepo = Get.put(UserRepository());
+  TextEditingController medsQuantity = TextEditingController();
+  TextEditingController medsSchedule = TextEditingController();
 
 class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   final currentEmail = _authRepo.firebaseUser.value?.email;
-  TextEditingController medsQuantity = TextEditingController();
-  TextEditingController medsSchedule = TextEditingController();
+  TextEditingController medsLabel = TextEditingController();
+
+  // medsLabel.text = widget.imagetakenText; 
   var formData = GlobalKey<FormState>();
   XFile? receivedImage;
 
-  void addMedsScheduleModal(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          // Handle the close button action here
-                          Navigator.of(context).pop();
-                        },
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    'Upload Medications schedules',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Quantity',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      // Background color
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Rounded border
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    child: TextFormField(
-                      controller: medsQuantity,
-                      decoration: const InputDecoration(
-                        hintText: '2 tabs/tablets',
-                        contentPadding: EdgeInsets.all(10.0),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Schedule',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      // Background color
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Rounded border
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    child: TextFormField(
-                      controller: medsSchedule,
-                      decoration: const InputDecoration(
-                        hintText: 'Morning After meal...',
-                        contentPadding: EdgeInsets.all(10.0),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Add',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Close',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      )),
-                ]),
-          );
-        });
-  }
+  // void addMedsScheduleModal(BuildContext context) {
+  //   showModalBottomSheet(
+  //       context: context,
+  //       builder: (context) {
+  //         return Container(
+  //           padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
+  //           child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.center,
+  //               children: [
+  //                 Row(
+  //                   children: [
+  //                     IconButton(
+  //                       onPressed: () {
+  //                         // Handle the close button action here
+  //                         Navigator.of(context).pop();
+  //                       },
+  //                       icon: const Icon(Icons.close),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 const Text(
+  //                   'Upload Medications schedules',
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //                 ),
+  //                 const SizedBox(
+  //                   height: 30,
+  //                 ),
+  //                 const Align(
+  //                   alignment: Alignment.centerLeft,
+  //                   child: Text(
+  //                     'Quantity',
+  //                     style:
+  //                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 Container(
+  //                   decoration: BoxDecoration(
+  //                     // Background color
+  //                     borderRadius:
+  //                         BorderRadius.circular(10.0), // Rounded border
+  //                     border: Border.all(
+  //                       color: Colors.black,
+  //                       width: 1.0,
+  //                     ),
+  //                   ),
+  //                   child: TextFormField(
+  //                     controller: medsQuantity,
+  //                     decoration: const InputDecoration(
+  //                       hintText: '2 tabs/tablets',
+  //                       contentPadding: EdgeInsets.all(10.0),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 const Align(
+  //                   alignment: Alignment.centerLeft,
+  //                   child: Text(
+  //                     'Schedule',
+  //                     style:
+  //                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 Container(
+  //                   decoration: BoxDecoration(
+  //                     // Background color
+  //                     borderRadius:
+  //                         BorderRadius.circular(10.0), // Rounded border
+  //                     border: Border.all(
+  //                       color: Colors.black,
+  //                       width: 1.0,
+  //                     ),
+  //                   ),
+  //                   child: TextFormField(
+  //                     controller: medsSchedule,
+  //                     decoration: const InputDecoration(
+  //                       hintText: 'Morning After meal...',
+  //                       contentPadding: EdgeInsets.all(10.0),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 ElevatedButton(
+  //                     onPressed: () {},
+  //                     child: const Text(
+  //                       'Add',
+  //                       style: TextStyle(
+  //                           fontSize: 20, fontWeight: FontWeight.bold),
+  //                     )),
+  //                 const SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 ElevatedButton(
+  //                     onPressed: () {},
+  //                     child: const Text(
+  //                       'Close',
+  //                       style: TextStyle(
+  //                           fontSize: 20, fontWeight: FontWeight.bold),
+  //                     )),
+  //               ]),
+  //         );
+  //       });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -228,7 +233,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-
+                Text(widget.imagetakenText ?? ''),
                 //upload schdules button
                 SizedBox(
                   width: double
@@ -236,8 +241,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       addMedsScheduleModal(context);
-                      // Add your onPressed logic here
-                      //  Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0CE25C),
@@ -262,7 +265,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -270,7 +272,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const PatientHomeScreen(
+                          builder: (context) => const NavigatorBar(
                             loginType: LoginType.patient,
                           ),
                         ),
@@ -309,7 +311,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                     style: const TextStyle(
                       color: Colors.black,
                     ),
-                    // controller: controller,
+                    controller: medsLabel,
                     enabled: false,
                     decoration: const InputDecoration(
                       hintText: "Your Medication Label... ",
@@ -357,21 +359,11 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                 ),
 
                 SizedBox(
-                  width: double
-                      .infinity, // Set the width to expand to the available space
+                  width: double.infinity, // Set the width to expand to the available space
                   child: ElevatedButton(
                     onPressed: () async {
-                    
-                      // if (await UserRepository.instance.createUser(user)) {
-                      //       await AuthenticationRepository.instance
-                      //           .registerUser(
-                      //         email.text.trim(),
-                      //         password.text.trim(),
-                      //         widget.registerType,
-                      //       );
-                      //     }
                      await userRepo.createPatientMedications(
-                        widget.imagetaken, 
+                        widget.imagetakenText, 
                         widget.imagetakenPill, 
                         medsQuantity.text.trim(), 
                         medsSchedule.text.trim(), 

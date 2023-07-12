@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/grace_user.dart';
+import 'package:my_project/models/medications.dart';
 
 class UserRepository extends GetxController {
   static UserRepository get instance => Get.find();
@@ -151,17 +151,6 @@ class UserRepository extends GetxController {
   }
 }
 
-
-// Future<bool> isPatientMedicationsExists(String email,String question) async {
-//     final CollectionReference usersCollection = firestore.collection('questions');
-//     var snapshot = await usersCollection
-//         .where("Email", isEqualTo: email)
-//         .where("Question", isEqualTo: question)
-//         .get();
-//     var isEmailExists = snapshot.docs.isNotEmpty;
-//     return isEmailExists; // If the snapshot has documents, email exists
-// }
-
 Future<String> uploadImageToStorage(String childName, XFile file) async {
   FirebaseStorage storage = FirebaseStorage.instance;
   Reference fileReference = storage.ref().child(childName);
@@ -176,44 +165,9 @@ Future<String> uploadImageToStorage(String childName, XFile file) async {
   }
 }
 
-  //   Future<bool> createUser(GraceUser user) async {
-  //   final String email = user.email!;
-  //   final bool emailExists = await isEmailExists(email, user.loginType);
-  //   if (emailExists) {
-  //     Get.snackbar(
-  //       "Error",
-  //       "Email already exists.",
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
-  //       colorText: Colors.red,
-  //     );
-  //     return false;
-  //   }
-  //   try {
-  //     await firestore.collection("users").add(user.toJson());
-  //     Get.snackbar(
-  //       "Congrats",
-  //       "A new account has been created.",
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.green.withOpacity(0.1),
-  //       colorText: Colors.green,
-  //     );
-  //     return true;
-  //   } catch (error) {
-  //     Get.snackbar(
-  //       "Error",
-  //       "Failed to create a new account.",
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
-  //       colorText: Colors.red,
-  //     );
-  //     print(error.toString());
-  //     return false;
-  //   }
-  // }
 
 // Future<bool> isPatientMedicationsExists(String email,String question) async {
-//     final CollectionReference usersCollection = firestore.collection('questions');
+//     final CollectionReference usersCollection = firestore.collection('medications');
 //     var snapshot = await usersCollection
 //         .where("Email", isEqualTo: email)
 //         .where("Question", isEqualTo: question)
@@ -222,9 +176,9 @@ Future<String> uploadImageToStorage(String childName, XFile file) async {
 //     return isEmailExists; // If the snapshot has documents, email exists
 // }
 
-
+//create patient medications
 Future<void> createPatientMedications(
-  XFile? labels,
+  String? labels,
   XFile? pills,
   String quantity,
   String schedule,
@@ -233,14 +187,12 @@ Future<void> createPatientMedications(
   final doesUserExists = await isEmailExists(email, LoginType.patient);
   if (!doesUserExists) return;
   try {
-  final pathRoute = 'medicationLabels/${labels}';
-  final pathRoute2 = 'medicationPills/${pills}';
-  String imageUrl = await uploadImageToStorage(pathRoute, labels!);
-  String imageUrl2 = await uploadImageToStorage(pathRoute2, pills!);
+  final pathRoute = 'medicationPills/${pills}';
+  String imageUrl = await uploadImageToStorage(pathRoute, pills!);
   
     await FirebaseFirestore.instance.collection("medications").add({
-      "Labels": imageUrl,
-      "Pills" : imageUrl2,
+      "Labels": labels,
+      "Pills" : imageUrl,
       "Quantity": quantity,
       "Schedule": schedule,
       "Email": email,
@@ -264,6 +216,49 @@ Future<void> createPatientMedications(
     print(error.toString());
   }
 }
+
+//   Future<List<String>> getQuestionsofCaregiver(String email) async {
+//     final doesUserExists = await isEmailExists(email, LoginType.caregiver);
+//     if (!doesUserExists) throw Exception('User does not exists');
+//     final snapshot = await firestore
+//         .collection("questions")
+//         .where("Email", isEqualTo: email)
+//         .get();
+//     return snapshot.docs
+//         .map(
+//           (e) => e.data()["Question"].toString(),
+//         )
+//         .toList();
+// }
+
+//get single patinet Medications
+ Future<List<Medication>> getPatientMedications(String email) async {
+final doesUserExists = await isEmailExists(email, LoginType.patient);
+if (!doesUserExists) throw Exception('User does not exists');
+    final snapshot = await firestore
+        .collection("medications")
+        .where("Email", isEqualTo: email)
+        .get();
+    final patientDataMedications = snapshot.docs
+        .map(
+          (e) => Medication.fromSnapshot(e),
+        )
+        .toList();
+    return patientDataMedications;
+  }
+
+  //  Future<List<GraceUser>> getAllPatients() async {
+  //   final snapshot = await firestore
+  //       .collection("users")
+  //       .where("LoginType", isEqualTo: LoginType.patient.name)
+  //       .get();
+  //   final patientData = snapshot.docs
+  //       .map(
+  //         (e) => GraceUser.fromSnapshot(e),
+  //       )
+  //       .toList();
+  //   return patientData;
+  // }
 
   //create caregivers questions function
   Future<void> createCaregiverUserQuestions(

@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
 
 class Medication {
   final String? id;
-  final XFile labels;
-  final XFile pills;
+  final String labels;
+  final String pills;
   final String quantity;
   final String schedule;
   final String email;
@@ -21,8 +20,8 @@ class Medication {
   
   Medication copy({
     String? id,
-    XFile? labels,
-    XFile? pills,
+    String? labels,
+    String? pills,
     String? quantity,
     String? schedule,
     String? email,
