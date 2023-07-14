@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,6 +30,8 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
   File? croppedImageFile;
 
   TextEditingController controller = TextEditingController();
+
+  String compressedImagePath = "/storage/emulated/0/Download/";
 
   @override
   void initState() {
@@ -213,7 +216,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
       ] ,
       uiSettings: [
         AndroidUiSettings(
-            toolbarTitle: 'Cropping Images for Medication Labels',
+            toolbarTitle: 'Cropping Images for Medication Pills',
             toolbarColor: Colors.deepOrange,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
@@ -254,7 +257,6 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
       }
     }
     controller.text = scannedTextpills; // Set the value of the TextEditingController to the scanned text
-  
     textScanning = false;
     setState(() {});
   }
@@ -268,9 +270,13 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
         path = '';
         textScanning = true;
         imageFilepills = getImage;
-        path = getImage.path;
-        setState(() {});
-        getRecognisedText(getImage);
+           final compressedFile = await FlutterImageCompress.compressAndGetFile(imageFilepills!.path,"$compressedImagePath/file1.jpg",
+          quality: 5,
+          );
+          imageFilepills = XFile(compressedFile!.path);
+          path = getImage.path;
+          setState(() {});
+          getRecognisedText(getImage);
       } else {
         path = '';
       }
@@ -284,5 +290,4 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     }
     return path;
   }
-
 }

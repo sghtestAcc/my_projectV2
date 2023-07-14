@@ -62,67 +62,125 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-  Future<void> loginUser(
-    String email,
-    String password,
-    LoginType loginType,
-  ) async {
-    try {
-      var emailExists = await userRepo.isEmailExists(email, loginType);
-      if (!emailExists) {
-        Get.snackbar(
-          'Invalid',
-          'Login information, please sign an account',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.redAccent.withOpacity(0.1),
-          colorText: Colors.red,
-        );
-        return;
-      }
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      Get.to(
-        () => loginType == LoginType.patient
-            ? const PatientUploadMedsScreen()
-            : const NavigatorBar(
-                loginType: LoginType.caregiver,
-              ),
-      );
-    } on FirebaseAuthException catch (e) {
-      print("ERROR: $e");
-      Get.snackbar(
-        'Invalid',
-        RegisterFailure.fromCode(e.code).message,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
-    } catch (ex) {
-      Get.snackbar(
-        'Invalid',
-        "Something went wrong. Please try again.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
-    }
-  }
-
-  // isCaregiversEmailAndPasswordExists
-
-  // Future<String?> loginCUser(String email, String password) async {
+//   Future<bool> isPatientMedicationsExists(String email) async {
+//     final CollectionReference usersCollection = firestore.collection('medications');
+//     var snapshot = await usersCollection
+//         .where("Email", isEqualTo: email)
+//         .get();
+//     var isEmailExists = snapshot.docs.isNotEmpty;
+//     return isEmailExists; // If the snapshot has documents, email exists
+// }
+// isPatientMedicationsExists
+  // Future<void> loginUser(
+  //   String email,
+  //   String password,
+  //   LoginType loginType,
+  // ) async {
   //   try {
+  //     var emailExists = await userRepo.isEmailExists(email, loginType);
+  //     var patientMedicationExists = await userRepo.isPatientMedicationsExists(email);
+  //     if (!emailExists) {
+  //       Get.snackbar(
+  //         'Invalid',
+  //         'Login information, please sign an account',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.redAccent.withOpacity(0.1),
+  //         colorText: Colors.red,
+  //       );
+  //       return;
+  //     }
   //     await _auth.signInWithEmailAndPassword(email: email, password: password);
-  //      firebaseUser.value != null ? Get.offAll(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,)) : Get.to(() => HomeScreen());
+  //     Get.to(
+  //       () => loginType == LoginType.patient
+  //           ? const PatientUploadMedsScreen()
+  //           : const NavigatorBar(
+  //               loginType: LoginType.caregiver,
+  //             ),
+  //     );
   //   } on FirebaseAuthException catch (e) {
-  //     final ex = LogInFailure.fromCode(e.code);
-  //     return ex.message;
+  //     print("ERROR: $e");
+  //     Get.snackbar(
+  //       'Invalid',
+  //       RegisterFailure.fromCode(e.code).message,
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
+  //       colorText: Colors.red,
+  //     );
   //   } catch (ex) {
-  //     const ex = LogInFailure();
-  //     return ex.message;
+  //     Get.snackbar(
+  //       'Invalid',
+  //       "Something went wrong. Please try again.",
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
+  //       colorText: Colors.red,
+  //     );
   //   }
-  //   return null;
   // }
 
+Future<void> loginUser(
+  String email,
+  String password,
+  LoginType loginType,
+) async {
+  try {
+    var emailExists = await userRepo.isEmailExists(email, loginType);
+    var patientMedicationExists = await userRepo.isPatientMedicationsExists(email);
+
+    if (!emailExists) {
+      Get.snackbar(
+        'Invalid',
+        'Login information, please sign up for an account',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent.withOpacity(0.1),
+        colorText: Colors.red,
+      );
+      return;
+    }
+
+    await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+    if (loginType == LoginType.patient && !patientMedicationExists) {
+        Get.to(
+          () => PatientUploadMedsScreen(),
+        );
+    } else {
+      if (loginType == LoginType.patient && patientMedicationExists) {
+        Get.to(
+        () => NavigatorBar(
+              loginType: LoginType.patient,
+            ),
+      );
+      } else {
+        Get.to(
+          () => NavigatorBar(
+                loginType: LoginType.caregiver,
+              ),
+        );
+      }
+    }
+  } on FirebaseAuthException catch (e) {
+    print("ERROR: $e");
+    Get.snackbar(
+      'Invalid',
+      RegisterFailure.fromCode(e.code).message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+  } catch (ex) {
+    Get.snackbar(
+      'Invalid',
+      "Something went wrong. Please try again.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+  }
+}
+
+
+
+//logout function
   Future<void> logout() async {
     try {
       if (firebaseUser.value != null) {

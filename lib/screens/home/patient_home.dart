@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
@@ -11,6 +12,7 @@ import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
 import 'package:my_project/screens/communications/patient/patients_vocalization.dart';
 import 'package:my_project/screens/home/patient_card.dart';
+import '../communications/caregiver/caregiver_prescription_patient_view.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -301,6 +303,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
+                                      
                                       const CaregiverPrescription()));
                         },
                         child: Image.asset(
@@ -315,7 +318,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const CaregviersVocalScreen()));
+                                    const CaregiverPrescriptionViewPatient()));
+                                      // const CaregviersVocalScreen()));
                         },
                         child: Image.asset(
                           'assets/images/mic.png',
@@ -392,34 +396,56 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
               ),
               child:  Column(children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'PatientName 1',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    Text(
-                      'Quantity',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    Text(
-                      'Schedule',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Row(
-                  children: [
-                    Text(
-                      'xxx@gmail.com',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  ],
-                ),
+                 FutureBuilder(
+                          future: controller.getPatientData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                               if (snapshot.hasData) {
+                                 var patientsInfo = snapshot.data;
+                                return Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                       children: [
+                                         Text(
+                                        "${patientsInfo?.name}",
+                                        style: const TextStyle(
+                                        fontSize: 15,
+                                        ),
+                                        ),
+                                        const Text(
+                                       'Quantity',
+                                        style: TextStyle(fontSize: 15),
+                                        ),   
+                                              const Text(
+                                          'Schedule',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                       ],
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Row(
+                                      children: [
+                                         Text(
+                                        "${patientsInfo?.email}",
+                                        style: const TextStyle(
+                                        fontSize: 15,
+                                        ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                );
+                               } else if (snapshot.hasError) {
+                                return Center(child: Text(snapshot.error.toString()));
+                              } else {
+                                return const Center(
+                                    child: Text('Something went wrong'));
+                              }
+                            } else {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          },),
                 const SizedBox(
                   height: 20,
                 ),
@@ -480,13 +506,28 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               ]),
             ),
           )
-              : FutureBuilder<List<GraceUser>>(
+              : 
+              // Expanded(
+              //     child: ListView.separated(
+              //       padding: const EdgeInsets.all(10.0),
+              //       itemCount: 10,
+              //       separatorBuilder: (context, index) {
+              //         return const SizedBox(
+              //           height: 10,
+              //         );
+              //       },
+              //       itemBuilder: (context, index) {
+              //         return buildCard(index);
+              //         // return patientcard(index);
+              //       },
+              //     ),
+              //   )
+              FutureBuilder<List<GraceUser>>(
                   future: controller.getPatients(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData) {
                         List<GraceUser> patients = snapshot.data!;
-
                         // Apply search filter
                         List<GraceUser> filteredPatients =
                             patients.where((patient) {
@@ -497,7 +538,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   .contains(lol.toLowerCase()) ||
                               name.toLowerCase().contains(lol.toLowerCase());
                         }).toList();
-
                         return Expanded(
                             child: ListView.separated(
                                 padding: const EdgeInsets.all(10.0),
@@ -512,7 +552,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   GraceUser patient = filteredPatients[index];
                                   String email = patient.email ?? '';
                                   String name = patient.name ?? '';
-
                                   return Container(
                                     padding: const EdgeInsets.fromLTRB(
                                         10, 10, 10, 0),
@@ -529,7 +568,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    child: Column(
+                                    child: 
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
@@ -539,83 +579,86 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         ),
                                         Text(name),
                                         Row(
-                                          children: [
-                                            const Text(
-                                              'View more for medication info',
-                                              style: TextStyle(fontSize: 10),
+                                    children: [
+                                    const Text(
+                                    'View more for medication info',
+                                 style: TextStyle(fontSize: 10),
+                               ),
+                            IconButton(
+                            onPressed: () {
+                             setState(() {
+                              isDropdownOpen = !isDropdownOpen;
+                             });
+                           },
+                           icon: Icon(
+                             isDropdownOpen ? Icons.expand_less : Icons.expand_more),
+                         ),
+                          ],
+                       ),
+                      if (isDropdownOpen)    
+                       FutureBuilder<List<Medication>>(
+                        future: userRepo.getAllPatientsMedications(email),
+                        builder: (context,snapshot) {
+                        if(snapshot.connectionState == ConnectionState.done) {
+                        if(snapshot.hasData) {
+                        final childrenfields = <Widget>[];
+                        var patientsInfoMedicationAll = snapshot.data;
+                        for (var i = 0; i < patientsInfoMedicationAll!.length; i++) {
+                          
+                             childrenfields.add(
+                              Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                              Container(
+                              decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
+                              border: Border.all(color: Colors.black, width: 1), // Set the border color and width
+                            ),
+                              child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
+                              child: Image.network(
+                              patientsInfoMedicationAll[i].pills ,
+                              height: 50,
+                              width: 50,
+                              fit: BoxFit.cover,
+                            ),
+                                             ),
                                             ),
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  isDropdownOpen =
-                                                      !isDropdownOpen;
-                                                });
-                                              },
-                                              icon: Icon(isDropdownOpen
-                                                  ? Icons.expand_less
-                                                  : Icons.expand_more),
-                                            ),
-                                          ],
-                                        ),
-                                        if (isDropdownOpen)
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              for (int i = 0;
-                                                  i < values.length;
-                                                  i++)
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          isItemExpanded[i] =
-                                                              !isItemExpanded[
-                                                                  i];
-                                                        });
-                                                      },
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text('1 $i',
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          12)),
-                                                          Text('1 $i',
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          12)),
-                                                          const Text('Morning',
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      12)),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    if (isItemExpanded[i])
-                                                      Padding(
-                                                        padding: const EdgeInsets
-                                                                .only(
-                                                            left:
-                                                                20.0), // Adjust the indentation as needed
-                                                        child: Text(
-                                                          'Additional medication info for item $i',
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 12),
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
+                                Text(patientsInfoMedicationAll[i].labels, 
+                                style: TextStyle(fontSize: 15),
+                                ),
+                                Text(patientsInfoMedicationAll[i].quantity, 
+                                style: TextStyle(fontSize: 15),
+                                ),
+                                Text(patientsInfoMedicationAll[i].schedule, 
+                                style: TextStyle(fontSize: 15),
+                                ),
+                                SizedBox(height: 10,),
+                             ]),
+                             );
+                             childrenfields.add(SizedBox(height: 10,));
+                        }
+                          return Column(
+                          children: childrenfields,);
+                          } else if (snapshot.hasError) {
+                          return Center(child: Text(snapshot.error.toString()));
+                          } else {
+                          return const Center(
+                          child: Text('Something went wrong'));
+                          }
+                          } else {
+                          return const Center(child: CircularProgressIndicator());
+                          }
+                        },    
+                       ),
+                      //  viewpatientcard(index),
+                      //         if (isDropdownOpen)
+                      //         viewpatientcard(index)
+                      //                   Row(
+                      //                     children: [
+                      //                       viewpatientcard(index)
+                      //                     ],
+                      //                   ),
                                       ],
                                     ),
                                   );
@@ -627,6 +670,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             child: Text('Something went wrong'));
                       }
                     } else {
+                      // return const Center(child: Text(''));
                       return const Center(child: CircularProgressIndicator());
                     }
                   },

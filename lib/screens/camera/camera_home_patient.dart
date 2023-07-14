@@ -300,11 +300,13 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
         path = '';
         textScanning = true;
         imageFile = getImage;
+        // Image.file(File(selectedImage!.path))
         XFile? file = XFile(imageFile!.path); 
         String fileName = file.path.split('/').last;
-        print(file);
+        // File(imageFile!.path),
+
+        print(await file.length());
         print(fileName);
-        // String fileName = path.split('/').last;
         path = getImage.path;
         setState(() {});
         // getRecognisedText(getImage);

@@ -318,7 +318,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           //caregivers view questions
            Expanded(
             child: FutureBuilder<List<String>>(
-              future: userRepo.getQuestionsofCaregiver(currentEmail!),
+            future: userRepo.getQuestionsofCaregiver(currentEmail!),
             builder: (context, snapshot) {
               if(snapshot.connectionState == ConnectionState.done) {
                 // var patientInfo2 = snapshot.data;

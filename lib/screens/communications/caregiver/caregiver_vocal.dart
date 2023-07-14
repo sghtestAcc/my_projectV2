@@ -98,7 +98,8 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         centerTitle: true,
       ),
-      body: Column(children: [
+      body: Column(
+        children: [
         Column(
           children: [
             Container(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
+import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/medications.dart';
 
@@ -19,6 +20,7 @@ class PatientsPrescripScreen extends StatefulWidget {
 
 class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
   final currentEmail = _authRepo.firebaseUser.value?.email;
+  final controller = Get.put(SelectPatientController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,38 +58,92 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                const SizedBox(
                 height: 10,
               ),
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xFFF6F6F6), // Background color
-                  borderRadius: BorderRadius.circular(10.0), // Rounded border
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 1.0,
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20.0),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF6F6F6), // Background color
+                      borderRadius: BorderRadius.circular(10.0), // Rounded border
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FutureBuilder(
+                          future: controller.getPatientData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                               if (snapshot.hasData) {
+                                 var patientsInfo = snapshot.data;
+                                return Column(
+                                   children: [
+                                     Text(
+                                    "${patientsInfo?.name}",
+                                    style: const TextStyle(
+                                    fontSize: 15,
+                                    ),
+                                    ),
+                                     Text(
+                                                "${patientsInfo?.email}",
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                ),
+                                    ),        
+                                   ],
+                                );
+                               } else if (snapshot.hasError) {
+                                return Center(child: Text(snapshot.error.toString()));
+                              } else {
+                                return const Center(
+                                    child: Text('Something went wrong'));
+                              }
+                            } else {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          },),
+                          SizedBox(height: 10,),
+                          FutureBuilder<List<Medication>>(
+                          future: userRepo.getPatientMedications(currentEmail!),
+                          builder: (context, snapshot) {
+                          if(snapshot.connectionState == ConnectionState.done) {
+                          if(snapshot.hasData) {
+                          var patientsInfoMedication = snapshot.data;
+                          final children = <Widget>[];
+                          for (var i = 0; i < patientsInfoMedication!.length; i++) {
+                          children.add(
+                          Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                          Text(
+                          'Feed ${patientsInfoMedication[i].labels} during the ${patientsInfoMedication[i].schedule}',
+                          style: TextStyle(fontSize: 15),
+                            ),
+                          SizedBox(height: 10,),
+                           ]),
+                          );
+                          children.add(SizedBox(height: 10,));
+                          }
+                          return Column(
+                          children: children,);
+                          } else if (snapshot.hasError) {
+                          return Center(child: Text(snapshot.error.toString()));
+                          } else {
+                          return const Center(
+                          child: Text('Something went wrong'));
+                          }
+                          }  else {
+                          return const Center(child: CircularProgressIndicator());
+                          }
+                          })
+                      ],
+                    ),
                   ),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('PatientName 1'),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text('Patient1@gmail.com'),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('Feed Medication 1 during the Morning, after meals'),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('Feed Medication 2 during the Morning, after meals'),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('Feed Medication 3 during the Morning, after meals'),
-                    ]),
+                ],
               )
             ]),
           ),
@@ -124,35 +180,59 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                   width: 1.0,
                 ),
               ),
-              child:  Column(children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'PatientName 1',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    Text(
-                      'Quantity',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    Text(
-                      'Schedule',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Row(
-                  children: [
-                    Text(
-                      'xxx@gmail.com',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  ],
-                ),
+              child:  
+              Column(
+                children: [
+                   FutureBuilder(
+                          future: controller.getPatientData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                               if (snapshot.hasData) {
+                                 var patientsInfo = snapshot.data;
+                                return Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                       children: [
+                                         Text(
+                                        "${patientsInfo?.name}",
+                                        style: const TextStyle(
+                                        fontSize: 15,
+                                        ),
+                                        ),
+                                        const Text(
+                                       'Quantity',
+                                        style: TextStyle(fontSize: 15),
+                                        ),   
+                                              const Text(
+                                          'Schedule',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                       ],
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Row(
+                                      children: [
+                                         Text(
+                                        "${patientsInfo?.email}",
+                                        style: const TextStyle(
+                                        fontSize: 15,
+                                        ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                );
+                               } else if (snapshot.hasError) {
+                                return Center(child: Text(snapshot.error.toString()));
+                              } else {
+                                return const Center(
+                                    child: Text('Something went wrong'));
+                              }
+                            } else {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          },),
                 const SizedBox(
                   height: 20,
                 ),
@@ -166,8 +246,8 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                           for (var i = 0; i < patientsInfoMedication!.length; i++) {
                              children.add(
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
                               Container(
                               decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
@@ -204,7 +284,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                           //      Row(
                           //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           //   children: [
-    
+                
                           //     Container(
                           //     decoration: BoxDecoration(
                           //     borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
