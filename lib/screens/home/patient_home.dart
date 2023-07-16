@@ -23,7 +23,8 @@ class PatientHomeScreen extends StatefulWidget {
   State<PatientHomeScreen> createState() => _PatientHomeScreenState();
 }
 
-  final _authRepo = Get.put(AuthenticationRepository());
+final _authRepo = Get.put(AuthenticationRepository());
+
 class _PatientHomeScreenState extends State<PatientHomeScreen> {
   final currentEmail = _authRepo.firebaseUser.value?.email;
   String lol = '';
@@ -303,7 +304,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      
                                       const CaregiverPrescription()));
                         },
                         child: Image.asset(
@@ -318,8 +318,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                    const CaregiverPrescriptionViewPatient()));
-                                      // const CaregviersVocalScreen()));
+                                      const CaregiverPrescriptionViewPatient()));
+                          // const CaregviersVocalScreen()));
                         },
                         child: Image.asset(
                           'assets/images/mic.png',
@@ -367,7 +367,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ]),
           ),
           widget.loginType == LoginType.patient
-              ? 
+              ?
               // Expanded(
               //     child: ListView.separated(
               //       padding: const EdgeInsets.all(10.0),
@@ -384,129 +384,156 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               //     ),
               //   )
               Container(
-            padding: const EdgeInsets.all(20.0),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color:const Color(0xFFF6F6F6), // Background color
-                borderRadius: BorderRadius.circular(10.0), // Rounded border
-                border: Border.all(
-                  color: Colors.black,
-                  width: 1.0,
-                ),
-              ),
-              child:  Column(children: [
-                 FutureBuilder(
-                          future: controller.getPatientData(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                               if (snapshot.hasData) {
-                                 var patientsInfo = snapshot.data;
-                                return Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                       children: [
-                                         Text(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF6F6F6), // Background color
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Rounded border
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(children: [
+                      FutureBuilder(
+                        future: controller.getPatientData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData) {
+                              var patientsInfo = snapshot.data;
+                              return Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
                                         "${patientsInfo?.name}",
                                         style: const TextStyle(
-                                        fontSize: 15,
+                                          fontSize: 15,
                                         ),
-                                        ),
-                                        const Text(
-                                       'Quantity',
+                                      ),
+                                      const Text(
+                                        'Quantity',
                                         style: TextStyle(fontSize: 15),
-                                        ),   
-                                              const Text(
-                                          'Schedule',
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                       ],
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                         Text(
+                                      ),
+                                      const Text(
+                                        'Schedule',
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
                                         "${patientsInfo?.email}",
                                         style: const TextStyle(
-                                        fontSize: 15,
+                                          fontSize: 15,
                                         ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text(snapshot.error.toString()));
+                            } else {
+                              return const Center(
+                                  child: Text('Something went wrong'));
+                            }
+                          } else {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      FutureBuilder<List<Medication>>(
+                          future: userRepo.getPatientMedications(currentEmail!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.hasData) {
+                                var patientsInfoMedication = snapshot.data;
+                                final children = <Widget>[];
+                                for (var i = 0;
+                                    i < patientsInfoMedication!.length;
+                                    i++) {
+                                  children.add(
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(
+                                                  12), // Adjust the value as needed for the desired roundness
+                                              border: Border.all(
+                                                  color: Colors.black,
+                                                  width:
+                                                      1), // Set the border color and width
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(
+                                                  12), // Same value as the BoxDecoration for rounded corners
+                                              child: Image.network(
+                                                patientsInfoMedication[i].pills,
+                                                height: 50,
+                                                width: 50,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            patientsInfoMedication[i].labels,
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          Text(
+                                            patientsInfoMedication[i].quantity,
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          Text(
+                                            patientsInfoMedication[i].schedule,
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                        ]),
+                                    //  SizedBox(height: 10,),
+                                  );
+                                  children.add(SizedBox(
+                                    height: 10,
+                                  ));
+                                }
+                                return Column(
+                                  children: children,
                                 );
-                               } else if (snapshot.hasError) {
-                                return Center(child: Text(snapshot.error.toString()));
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                    child: Text(snapshot.error.toString()));
                               } else {
                                 return const Center(
                                     child: Text('Something went wrong'));
                               }
                             } else {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
-                          },),
-                const SizedBox(
-                  height: 20,
-                ),
-                FutureBuilder<List<Medication>>(
-                  future: userRepo.getPatientMedications(currentEmail!),
-                  builder: (context, snapshot) {
-                     if(snapshot.connectionState == ConnectionState.done) {
-                       if(snapshot.hasData) {
-                          var patientsInfoMedication = snapshot.data;
-                          final children = <Widget>[];
-                          for (var i = 0; i < patientsInfoMedication!.length; i++) {
-                             children.add(
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                              Container(
-                              decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
-                              border: Border.all(color: Colors.black, width: 1), // Set the border color and width
-                            ),
-                              child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
-                              child: Image.network(
-                              patientsInfoMedication[i].pills ,
-                              height: 50,
-                              width: 50,
-                              fit: BoxFit.cover,
-                            ),
-                                             ),
-                                            ),
-                                Text(patientsInfoMedication[i].labels, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedication[i].quantity, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedication[i].schedule, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                SizedBox(height: 10,),
-                             ]),
-                            //  SizedBox(height: 10,),
-                             );
-                             children.add(SizedBox(height: 10,));
-                          }
-                               return Column(
-                                children: children,);
-                       } else if (snapshot.hasError) {
-                        return Center(child: Text(snapshot.error.toString()));
-              } else {
-                 return const Center(
-                            child: Text('Something went wrong'));
-              }
-                     }  else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  }),
-              ]),
-            ),
-          )
-              : 
+                          }),
+                    ]),
+                  ),
+                )
+              :
               // Expanded(
               //     child: ListView.separated(
               //       padding: const EdgeInsets.all(10.0),
@@ -568,8 +595,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    child: 
-                                    Column(
+                                    child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
@@ -579,86 +605,135 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         ),
                                         Text(name),
                                         Row(
-                                    children: [
-                                    const Text(
-                                    'View more for medication info',
-                                 style: TextStyle(fontSize: 10),
-                               ),
-                            IconButton(
-                            onPressed: () {
-                             setState(() {
-                              isDropdownOpen = !isDropdownOpen;
-                             });
-                           },
-                           icon: Icon(
-                             isDropdownOpen ? Icons.expand_less : Icons.expand_more),
-                         ),
-                          ],
-                       ),
-                      if (isDropdownOpen)    
-                       FutureBuilder<List<Medication>>(
-                        future: userRepo.getAllPatientsMedications(email),
-                        builder: (context,snapshot) {
-                        if(snapshot.connectionState == ConnectionState.done) {
-                        if(snapshot.hasData) {
-                        final childrenfields = <Widget>[];
-                        var patientsInfoMedicationAll = snapshot.data;
-                        for (var i = 0; i < patientsInfoMedicationAll!.length; i++) {
-                          
-                             childrenfields.add(
-                              Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                              Container(
-                              decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
-                              border: Border.all(color: Colors.black, width: 1), // Set the border color and width
-                            ),
-                              child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
-                              child: Image.network(
-                              patientsInfoMedicationAll[i].pills ,
-                              height: 50,
-                              width: 50,
-                              fit: BoxFit.cover,
-                            ),
-                                             ),
+                                          children: [
+                                            const Text(
+                                              'View more for medication info',
+                                              style: TextStyle(fontSize: 10),
                                             ),
-                                Text(patientsInfoMedicationAll[i].labels, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedicationAll[i].quantity, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedicationAll[i].schedule, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                SizedBox(height: 10,),
-                             ]),
-                             );
-                             childrenfields.add(SizedBox(height: 10,));
-                        }
-                          return Column(
-                          children: childrenfields,);
-                          } else if (snapshot.hasError) {
-                          return Center(child: Text(snapshot.error.toString()));
-                          } else {
-                          return const Center(
-                          child: Text('Something went wrong'));
-                          }
-                          } else {
-                          return const Center(child: CircularProgressIndicator());
-                          }
-                        },    
-                       ),
-                      //  viewpatientcard(index),
-                      //         if (isDropdownOpen)
-                      //         viewpatientcard(index)
-                      //                   Row(
-                      //                     children: [
-                      //                       viewpatientcard(index)
-                      //                     ],
-                      //                   ),
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isDropdownOpen =
+                                                      !isDropdownOpen;
+                                                });
+                                              },
+                                              icon: Icon(isDropdownOpen
+                                                  ? Icons.expand_less
+                                                  : Icons.expand_more),
+                                            ),
+                                          ],
+                                        ),
+                                        if (isDropdownOpen)
+                                          FutureBuilder<List<Medication>>(
+                                            future: userRepo
+                                                .getAllPatientsMedications(
+                                                    email),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.done) {
+                                                if (snapshot.hasData) {
+                                                  final childrenfields =
+                                                      <Widget>[];
+                                                  var patientsInfoMedicationAll =
+                                                      snapshot.data;
+                                                  for (var i = 0;
+                                                      i <
+                                                          patientsInfoMedicationAll!
+                                                              .length;
+                                                      i++) {
+                                                    childrenfields.add(
+                                                      Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12), // Adjust the value as needed for the desired roundness
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width:
+                                                                        1), // Set the border color and width
+                                                              ),
+                                                              child: ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12), // Same value as the BoxDecoration for rounded corners
+                                                                child: Image
+                                                                    .network(
+                                                                  patientsInfoMedicationAll[
+                                                                          i]
+                                                                      .pills,
+                                                                  height: 50,
+                                                                  width: 50,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              patientsInfoMedicationAll[
+                                                                      i]
+                                                                  .labels,
+                                                              style: TextStyle(
+                                                                  fontSize: 15),
+                                                            ),
+                                                            Text(
+                                                              patientsInfoMedicationAll[
+                                                                      i]
+                                                                  .quantity,
+                                                              style: TextStyle(
+                                                                  fontSize: 15),
+                                                            ),
+                                                            Text(
+                                                              patientsInfoMedicationAll[
+                                                                      i]
+                                                                  .schedule,
+                                                              style: TextStyle(
+                                                                  fontSize: 15),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ]),
+                                                    );
+                                                    childrenfields.add(SizedBox(
+                                                      height: 10,
+                                                    ));
+                                                  }
+                                                  return Column(
+                                                    children: childrenfields,
+                                                  );
+                                                } else if (snapshot.hasError) {
+                                                  return Center(
+                                                      child: Text(snapshot.error
+                                                          .toString()));
+                                                } else {
+                                                  return const Center(
+                                                      child: Text(
+                                                          'Something went wrong'));
+                                                }
+                                              } else {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator());
+                                              }
+                                            },
+                                          ),
+                                        //  viewpatientcard(index),
+                                        //         if (isDropdownOpen)
+                                        //         viewpatientcard(index)
+                                        //                   Row(
+                                        //                     children: [
+                                        //                       viewpatientcard(index)
+                                        //                     ],
+                                        //                   ),
                                       ],
                                     ),
                                   );
