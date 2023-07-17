@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/main.dart';
+import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/error/register_failure.dart';
 
@@ -34,14 +36,18 @@ class AuthenticationRepository extends GetxController {
     String email,
     String password,
     LoginType loginType,
+    GraceUser user
   ) async {
     try {
-      var emailExists = await userRepo.isEmailExists(email, loginType);
-      if (!emailExists) throw Exception("");
+      // var emailExists = await userRepo.isEmailExists(email, loginType);
+      // if (!emailExists) throw Exception("");
       await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      String uid = FirebaseAuth.instance.currentUser!.uid;
+
+      UserRepository.instance.createUser(user, uid);
       Get.offAll(() => const HomeScreen());
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
@@ -124,8 +130,7 @@ Future<void> loginUser(
 ) async {
   try {
     var emailExists = await userRepo.isEmailExists(email, loginType);
-    var patientMedicationExists = await userRepo.isPatientMedicationsExists(email);
-
+    
     if (!emailExists) {
       Get.snackbar(
         'Invalid',
@@ -138,6 +143,9 @@ Future<void> loginUser(
     }
 
     await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    var patientMedicationExists = await userRepo.isPatientMedicationsExists(uid);
 
     if (loginType == LoginType.patient && !patientMedicationExists) {
         Get.to(
@@ -177,7 +185,6 @@ Future<void> loginUser(
     );
   }
 }
-
 
 
 //logout function

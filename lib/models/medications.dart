@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Medication {
@@ -6,7 +8,8 @@ class Medication {
   final String pills;
   final String quantity;
   final String schedule;
-  final String email;
+  final String? email;
+  final String? name;
 
   const Medication({
     this.id,
@@ -14,7 +17,8 @@ class Medication {
     required this.pills,
     required this.quantity,
     required this.schedule,
-    required this.email,
+    this.email,
+    this.name
   });
 
   
@@ -25,6 +29,7 @@ class Medication {
     String? quantity,
     String? schedule,
     String? email,
+    String? name
   }) =>
       Medication(
         id: id ?? this.id,
@@ -33,6 +38,7 @@ class Medication {
         quantity: quantity ?? this.quantity,
         schedule: schedule ?? this.schedule,
         email: email ?? this.email,
+        name: name ?? this.name,
       );
 
   toJson() {
@@ -42,6 +48,7 @@ class Medication {
       'Quantity': quantity,
       'Schedule': schedule,
       'Email': email,
+      'Name' : name
     };
   }
 
@@ -57,7 +64,42 @@ class Medication {
       quantity: data["Quantity"],
       schedule: data["Schedule"],
       email: data["Email"],
+      name: data["Name"],
     );
   }
+
+  // factory Medication.fromJson(
+  //   Map<String, dynamic> jsonData,
+  // ) {
+  //   return Medication(
+  //     labels: jsonData["Labels"],
+  //     pills: jsonData["Pills"],
+  //     quantity: jsonData["Quantity"],
+  //     schedule: jsonData["Schedule"],
+  //     email: jsonData["Email"],
+  //     name: jsonData["Name"],
+  //   );
+  // }
+
+  // static Map<String, dynamic> toListString(Medication medications) {
+  //   return {
+  //     'Labels': medications.labels,
+  //     'Pills': medications.pills,
+  //     'Quantity': medications.quantity,
+  //     'Schedule': medications.schedule,
+  //     'Email': medications.email,
+  //     'Name' : medications.name
+  //   };
+  // }
+
+  // // Format the list into string to store into Firebase
+  // static String encode(List<Medication> medications) {
+  //   return jsonEncode(medications.map<Map<String, dynamic>>((medications) => Medication.toListString(medications)).toList());
+  // }
+
+  // // Format the string back to list
+  // static List<Medication> decode(String medicationsString) {
+  //   return (jsonDecode(medicationsString) as List<dynamic>).map((item) => Medication.fromJson(item)).toList();
+  // }
 
 }

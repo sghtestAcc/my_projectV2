@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
@@ -199,14 +200,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             name: fullName.text.trim(),
                             loginType: widget.registerType,
                           );
-                          if (await UserRepository.instance.createUser(user)) {
+
+                          // String uid = FirebaseAuth.instance.currentUser!.uid;
+                          // if (await UserRepository.instance.createUser(user,uid)) {
+                          //   await AuthenticationRepository.instance
+                          //       .registerUser(
+                          //     email.text.trim(),
+                          //     password.text.trim(),
+                          //     widget.registerType,
+                          //   );
+                          // }
+
+                          // if (await UserRepository.instance.createUser(user)) {
                             await AuthenticationRepository.instance
                                 .registerUser(
                               email.text.trim(),
                               password.text.trim(),
                               widget.registerType,
+                              user
                             );
-                          }
+                          // }
+                         
                           formData.currentState?.reset();
                         }
                       },

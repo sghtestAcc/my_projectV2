@@ -511,13 +511,13 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                            if (formDataQuestions.currentState!.validate()) {
-                              await userRepo.createPatientMedications(
+                            await userRepo.createPatientMedications(
                             widget.imagetakenText, 
                             widget.imagetakenPill, 
                             medsQuantity.text.trim(), 
                             medsSchedule.text.trim(), 
-                            currentEmail!,
-                            patientsInfo?.name
+                            // currentEmail!,
+                            // patientsInfo?.name
                             );
                             formDataQuestions.currentState?.reset();
                             }

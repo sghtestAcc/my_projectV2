@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
+import 'package:my_project/models/medications.dart';
+import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
 import '../../components/navigation_drawer.dart';
 
@@ -165,39 +168,102 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 6,
+          // Expanded(
+          //   child: ListView.builder(
+          //     itemCount: 6,
+          //     itemBuilder: (context, index) {
+          //       return buildCard(index);
+          //     },
+          //   ),
+          // ),
+            FutureBuilder<List<GraceUser>>(
+            future: userRepo.getAllPatientsWithMedications(),
+            builder: (context,snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData) {
+                      return  Column(
+                        children: [
+                          Expanded(
+                    child: ListView.builder(
+                     padding: const EdgeInsets.all(10.0),
+              itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                return buildCard(index);
+                // return buildCard2(index);
+                return Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.black,
+              width: 1.0,
+            ),
+          ),
+          child: CheckboxListTile(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  snapshot.data![index].email ?? '',
+                  style: const TextStyle(fontSize: 15),
+                ),
+                Text(snapshot.data![index].name ?? '',
+                    style: const TextStyle(fontSize: 12)),                    
+              ],
+            ),
+            value: _checkedList[index],
+            onChanged: (value) {
+              setState(() {
+                _checkedList[index] = value!;
+              });
+            },
+            activeColor: const Color(0xFF0CE25C),
+          ),
+        );
               },
             ),
           ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    const Color(0xFF0CE25C), // Button background color
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(12), // Rounded corner radius
-                ),
-                minimumSize: const Size(double.infinity,
-                    40), // Adjust the width by modifying the minimumSize property
-              ),
-              child: const Text(
-                'Add Patients',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
+          
+                        ],
+                      );
+
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text(snapshot.error.toString()));
+              } else {
+                 return const Center(
+                            child: Text('Something went wrong'));
+              }
+                      }  else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+            }), 
+
+          //             Container(
+          //   padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
+          //     },
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor:
+          //           const Color(0xFF0CE25C), // Button background color
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius:
+          //             BorderRadius.circular(12), // Rounded corner radius
+          //       ),
+          //       minimumSize: const Size(double.infinity,
+          //           40), // Adjust the width by modifying the minimumSize property
+          //     ),
+          //     child: const Text(
+          //       'Add Patients',
+          //       style: TextStyle(
+          //         fontSize: 20,
+          //         fontWeight: FontWeight.bold,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+
+
+          
           Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: const Align(
@@ -206,6 +272,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                   style: TextStyle(fontSize: 20)),
             ),
           ),
+       
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(10.0),

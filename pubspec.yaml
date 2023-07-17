@@ -48,6 +48,7 @@ dependencies:
   avatar_glow: ^2.0.2
   speech_to_text: ^6.3.0
   flutter_image_compress: ^2.0.2
+  flutter_tts: ^3.7.0
   
 
 

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
@@ -6,7 +5,6 @@ import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/screens/communications/caregiver/caregiver_prescription.dart';
-import 'package:my_project/screens/communications/caregiver/caregiver_vocal.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
@@ -30,102 +28,103 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   TextEditingController searchController = TextEditingController();
   final controller = Get.put(SelectPatientController());
 
-  bool isDropdownOpen = false;
+//  bool isDropdownOpen = false;
+List<bool> isItemDropdownOpen = [];
 
   @override
   Widget build(BuildContext context) {
-    List<int> values = [
-      2,
-      4,
-      6,
-      8,
-      10
-    ]; // Replace with your actual list of values
+    // List<int> values = [
+    //   2,
+    //   4,
+    //   6,
+    //   8,
+    //   10
+    // ]; // Replace with your actual list of values
 
-    List<bool> isItemExpanded = List.filled(values.length, false);
+    // List<bool> isItemExpanded = List.filled(values.length, false);
 
-    Widget buildCard(int index) => Container(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(22)),
-            color: Color(0xDDF6F6F6),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.5),
-                offset: Offset(0, 1),
-                blurRadius: 4,
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Patient $index',
-                style: const TextStyle(fontSize: 15),
-              ),
-              Text('phoneNumber $index', style: const TextStyle(fontSize: 12)),
-              Row(
-                children: [
-                  const Text(
-                    'View more for medication info',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isDropdownOpen = !isDropdownOpen;
-                      });
-                    },
-                    icon: Icon(
-                        isDropdownOpen ? Icons.expand_less : Icons.expand_more),
-                  ),
-                ],
-              ),
-              if (isDropdownOpen)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (int i = 0; i < values.length; i++)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isItemExpanded[i] = !isItemExpanded[i];
-                              });
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('1 $i',
-                                    style: const TextStyle(fontSize: 12)),
-                                Text('1 $i',
-                                    style: const TextStyle(fontSize: 12)),
-                                const Text('Morning',
-                                    style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                          if (isItemExpanded[i])
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left:
-                                      20.0), // Adjust the indentation as needed
-                              child: Text(
-                                'Additional medication info for item $i',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                        ],
-                      ),
-                  ],
-                ),
-            ],
-          ),
-        );
+    // Widget buildCard(int index) => Container(
+    //       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+    //       decoration: const BoxDecoration(
+    //         borderRadius: BorderRadius.all(Radius.circular(22)),
+    //         color: Color(0xDDF6F6F6),
+    //         boxShadow: [
+    //           BoxShadow(
+    //             color: Color.fromRGBO(0, 0, 0, 0.5),
+    //             offset: Offset(0, 1),
+    //             blurRadius: 4,
+    //             spreadRadius: 0,
+    //           ),
+    //         ],
+    //       ),
+    //       child: Column(
+    //         crossAxisAlignment: CrossAxisAlignment.start,
+    //         children: [
+    //           Text(
+    //             'Patient $index',
+    //             style: const TextStyle(fontSize: 15),
+    //           ),
+    //           Text('phoneNumber $index', style: const TextStyle(fontSize: 12)),
+    //           Row(
+    //             children: [
+    //               const Text(
+    //                 'View more for medication info',
+    //                 style: TextStyle(fontSize: 10),
+    //               ),
+    //               IconButton(
+    //                 onPressed: () {
+    //                   setState(() {
+    //                     isDropdownOpen = !isDropdownOpen;
+    //                   });
+    //                 },
+    //                 icon: Icon(
+    //                     isDropdownOpen ? Icons.expand_less : Icons.expand_more),
+    //               ),
+    //             ],
+    //           ),
+    //           if (isDropdownOpen)
+    //             Column(
+    //               crossAxisAlignment: CrossAxisAlignment.start,
+    //               children: [
+    //                 for (int i = 0; i < values.length; i++)
+    //                   Column(
+    //                     crossAxisAlignment: CrossAxisAlignment.start,
+    //                     children: [
+    //                       GestureDetector(
+    //                         onTap: () {
+    //                           setState(() {
+    //                             isItemExpanded[i] = !isItemExpanded[i];
+    //                           });
+    //                         },
+    //                         child: Row(
+    //                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //                           children: [
+    //                             Text('1 $i',
+    //                                 style: const TextStyle(fontSize: 12)),
+    //                             Text('1 $i',
+    //                                 style: const TextStyle(fontSize: 12)),
+    //                             const Text('Morning',
+    //                                 style: TextStyle(fontSize: 12)),
+    //                           ],
+    //                         ),
+    //                       ),
+    //                       if (isItemExpanded[i])
+    //                         Padding(
+    //                           padding: const EdgeInsets.only(
+    //                               left:
+    //                                   20.0), // Adjust the indentation as needed
+    //                           child: Text(
+    //                             'Additional medication info for item $i',
+    //                             style: const TextStyle(fontSize: 12),
+    //                           ),
+    //                         ),
+    //                     ],
+    //                   ),
+    //               ],
+    //             ),
+    //         ],
+    //       ),
+    //     );
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -433,24 +432,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         ),
                                         ),
                                       ],
-                                    )
-                                  ],
-                                );
-                               } else if (snapshot.hasError) {
-                                return Center(child: Text(snapshot.error.toString()));
-                              } else {
-                                return const Center(
-                                    child: Text('Something went wrong'));
-                              }
-                            } else {
-                              return const Center(child: CircularProgressIndicator());
-                            }
-                          },),
-                const SizedBox(
-                  height: 20,
-                ),
-                FutureBuilder<List<Medication>>(
-                  future: userRepo.getPatientMedications(currentEmail!),
+                                    ),
+                                    const SizedBox(
+                                    height: 20,
+                                    ),
+                              FutureBuilder<List<Medication>>(
+                  future: userRepo.getPatientMedications(patientsInfo?.id),
                   builder: (context, snapshot) {
                      if(snapshot.connectionState == ConnectionState.done) {
                        if(snapshot.hasData) {
@@ -502,7 +489,21 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                      }  else {
                       return const Center(child: CircularProgressIndicator());
                     }
-                  }),
+                  }),   
+                                  ],
+                                );
+                               } else if (snapshot.hasError) {
+                                return Center(child: Text(snapshot.error.toString()));
+                              } else {
+                                return const Center(
+                                    child: Text('Something went wrong'));
+                              }
+                            } else {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          },),
+         
+
               ]),
             ),
           )
@@ -527,6 +528,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData) {
+                        // List<GraceUser> patients = snapshot.data!;
                         List<GraceUser> patients = snapshot.data!;
                         // Apply search filter
                         List<GraceUser> filteredPatients =
@@ -538,6 +540,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   .contains(lol.toLowerCase()) ||
                               name.toLowerCase().contains(lol.toLowerCase());
                         }).toList();
+                        isItemDropdownOpen = List<bool>.filled(filteredPatients.length, false); // Initialize the isItemDropdownOpen list
                         return Expanded(
                             child: ListView.separated(
                                 padding: const EdgeInsets.all(10.0),
@@ -550,8 +553,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 },
                                 itemBuilder: (context, index) {
                                   GraceUser patient = filteredPatients[index];
+                                  String uid = patient.id ?? '';
                                   String email = patient.email ?? '';
                                   String name = patient.name ?? '';
+
+                                  bool isDropdownOpen = false;
+                                  //   if (isItemDropdownOpen.length <= index) {
+                                  //  isItemDropdownOpen.add(false); // Initialize dropdown state for new patient
+                                  // }
                                   return Container(
                                     padding: const EdgeInsets.fromLTRB(
                                         10, 10, 10, 0),
@@ -595,16 +604,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                          ),
                           ],
                        ),
-                      if (isDropdownOpen)    
-                       FutureBuilder<List<Medication>>(
-                        future: userRepo.getAllPatientsMedications(email),
+                      // if (isDropdownOpen)    
+                        FutureBuilder<List<Medication>>(
+                        future: userRepo.getAllPatientsMedications(uid),
                         builder: (context,snapshot) {
                         if(snapshot.connectionState == ConnectionState.done) {
                         if(snapshot.hasData) {
                         final childrenfields = <Widget>[];
                         var patientsInfoMedicationAll = snapshot.data;
-                        for (var i = 0; i < patientsInfoMedicationAll!.length; i++) {
-                          
+                        if (isDropdownOpen && patientsInfoMedicationAll != null) {
+                            for (var i = 0; i < patientsInfoMedicationAll.length; i++) {
                              childrenfields.add(
                               Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -638,9 +647,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                              );
                              childrenfields.add(SizedBox(height: 10,));
                         }
+                        }
                           return Column(
                           children: childrenfields,);
-                          } else if (snapshot.hasError) {
+                          } else if (!snapshot.hasData) {
                           return Center(child: Text(snapshot.error.toString()));
                           } else {
                           return const Center(

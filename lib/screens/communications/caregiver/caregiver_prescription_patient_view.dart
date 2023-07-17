@@ -3,6 +3,7 @@ import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/models/login_type.dart';
 
 class CaregiverPrescriptionViewPatient extends StatefulWidget {
+  
   const CaregiverPrescriptionViewPatient({super.key});
 
   @override

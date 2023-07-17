@@ -215,8 +215,6 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
         ],
       ),
       endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
-      // bottomNavigationBar: NavigatorBar(loginType: LoginType4.patientsLoginBottomTab,),
-      // Get.to(() => NavigatorBar(loginType: LoginType4.caregiversLoginBottomTab,));
     );
   }
 }

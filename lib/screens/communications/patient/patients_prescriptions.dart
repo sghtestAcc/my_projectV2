@@ -71,76 +71,73 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                         width: 1.0,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FutureBuilder(
-                          future: controller.getPatientData(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                               if (snapshot.hasData) {
-                                 var patientsInfo = snapshot.data;
-                                return Column(
-                                   children: [
-                                     Text(
-                                    "${patientsInfo?.name}",
-                                    style: const TextStyle(
-                                    fontSize: 15,
-                                    ),
-                                    ),
-                                     Text(
-                                                "${patientsInfo?.email}",
-                                                style: const TextStyle(
-                                                  fontSize: 15,
-                                                ),
-                                    ),        
-                                   ],
-                                );
-                               } else if (snapshot.hasError) {
-                                return Center(child: Text(snapshot.error.toString()));
-                              } else {
-                                return const Center(
-                                    child: Text('Something went wrong'));
-                              }
-                            } else {
-                              return const Center(child: CircularProgressIndicator());
-                            }
-                          },),
-                          SizedBox(height: 10,),
-                          FutureBuilder<List<Medication>>(
-                          future: userRepo.getPatientMedications(currentEmail!),
-                          builder: (context, snapshot) {
-                          if(snapshot.connectionState == ConnectionState.done) {
+                    child: FutureBuilder(
+                      future: controller.getPatientData(),
+                      builder: (context, snapshot) {
+                       if (snapshot.connectionState == ConnectionState.done) {
                           if(snapshot.hasData) {
-                          var patientsInfoMedication = snapshot.data;
-                          final children = <Widget>[];
-                          for (var i = 0; i < patientsInfoMedication!.length; i++) {
-                          children.add(
-                          Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                          Text(
-                          'Feed ${patientsInfoMedication[i].labels} during the ${patientsInfoMedication[i].schedule}',
-                          style: TextStyle(fontSize: 15),
-                            ),
-                          SizedBox(height: 10,),
-                           ]),
-                          );
-                          children.add(SizedBox(height: 10,));
-                          }
-                          return Column(
-                          children: children,);
+                             var patientsInfo = snapshot.data;
+                             return  Column(
+                              children: [
+                                   Text(
+                                        "${patientsInfo?.name}",
+                                        style: const TextStyle(
+                                        fontSize: 15,
+                                        ),
+                                        ),
+                                   Text(
+                                        "${patientsInfo?.email}",
+                                          style: const TextStyle(
+                                           fontSize: 15,
+                                          ),
+                                  ),
+                                  SizedBox(height: 10,),
+                                   FutureBuilder<List<Medication>>(
+                              future: userRepo.getPatientMedications(patientsInfo?.id),
+                              builder: (context, snapshot) {
+                              if(snapshot.connectionState == ConnectionState.done) {
+                              if(snapshot.hasData) {
+                              var patientsInfoMedication = snapshot.data;
+                              final children = <Widget>[];
+                              for (var i = 0; i < patientsInfoMedication!.length; i++) {
+                              children.add(
+                              Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                              Text(
+                              'Feed ${patientsInfoMedication[i].labels} during the ${patientsInfoMedication[i].schedule}',
+                              style: TextStyle(fontSize: 15),
+                                ),
+                              SizedBox(height: 10,),
+                               ]),
+                              );
+                              children.add(SizedBox(height: 10,));
+                              }
+                              return Column(
+                              children: children,);
+                              } else if (snapshot.hasError) {
+                              return Center(child: Text(snapshot.error.toString()));
+                              } else {
+                              return const Center(
+                              child: Text('Something went wrong'));
+                              }
+                              }  else {
+                              return const Center(child: CircularProgressIndicator());
+                              }
+                              })
+ 
+                              ],
+                             );
                           } else if (snapshot.hasError) {
-                          return Center(child: Text(snapshot.error.toString()));
+                                    return Center(child: Text(snapshot.error.toString()));
                           } else {
-                          return const Center(
-                          child: Text('Something went wrong'));
-                          }
-                          }  else {
-                          return const Center(child: CircularProgressIndicator());
-                          }
-                          })
-                      ],
+                                    return const Center(
+                                        child: Text('Something went wrong'));
+                                  }
+                       }else  {
+                                  return const Center(child: CircularProgressIndicator());
+                        }
+                      }
                     ),
                   ),
                 ],
@@ -188,7 +185,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.done) {
                                if (snapshot.hasData) {
-                                 var patientsInfo = snapshot.data;
+                                var patientsInfo = snapshot.data;
                                 return Column(
                                   children: [
                                     Row(
@@ -220,24 +217,12 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                         ),
                                         ),
                                       ],
-                                    )
-                                  ],
-                                );
-                               } else if (snapshot.hasError) {
-                                return Center(child: Text(snapshot.error.toString()));
-                              } else {
-                                return const Center(
-                                    child: Text('Something went wrong'));
-                              }
-                            } else {
-                              return const Center(child: CircularProgressIndicator());
-                            }
-                          },),
-                const SizedBox(
-                  height: 20,
-                ),
-                FutureBuilder<List<Medication>>(
-                  future: userRepo.getPatientMedications(currentEmail!),
+                                    ),
+                                      const SizedBox(
+                                       height: 20,
+                                      ),
+                                      FutureBuilder<List<Medication>>(
+                      future: userRepo.getPatientMedications(patientsInfo?.id),
                   builder: (context, snapshot) {
                      if(snapshot.connectionState == ConnectionState.done) {
                        if(snapshot.hasData) {
@@ -280,38 +265,6 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                           }
                                return Column(
                                 children: children,);
-                               
-                          //      Row(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
-                
-                          //     Container(
-                          //     decoration: BoxDecoration(
-                          //     borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
-                          //     border: Border.all(color: Colors.black, width: 1), // Set the border color and width
-                          //   ),
-                          //     child: ClipRRect(
-                          //     borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
-                          //     child: Image.network(
-                          //     patientsInfoMedication[i].pills ,
-                          //     height: 50,
-                          //     width: 50,
-                          //     fit: BoxFit.cover,
-                          //   ),
-                          //                    ),
-                          //                   ),
-                          //       Text(patientsInfoMedication[i].labels, 
-                          //       style: TextStyle(fontSize: 15),
-                          //       ),
-                          //       Text(patientsInfoMedication[i].quantity, 
-                          //       style: TextStyle(fontSize: 15),
-                          //       ),
-                          //       Text(patientsInfoMedication[i].schedule, 
-                          //       style: TextStyle(fontSize: 15),
-                          //       ),
-                          //   ],
-                          //   // patientsInfo?.name
-                          // );
                        } else if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
               } else {
@@ -322,6 +275,24 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                       return const Center(child: CircularProgressIndicator());
                     }
                   }),
+
+
+                                  ],
+                                );
+                               } else if (snapshot.hasError) {
+                                return Center(child: Text(snapshot.error.toString()));
+                              } else {
+                                return const Center(
+                                    child: Text('Something went wrong'));
+                              }
+                            } else {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          },),
+                const SizedBox(
+                  height: 20,
+                ),
+
               ]),
             ),
           ),
