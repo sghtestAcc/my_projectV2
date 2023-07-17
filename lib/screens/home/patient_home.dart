@@ -726,14 +726,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               }
                                             },
                                           ),
-                                         viewpatientcard(index),
-                                                if (isDropdownOpen)
-                                                viewpatientcard(index)
-                                                          Row(
-                                                            children: [
-                                                              viewpatientcard(index)
-                                                            ],
-                                                          ),
+                                        //  viewpatientcard(index),
+                                        //         if (isDropdownOpen)
+                                        //         viewpatientcard(index)
+                                        //                   Row(
+                                        //                     children: [
+                                        //                       viewpatientcard(index)
+                                        //                     ],
+                                        //                   ),
                                       ],
                                     ),
                                   );
