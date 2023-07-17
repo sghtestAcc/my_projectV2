@@ -1,8 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_project/models/grace_user.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/models/medications.dart';
-import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
 import '../../components/navigation_drawer.dart';
 
@@ -13,137 +13,165 @@ class SelectPatientScreen extends StatefulWidget {
   State<SelectPatientScreen> createState() => _SelectPatientScreenState();
 }
 
-List<bool> _checkedList = List.generate(10, (index) => false);
-
 class _SelectPatientScreenState extends State<SelectPatientScreen> {
+  List<Map<String, dynamic>> _allPatients = [];
+  List<Map<String, dynamic>> _selectedPatients = [];
+  List<Map<String, dynamic>> _successfullyAddedPatients = [];
+  bool isDropdownOpen = false;
 
-   bool isDropdownOpen = false;
+  @override
+  void initState() {
+    super.initState();
+    fetchPatients();
+  }
+
+  Future<void> fetchPatients() async {
+    try {
+      await Firebase.initializeApp();
+      QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('users')
+          .where('LoginType', isEqualTo: 'patient')
+          .get();
+      List<Map<String, dynamic>> patients =
+          snapshot.docs.map((doc) => doc.data()).toList();
+      setState(() {
+        _allPatients = patients;
+      });
+    } catch (e) {
+      print('Error fetching patients: $e');
+    }
+  }
+
+  Widget buildCard(Map<String, dynamic> patientData) {
+    String patientName = patientData['Name'];
+    String patientEmail = patientData['Email'];
+
+    bool isPatientSelected = _selectedPatients.contains(patientData);
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black,
+          width: 1.0,
+        ),
+      ),
+      child: CheckboxListTile(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              patientName,
+              style: const TextStyle(fontSize: 15),
+            ),
+            Text(
+              patientEmail,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+        value: isPatientSelected,
+        onChanged: (bool? value) {
+          setState(() {
+            if (value!) {
+              _selectedPatients.add(patientData);
+            } else {
+              _selectedPatients.remove(patientData);
+            }
+          });
+        },
+        activeColor: const Color(0xFF0CE25C),
+      ),
+    );
+  }
+
+  Future<void> addPatientsToCurrentUser() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String currentUserId = user.uid;
+        CollectionReference<Map<String, dynamic>> userCollection =
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUserId)
+                .collection('patients');
+
+        List<Map<String, dynamic>> selectedPatientsCopy =
+            List.from(_selectedPatients);
+
+        for (Map<String, dynamic> patient in selectedPatientsCopy) {
+          await userCollection.add(patient);
+          _selectedPatients.remove(patient);
+        }
+
+        setState(() {
+          // No need to modify _allPatients, as we only modify _selectedPatients now
+        });
+      }
+    } catch (e) {
+      print('Error adding patients: $e');
+    }
+  }
+
+  Future<bool> addPatientToSecondList(Map<String, dynamic> patientData) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String currentUserId = user.uid;
+        CollectionReference<Map<String, dynamic>> userCollection =
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUserId)
+                .collection('patients');
+
+        await userCollection.add(patientData);
+        return true;
+      }
+    } catch (e) {
+      print('Error adding patient to the second list: $e');
+    }
+    return false;
+  }
+
+  void removePatientFromList(Map<String, dynamic> patientData) {
+    setState(() {
+      _allPatients.remove(patientData);
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> fetchSecondListData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String currentUserId = user.uid;
+        QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+            .instance
+            .collection('users')
+            .doc(currentUserId)
+            .collection('patients')
+            .get();
+
+        return snapshot.docs.map((doc) => doc.data()).toList();
+      }
+    } catch (e) {
+      print('Error fetching second list data: $e');
+    }
+
+    return [];
+  }
+
+  Widget buildSecondListCard(Map<String, dynamic> data) {
+    String patientName = data['Name'];
+    String patientEmail = data['Email'];
+
+    return ListTile(
+      title: Text(patientName),
+      subtitle: Text(patientEmail),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    //  List<bool> _checkedList = List.generate(10, (index) => false);
-    Widget buildCard(int index) => Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black,
-              width: 1.0,
-            ),
-          ),
-          child: CheckboxListTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Patient $index',
-                  style: const TextStyle(fontSize: 15),
-                ),
-                Text('patientEmail $index',
-                    style: const TextStyle(fontSize: 12)),
-              ],
-            ),
-            value: _checkedList[index],
-            onChanged: (value) {
-              setState(() {
-                _checkedList[index] = value!;
-              });
-            },
-            activeColor: const Color(0xFF0CE25C),
-          ),
-        );
-
-
-         List<int> values = [
-      2,
-      4,
-      6,
-      8,
-      10
-    ]; // Replace with your actual list of values
-
-    List<bool> isItemExpanded = List.filled(values.length, false);
-
-    Widget buildCard2(int index) => Container(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(22)),
-            color: Color(0xDDF6F6F6),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.5),
-                offset: Offset(0, 1),
-                blurRadius: 4,
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Patient $index',
-                style: const TextStyle(fontSize: 15),
-              ),
-              Text('phoneNumber $index', style: const TextStyle(fontSize: 12)),
-              Row(
-                children: [
-                  const Text(
-                    'View more for medication info',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isDropdownOpen = !isDropdownOpen;
-                      });
-                    },
-                    icon: Icon(
-                        isDropdownOpen ? Icons.expand_less : Icons.expand_more),
-                  ),
-                ],
-              ),
-              if (isDropdownOpen)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (int i = 0; i < values.length; i++)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isItemExpanded[i] = !isItemExpanded[i];
-                              });
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('1 $i',
-                                    style: const TextStyle(fontSize: 12)),
-                                Text('1 $i',
-                                    style: const TextStyle(fontSize: 12)),
-                                const Text('Morning',
-                                    style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                          if (isItemExpanded[i])
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left:
-                                      20.0), // Adjust the indentation as needed
-                              child: Text(
-                                'Additional medication info for item $i',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                        ],
-                      ),
-                  ],
-                ),
-            ],
-          ),
-        );
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -168,125 +196,79 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
           ),
-          // Expanded(
-          //   child: ListView.builder(
-          //     itemCount: 6,
-          //     itemBuilder: (context, index) {
-          //       return buildCard(index);
-          //     },
-          //   ),
-          // ),
-            FutureBuilder<List<GraceUser>>(
-            future: userRepo.getAllPatientsWithMedications(),
-            builder: (context,snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.hasData) {
-                      return  Column(
-                        children: [
-                          Expanded(
-                    child: ListView.builder(
-                     padding: const EdgeInsets.all(10.0),
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                // return buildCard2(index);
-                return Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black,
-              width: 1.0,
-            ),
-          ),
-          child: CheckboxListTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  snapshot.data![index].email ?? '',
-                  style: const TextStyle(fontSize: 15),
-                ),
-                Text(snapshot.data![index].name ?? '',
-                    style: const TextStyle(fontSize: 12)),                    
-              ],
-            ),
-            value: _checkedList[index],
-            onChanged: (value) {
-              setState(() {
-                _checkedList[index] = value!;
-              });
-            },
-            activeColor: const Color(0xFF0CE25C),
-          ),
-        );
-              },
-            ),
-          ),
-          
-                        ],
-                      );
-
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text(snapshot.error.toString()));
-              } else {
-                 return const Center(
-                            child: Text('Something went wrong'));
-              }
-                      }  else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-            }), 
-
-          //             Container(
-          //   padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
-          //     },
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor:
-          //           const Color(0xFF0CE25C), // Button background color
-          //       shape: RoundedRectangleBorder(
-          //         borderRadius:
-          //             BorderRadius.circular(12), // Rounded corner radius
-          //       ),
-          //       minimumSize: const Size(double.infinity,
-          //           40), // Adjust the width by modifying the minimumSize property
-          //     ),
-          //     child: const Text(
-          //       'Add Patients',
-          //       style: TextStyle(
-          //         fontSize: 20,
-          //         fontWeight: FontWeight.bold,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-
-
-          
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: const Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Patient Info Medication List',
-                  style: TextStyle(fontSize: 20)),
-            ),
-          ),
-       
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(10.0),
-              itemCount: 5,
-              separatorBuilder: (context, index) {
-                return const SizedBox(
-                  height: 10,
-                );
-              },
+            child: ListView.builder(
+              itemCount: _allPatients.length,
               itemBuilder: (context, index) {
-                return buildCard2(index);
+                final patientData = _allPatients[index];
+                if (_successfullyAddedPatients.contains(patientData)) {
+                  return SizedBox.shrink();
+                } else {
+                  return buildCard(patientData);
+                }
               },
             ),
-          )
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+            child: ElevatedButton(
+              onPressed: () async {
+                for (var patientData in _selectedPatients) {
+                  bool added = await addPatientToSecondList(patientData);
+                  if (added) {
+                    // If the patient was successfully added to the second list,
+                    // remove the patient from the first list (_allPatients).
+                    removePatientFromList(patientData);
+                    _successfullyAddedPatients.add(patientData);
+                  }
+                }
+                _selectedPatients
+                    .clear(); // Clear the selected patients list after adding them
+                setState(() {});
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0CE25C),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                minimumSize: const Size(double.infinity, 40),
+              ),
+              child: const Text(
+                'Add Patients',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: fetchSecondListData().asStream(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+
+              List<Map<String, dynamic>> secondListData = snapshot.data ?? [];
+
+              if (secondListData.isEmpty) {
+                return Center(child: Text('Patient List is Empty.'));
+              }
+
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: secondListData.length,
+                  itemBuilder: (context, index) {
+                    return buildSecondListCard(secondListData[index]);
+                  },
+                ),
+              );
+            },
+          ),
         ],
       ),
       endDrawer: const AppDrawerNavigation(

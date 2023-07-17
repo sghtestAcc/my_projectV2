@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
@@ -5,6 +6,7 @@ import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/screens/communications/caregiver/caregiver_prescription.dart';
+import 'package:my_project/screens/communications/caregiver/caregiver_vocal.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
@@ -21,110 +23,110 @@ class PatientHomeScreen extends StatefulWidget {
   State<PatientHomeScreen> createState() => _PatientHomeScreenState();
 }
 
-  final _authRepo = Get.put(AuthenticationRepository());
+final _authRepo = Get.put(AuthenticationRepository());
+
 class _PatientHomeScreenState extends State<PatientHomeScreen> {
   final currentEmail = _authRepo.firebaseUser.value?.email;
   String lol = '';
   TextEditingController searchController = TextEditingController();
   final controller = Get.put(SelectPatientController());
 
-//  bool isDropdownOpen = false;
-List<bool> isItemDropdownOpen = [];
+  bool isDropdownOpen = false;
 
   @override
   Widget build(BuildContext context) {
-    // List<int> values = [
-    //   2,
-    //   4,
-    //   6,
-    //   8,
-    //   10
-    // ]; // Replace with your actual list of values
+    List<int> values = [
+      2,
+      4,
+      6,
+      8,
+      10
+    ]; // Replace with your actual list of values
 
-    // List<bool> isItemExpanded = List.filled(values.length, false);
+    List<bool> isItemExpanded = List.filled(values.length, false);
 
-    // Widget buildCard(int index) => Container(
-    //       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-    //       decoration: const BoxDecoration(
-    //         borderRadius: BorderRadius.all(Radius.circular(22)),
-    //         color: Color(0xDDF6F6F6),
-    //         boxShadow: [
-    //           BoxShadow(
-    //             color: Color.fromRGBO(0, 0, 0, 0.5),
-    //             offset: Offset(0, 1),
-    //             blurRadius: 4,
-    //             spreadRadius: 0,
-    //           ),
-    //         ],
-    //       ),
-    //       child: Column(
-    //         crossAxisAlignment: CrossAxisAlignment.start,
-    //         children: [
-    //           Text(
-    //             'Patient $index',
-    //             style: const TextStyle(fontSize: 15),
-    //           ),
-    //           Text('phoneNumber $index', style: const TextStyle(fontSize: 12)),
-    //           Row(
-    //             children: [
-    //               const Text(
-    //                 'View more for medication info',
-    //                 style: TextStyle(fontSize: 10),
-    //               ),
-    //               IconButton(
-    //                 onPressed: () {
-    //                   setState(() {
-    //                     isDropdownOpen = !isDropdownOpen;
-    //                   });
-    //                 },
-    //                 icon: Icon(
-    //                     isDropdownOpen ? Icons.expand_less : Icons.expand_more),
-    //               ),
-    //             ],
-    //           ),
-    //           if (isDropdownOpen)
-    //             Column(
-    //               crossAxisAlignment: CrossAxisAlignment.start,
-    //               children: [
-    //                 for (int i = 0; i < values.length; i++)
-    //                   Column(
-    //                     crossAxisAlignment: CrossAxisAlignment.start,
-    //                     children: [
-    //                       GestureDetector(
-    //                         onTap: () {
-    //                           setState(() {
-    //                             isItemExpanded[i] = !isItemExpanded[i];
-    //                           });
-    //                         },
-    //                         child: Row(
-    //                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //                           children: [
-    //                             Text('1 $i',
-    //                                 style: const TextStyle(fontSize: 12)),
-    //                             Text('1 $i',
-    //                                 style: const TextStyle(fontSize: 12)),
-    //                             const Text('Morning',
-    //                                 style: TextStyle(fontSize: 12)),
-    //                           ],
-    //                         ),
-    //                       ),
-    //                       if (isItemExpanded[i])
-    //                         Padding(
-    //                           padding: const EdgeInsets.only(
-    //                               left:
-    //                                   20.0), // Adjust the indentation as needed
-    //                           child: Text(
-    //                             'Additional medication info for item $i',
-    //                             style: const TextStyle(fontSize: 12),
-    //                           ),
-    //                         ),
-    //                     ],
-    //                   ),
-    //               ],
-    //             ),
-    //         ],
-    //       ),
-    //     );
+    Widget buildCard(int index) => Container(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(22)),
+            color: Color(0xDDF6F6F6),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.5),
+                offset: Offset(0, 1),
+                blurRadius: 4,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Patient $index',
+                style: const TextStyle(fontSize: 15),
+              ),
+              Text('phoneNumber $index', style: const TextStyle(fontSize: 12)),
+              Row(
+                children: [
+                  const Text(
+                    'View more for medication info',
+                    style: TextStyle(fontSize: 10),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isDropdownOpen = !isDropdownOpen;
+                      });
+                    },
+                    icon: Icon(
+                        isDropdownOpen ? Icons.expand_less : Icons.expand_more),
+                  ),
+                ],
+              ),
+              if (isDropdownOpen)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < values.length; i++)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isItemExpanded[i] = !isItemExpanded[i];
+                              });
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('1 $i',
+                                    style: const TextStyle(fontSize: 12)),
+                                Text('1 $i',
+                                    style: const TextStyle(fontSize: 12)),
+                                const Text('Morning',
+                                    style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          if (isItemExpanded[i])
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left:
+                                      20.0), // Adjust the indentation as needed
+                              child: Text(
+                                'Additional medication info for item $i',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
+                        ],
+                      ),
+                  ],
+                ),
+            ],
+          ),
+        );
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -302,7 +304,6 @@ List<bool> isItemDropdownOpen = [];
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      
                                       const CaregiverPrescription()));
                         },
                         child: Image.asset(
@@ -317,8 +318,8 @@ List<bool> isItemDropdownOpen = [];
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                    const CaregiverPrescriptionViewPatient()));
-                                      // const CaregviersVocalScreen()));
+                                      const CaregiverPrescriptionViewPatient()));
+                          // const CaregviersVocalScreen()));
                         },
                         child: Image.asset(
                           'assets/images/mic.png',
@@ -366,7 +367,7 @@ List<bool> isItemDropdownOpen = [];
                 ]),
           ),
           widget.loginType == LoginType.patient
-              ? 
+              ?
               // Expanded(
               //     child: ListView.separated(
               //       padding: const EdgeInsets.all(10.0),
@@ -383,131 +384,156 @@ List<bool> isItemDropdownOpen = [];
               //     ),
               //   )
               Container(
-            padding: const EdgeInsets.all(20.0),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color:const Color(0xFFF6F6F6), // Background color
-                borderRadius: BorderRadius.circular(10.0), // Rounded border
-                border: Border.all(
-                  color: Colors.black,
-                  width: 1.0,
-                ),
-              ),
-              child:  Column(children: [
-                 FutureBuilder(
-                          future: controller.getPatientData(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                               if (snapshot.hasData) {
-                                 var patientsInfo = snapshot.data;
-                                return Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                       children: [
-                                         Text(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF6F6F6), // Background color
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Rounded border
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(children: [
+                      FutureBuilder(
+                        future: controller.getPatientData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData) {
+                              var patientsInfo = snapshot.data;
+                              return Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
                                         "${patientsInfo?.name}",
                                         style: const TextStyle(
-                                        fontSize: 15,
+                                          fontSize: 15,
                                         ),
-                                        ),
-                                        const Text(
-                                       'Quantity',
+                                      ),
+                                      const Text(
+                                        'Quantity',
                                         style: TextStyle(fontSize: 15),
-                                        ),   
-                                              const Text(
-                                          'Schedule',
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                       ],
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                         Text(
+                                      ),
+                                      const Text(
+                                        'Schedule',
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
                                         "${patientsInfo?.email}",
                                         style: const TextStyle(
-                                        fontSize: 15,
+                                          fontSize: 15,
                                         ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                    height: 20,
-                                    ),
-                              FutureBuilder<List<Medication>>(
-                  future: userRepo.getPatientMedications(patientsInfo?.id),
-                  builder: (context, snapshot) {
-                     if(snapshot.connectionState == ConnectionState.done) {
-                       if(snapshot.hasData) {
-                          var patientsInfoMedication = snapshot.data;
-                          final children = <Widget>[];
-                          for (var i = 0; i < patientsInfoMedication!.length; i++) {
-                             children.add(
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                              Container(
-                              decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
-                              border: Border.all(color: Colors.black, width: 1), // Set the border color and width
-                            ),
-                              child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
-                              child: Image.network(
-                              patientsInfoMedication[i].pills ,
-                              height: 50,
-                              width: 50,
-                              fit: BoxFit.cover,
-                            ),
-                                             ),
-                                            ),
-                                Text(patientsInfoMedication[i].labels, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedication[i].quantity, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedication[i].schedule, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                SizedBox(height: 10,),
-                             ]),
-                            //  SizedBox(height: 10,),
-                             );
-                             children.add(SizedBox(height: 10,));
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text(snapshot.error.toString()));
+                            } else {
+                              return const Center(
+                                  child: Text('Something went wrong'));
+                            }
+                          } else {
+                            return const Center(
+                                child: CircularProgressIndicator());
                           }
-                               return Column(
-                                children: children,);
-                       } else if (snapshot.hasError) {
-                        return Center(child: Text(snapshot.error.toString()));
-              } else {
-                 return const Center(
-                            child: Text('Something went wrong'));
-              }
-                     }  else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  }),   
-                                  ],
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      FutureBuilder<List<Medication>>(
+                          future: userRepo.getPatientMedications(currentEmail!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.hasData) {
+                                var patientsInfoMedication = snapshot.data;
+                                final children = <Widget>[];
+                                for (var i = 0;
+                                    i < patientsInfoMedication!.length;
+                                    i++) {
+                                  children.add(
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(
+                                                  12), // Adjust the value as needed for the desired roundness
+                                              border: Border.all(
+                                                  color: Colors.black,
+                                                  width:
+                                                      1), // Set the border color and width
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(
+                                                  12), // Same value as the BoxDecoration for rounded corners
+                                              child: Image.network(
+                                                patientsInfoMedication[i].pills,
+                                                height: 50,
+                                                width: 50,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            patientsInfoMedication[i].labels,
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          Text(
+                                            patientsInfoMedication[i].quantity,
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          Text(
+                                            patientsInfoMedication[i].schedule,
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                        ]),
+                                    //  SizedBox(height: 10,),
+                                  );
+                                  children.add(SizedBox(
+                                    height: 10,
+                                  ));
+                                }
+                                return Column(
+                                  children: children,
                                 );
-                               } else if (snapshot.hasError) {
-                                return Center(child: Text(snapshot.error.toString()));
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                    child: Text(snapshot.error.toString()));
                               } else {
                                 return const Center(
                                     child: Text('Something went wrong'));
                               }
                             } else {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
-                          },),
-         
-
-              ]),
-            ),
-          )
-              : 
+                          }),
+                    ]),
+                  ),
+                )
+              :
               // Expanded(
               //     child: ListView.separated(
               //       padding: const EdgeInsets.all(10.0),
@@ -528,7 +554,6 @@ List<bool> isItemDropdownOpen = [];
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData) {
-                        // List<GraceUser> patients = snapshot.data!;
                         List<GraceUser> patients = snapshot.data!;
                         // Apply search filter
                         List<GraceUser> filteredPatients =
@@ -540,7 +565,6 @@ List<bool> isItemDropdownOpen = [];
                                   .contains(lol.toLowerCase()) ||
                               name.toLowerCase().contains(lol.toLowerCase());
                         }).toList();
-                        isItemDropdownOpen = List<bool>.filled(filteredPatients.length, false); // Initialize the isItemDropdownOpen list
                         return Expanded(
                             child: ListView.separated(
                                 padding: const EdgeInsets.all(10.0),
@@ -556,11 +580,6 @@ List<bool> isItemDropdownOpen = [];
                                   String uid = patient.id ?? '';
                                   String email = patient.email ?? '';
                                   String name = patient.name ?? '';
-
-                                  bool isDropdownOpen = false;
-                                  //   if (isItemDropdownOpen.length <= index) {
-                                  //  isItemDropdownOpen.add(false); // Initialize dropdown state for new patient
-                                  // }
                                   return Container(
                                     padding: const EdgeInsets.fromLTRB(
                                         10, 10, 10, 0),
@@ -577,8 +596,7 @@ List<bool> isItemDropdownOpen = [];
                                         ),
                                       ],
                                     ),
-                                    child: 
-                                    Column(
+                                    child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
@@ -588,87 +606,134 @@ List<bool> isItemDropdownOpen = [];
                                         ),
                                         Text(name),
                                         Row(
-                                    children: [
-                                    const Text(
-                                    'View more for medication info',
-                                 style: TextStyle(fontSize: 10),
-                               ),
-                            IconButton(
-                            onPressed: () {
-                             setState(() {
-                              isDropdownOpen = !isDropdownOpen;
-                             });
-                           },
-                           icon: Icon(
-                             isDropdownOpen ? Icons.expand_less : Icons.expand_more),
-                         ),
-                          ],
-                       ),
-                      // if (isDropdownOpen)    
-                        FutureBuilder<List<Medication>>(
-                        future: userRepo.getAllPatientsMedications(uid),
-                        builder: (context,snapshot) {
-                        if(snapshot.connectionState == ConnectionState.done) {
-                        if(snapshot.hasData) {
-                        final childrenfields = <Widget>[];
-                        var patientsInfoMedicationAll = snapshot.data;
-                        if (isDropdownOpen && patientsInfoMedicationAll != null) {
-                            for (var i = 0; i < patientsInfoMedicationAll.length; i++) {
-                             childrenfields.add(
-                              Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                              Container(
-                              decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
-                              border: Border.all(color: Colors.black, width: 1), // Set the border color and width
-                            ),
-                              child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
-                              child: Image.network(
-                              patientsInfoMedicationAll[i].pills ,
-                              height: 50,
-                              width: 50,
-                              fit: BoxFit.cover,
-                            ),
-                                             ),
+                                          children: [
+                                            const Text(
+                                              'View more for medication info',
+                                              style: TextStyle(fontSize: 10),
                                             ),
-                                Text(patientsInfoMedicationAll[i].labels, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedicationAll[i].quantity, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                Text(patientsInfoMedicationAll[i].schedule, 
-                                style: TextStyle(fontSize: 15),
-                                ),
-                                SizedBox(height: 10,),
-                             ]),
-                             );
-                             childrenfields.add(SizedBox(height: 10,));
-                        }
-                        }
-                          return Column(
-                          children: childrenfields,);
-                          } else if (!snapshot.hasData) {
-                          return Center(child: Text(snapshot.error.toString()));
-                          } else {
-                          return const Center(
-                          child: Text('Something went wrong'));
-                          }
-                          } else {
-                          return const Center(child: CircularProgressIndicator());
-                          }
-                        },    
-                       ),
-                      //  viewpatientcard(index),
-                      //         if (isDropdownOpen)
-                      //         viewpatientcard(index)
-                      //                   Row(
-                      //                     children: [
-                      //                       viewpatientcard(index)
-                      //                     ],
-                      //                   ),
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isDropdownOpen =
+                                                      !isDropdownOpen;
+                                                });
+                                              },
+                                              icon: Icon(isDropdownOpen
+                                                  ? Icons.expand_less
+                                                  : Icons.expand_more),
+                                            ),
+                                          ],
+                                        ),
+                                        if (isDropdownOpen)
+                                          FutureBuilder<List<Medication>>(
+                                            future: userRepo
+                                                .getAllPatientsMedications(uid),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.done) {
+                                                if (snapshot.hasData) {
+                                                  final childrenfields =
+                                                      <Widget>[];
+                                                  var patientsInfoMedicationAll =
+                                                      snapshot.data;
+                                                  for (var i = 0;
+                                                      i <
+                                                          patientsInfoMedicationAll!
+                                                              .length;
+                                                      i++) {
+                                                    childrenfields.add(
+                                                      Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12), // Adjust the value as needed for the desired roundness
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width:
+                                                                        1), // Set the border color and width
+                                                              ),
+                                                              child: ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12), // Same value as the BoxDecoration for rounded corners
+                                                                child: Image
+                                                                    .network(
+                                                                  patientsInfoMedicationAll[
+                                                                          i]
+                                                                      .pills,
+                                                                  height: 50,
+                                                                  width: 50,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              patientsInfoMedicationAll[
+                                                                      i]
+                                                                  .labels,
+                                                              style: TextStyle(
+                                                                  fontSize: 15),
+                                                            ),
+                                                            Text(
+                                                              patientsInfoMedicationAll[
+                                                                      i]
+                                                                  .quantity,
+                                                              style: TextStyle(
+                                                                  fontSize: 15),
+                                                            ),
+                                                            Text(
+                                                              patientsInfoMedicationAll[
+                                                                      i]
+                                                                  .schedule,
+                                                              style: TextStyle(
+                                                                  fontSize: 15),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ]),
+                                                    );
+                                                    childrenfields.add(SizedBox(
+                                                      height: 10,
+                                                    ));
+                                                  }
+                                                  return Column(
+                                                    children: childrenfields,
+                                                  );
+                                                } else if (snapshot.hasError) {
+                                                  return Center(
+                                                      child: Text(snapshot.error
+                                                          .toString()));
+                                                } else {
+                                                  return const Center(
+                                                      child: Text(
+                                                          'Something went wrong'));
+                                                }
+                                              } else {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator());
+                                              }
+                                            },
+                                          ),
+                                         viewpatientcard(index),
+                                                if (isDropdownOpen)
+                                                viewpatientcard(index)
+                                                          Row(
+                                                            children: [
+                                                              viewpatientcard(index)
+                                                            ],
+                                                          ),
                                       ],
                                     ),
                                   );
