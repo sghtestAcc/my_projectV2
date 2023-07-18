@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -35,10 +34,12 @@ class UserRepository extends GetxController {
         "Error",
         "Email already exists.",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
+        // backgroundColor: Colors.redAccent.withOpacity(0.1),
+        // colorText: Colors.red,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
       );
-      return false;
+      return true;
     }
     try {
       await firestore.collection("users").doc(uid).set(user.toJson());
@@ -46,8 +47,10 @@ class UserRepository extends GetxController {
         "Congrats",
         "A new account has been created.",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
+        // backgroundColor: Colors.green.withOpacity(0.1),
+        // colorText: Colors.green,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
       );
       return true;
     } catch (error) {
@@ -66,9 +69,9 @@ class UserRepository extends GetxController {
 
 
 //retrieve patient questions function(of single users)
-  Future<List<String>> getQuestionsofPatient(String email) async {
-    final doesUserExists = await isEmailExists(email, LoginType.patient);
-    if (!doesUserExists) throw Exception('User does not exists');
+  Future<List<String>> getQuestionsofPatient(String? email) async {
+    // final doesUserExists = await isEmailExists(email, LoginType.patient);
+    // if (!doesUserExists) throw Exception('User does not exists');
     final snapshot = await firestore
         .collection("questions")
         .where("Email", isEqualTo: email)
@@ -82,8 +85,8 @@ class UserRepository extends GetxController {
 
 //retrieve caregivers questions function(of single users)
   Future<List<String>> getQuestionsofCaregiver(String email) async {
-    final doesUserExists = await isEmailExists(email, LoginType.caregiver);
-    if (!doesUserExists) throw Exception('User does not exists');
+    // final doesUserExists = await isEmailExists(email, LoginType.caregiver);
+    // if (!doesUserExists) throw Exception('User does not exists');
     final snapshot = await firestore
         .collection("questions")
         .where("Email", isEqualTo: email)
@@ -95,15 +98,22 @@ class UserRepository extends GetxController {
         .toList();
 }
 
-   Future<bool> isPatientQuestionsEmailExists(String email,String question) async {
-    final CollectionReference usersCollection = firestore.collection('questions');
-    var snapshot = await usersCollection
-        .where("Email", isEqualTo: email)
-        .where("Question", isEqualTo: question)
-        .get();
-    var isEmailExists = snapshot.docs.isNotEmpty;
-    return isEmailExists; // If the snapshot has documents, email exists
-  }
+Future<bool> isPatientQuestionsEmailExists(String email, String question) async {
+  final CollectionReference usersCollection = firestore.collection('questions');
+  String lowerCaseQuestion = question.toLowerCase();
+
+  print("Searching for: $lowerCaseQuestion");
+
+  var snapshot = await usersCollection
+      .where("Email", isEqualTo: email)
+      .where("LowerCaseQuestion", isEqualTo: lowerCaseQuestion)
+      .get();
+
+  print("Snapshot documents: ${snapshot.docs}");
+
+  var isEmailExists = snapshot.docs.isNotEmpty;
+  return isEmailExists;
+}
 
 
 //create patients questions function
@@ -126,7 +136,6 @@ class UserRepository extends GetxController {
     );
     return;
   }
-
   try {
     await firestore.collection("questions").add({
       "Email": email,
@@ -150,6 +159,10 @@ class UserRepository extends GetxController {
     print(error.toString());
   }
 }
+
+
+
+
 
 
 
@@ -227,78 +240,6 @@ Future<void> createPatientMedications(
   }
 }
 
-
-//original ----create Patient Medications---
-// Future<void> createPatientMedications(
-//   String? labels,
-//   XFile? pills,
-//   String quantity,
-//   String schedule,
-//   // String email,
-//   // String? name,
-// ) async {
-//   // final doesUserExist = await isEmailExists(email, LoginType.patient);
-//   // if (!doesUserExist) return;
-//   try {
-//     final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-//     final pathRoute = 'medicationPills/$fileName';
-//     String imageUrl = await uploadImageToStorage(pathRoute, pills!);
-
-//     String uid = FirebaseAuth.instance.currentUser!.uid;
-
-//     await FirebaseFirestore.instance.collection("users").doc(uid)
-//     .collection("medications")
-//     .add({
-//       "Labels": labels,
-//       "Pills": imageUrl,
-//       "Quantity": quantity,
-//       "Schedule": schedule,
-//       // "Email": email,
-//       // 'Name': name
-//     });
-
-//     Get.snackbar(
-//       "Congrats",
-//       "A new medication has been added.",
-//       snackPosition: SnackPosition.BOTTOM,
-//       backgroundColor: Colors.green.withOpacity(0.1),
-//       colorText: Colors.green,
-//     );
-//   } catch (error) {
-//     Get.snackbar(
-//       "Error",
-//       "Failed to add a medication",
-//       snackPosition: SnackPosition.BOTTOM,
-//       backgroundColor: Colors.redAccent.withOpacity(0.1),
-//       colorText: Colors.red,
-//     );
-//     print(error.toString());
-//   }
-// }
-
-// String uid = FirebaseAuth.instance.currentUser!.uid;
-//     var patientMedicationExists = await userRepo.isPatientMedicationsExists(uid);
-
-// Future<List<Medication>> displayAllPatientsMedications2() async {
-
-//   String uid = FirebaseAuth.instance.currentUser!.uid;
-//   var isdisplayAllitem = await displayAllPatientsMedications(uid);
-
-//   var CheckpatientHasMedications = await isPatientMedicationsExists(uid);
-
-// }
-
-  // final snapshot = await firestore
-  //       .collection("users")
-  //       .where("LoginType", isEqualTo: LoginType.patient.name)
-  //       .get();
-  //   final patientData = snapshot.docs
-  //       .map(
-  //         (e) => GraceUser.fromSnapshot(e),
-  //       )
-  //       .toList();
-  //   return patientData;
-
 Future<List<GraceUser>> getAllPatientsWithMedications() async {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
@@ -335,42 +276,6 @@ Future<List<Medication>> displayAllPatientsMedications(String? uid) async {
         .toList();
     return patientData;
 }
-
-// Future<List<Medication>> getPatientMedications(String email) async {
-//   final doesUserExists = await isEmailExists(email, LoginType.patient);
-//   if (!doesUserExists) throw Exception('User does not exist');
-
-//   var patientDataMedications = await firestore
-//       .collection("medications")
-//       .where("Email", isEqualTo: email)
-//       .get()
-//       .then((value) {
-//         if (value.docs.isEmpty) {
-//           // Return an empty list if no medications data is found for the user.
-//           return <Medication>[];
-//         } else {
-//           // Extract the email and name from the first document
-//           String email = value.docs[0].get("Email");
-//           String name = value.docs[0].get("Name");
-//           List<Medication> medications = [];
-
-//           // Iterate over all the documents and add medications to the list
-//           for (var doc in value.docs) {
-//             String jsonData = doc.get("data");
-//             List<Medication> medsForPatient = Medication.decode(jsonData);
-
-//             // Update the email and name for each medication object
-//             medsForPatient = medsForPatient.map((med) => med.copy(email: email, name: name)).toList();
-
-//             medications.addAll(medsForPatient);
-//           }
-
-//           return medications;
-//         }
-//       });
-
-//   return patientDataMedications;
-// }
 
 //get single patinet Medications
 Future<List<Medication>> getPatientMedications(String? uid) async {
@@ -413,9 +318,6 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
 }
 
 
-
-
-
 // //original patient medication -- do not delete---
 //   Future<List<Medication>> getAllPatientsMedications(String email) async {
 //   final doesUserExists = await isEmailExists(email, LoginType.patient);
@@ -433,22 +335,6 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
 //   return patientDataMedications;
 // }
 
-
-
-//get patient medications of each user(all patient users medications)
-
-  //  Future<List<Medication>> getAllPatients() async {
-  //   final snapshot = await firestore
-  //       .collection("users")
-  //       .where("LoginType", isEqualTo: LoginType.patient.name)
-  //       .get();
-  //   final patientData = snapshot.docs
-  //       .map(
-  //         (e) => GraceUser.fromSnapshot(e),
-  //       )
-  //       .toList();
-  //   return patientData;
-  // }
 
   //create caregivers questions function
   Future<void> createCaregiverUserQuestions(
@@ -521,4 +407,6 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
         .toList();
     return patientData;
   }
+
+  getSingleUserQuestionPatient(String s) {}
 }

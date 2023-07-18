@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation.tab.dart';
@@ -46,7 +45,6 @@ class AuthenticationRepository extends GetxController {
         password: password,
       );
       String uid = FirebaseAuth.instance.currentUser!.uid;
-
       UserRepository.instance.createUser(user, uid);
       Get.offAll(() => const HomeScreen());
     } on FirebaseAuthException catch (e) {
@@ -68,60 +66,30 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-//   Future<bool> isPatientMedicationsExists(String email) async {
-//     final CollectionReference usersCollection = firestore.collection('medications');
-//     var snapshot = await usersCollection
-//         .where("Email", isEqualTo: email)
-//         .get();
-//     var isEmailExists = snapshot.docs.isNotEmpty;
-//     return isEmailExists; // If the snapshot has documents, email exists
-// }
-// isPatientMedicationsExists
-  // Future<void> loginUser(
-  //   String email,
-  //   String password,
-  //   LoginType loginType,
-  // ) async {
-  //   try {
-  //     var emailExists = await userRepo.isEmailExists(email, loginType);
-  //     var patientMedicationExists = await userRepo.isPatientMedicationsExists(email);
-  //     if (!emailExists) {
-  //       Get.snackbar(
-  //         'Invalid',
-  //         'Login information, please sign an account',
-  //         snackPosition: SnackPosition.BOTTOM,
-  //         backgroundColor: Colors.redAccent.withOpacity(0.1),
-  //         colorText: Colors.red,
-  //       );
-  //       return;
-  //     }
-  //     await _auth.signInWithEmailAndPassword(email: email, password: password);
-  //     Get.to(
-  //       () => loginType == LoginType.patient
-  //           ? const PatientUploadMedsScreen()
-  //           : const NavigatorBar(
-  //               loginType: LoginType.caregiver,
-  //             ),
-  //     );
-  //   } on FirebaseAuthException catch (e) {
-  //     print("ERROR: $e");
-  //     Get.snackbar(
-  //       'Invalid',
-  //       RegisterFailure.fromCode(e.code).message,
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
-  //       colorText: Colors.red,
-  //     );
-  //   } catch (ex) {
-  //     Get.snackbar(
-  //       'Invalid',
-  //       "Something went wrong. Please try again.",
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
-  //       colorText: Colors.red,
-  //     );
-  //   }
-  // }
+Future<void> MedicationChecksDoubleLayer(
+  String uid
+) async {
+    // String uid = FirebaseAuth.instance.currentUser!.uid;
+    var patientMedicationExists = await userRepo.isPatientMedicationsExists(uid);
+  if(!patientMedicationExists) {
+     Get.snackbar(
+        'Invalid',
+        'You have not entered any medication yet!',
+        snackPosition: SnackPosition.BOTTOM,
+        // backgroundColor: Colors.redAccent.withOpacity(0.1),
+        // colorText: Colors.red,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
+      );
+      return;
+  } else {
+     Get.to(
+        () => const NavigatorBar(
+              loginType: LoginType.patient,
+            ),
+      );
+  }
+}
 
 Future<void> loginUser(
   String email,
@@ -136,8 +104,10 @@ Future<void> loginUser(
         'Invalid',
         'Login information, please sign up for an account',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
+        // backgroundColor: Colors.redAccent.withOpacity(0.1),
+        // colorText: Colors.red,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
       );
       return;
     }
@@ -149,18 +119,18 @@ Future<void> loginUser(
 
     if (loginType == LoginType.patient && !patientMedicationExists) {
         Get.to(
-          () => PatientUploadMedsScreen(),
+          () => const PatientUploadMedsScreen(),
         );
     } else {
       if (loginType == LoginType.patient && patientMedicationExists) {
         Get.to(
-        () => NavigatorBar(
+        () => const NavigatorBar(
               loginType: LoginType.patient,
             ),
       );
       } else {
         Get.to(
-          () => NavigatorBar(
+          () => const NavigatorBar(
                 loginType: LoginType.caregiver,
               ),
         );
@@ -172,16 +142,20 @@ Future<void> loginUser(
       'Invalid',
       RegisterFailure.fromCode(e.code).message,
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
+      // backgroundColor: Colors.redAccent.withOpacity(0.1),
+      // colorText: Colors.red,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
   } catch (ex) {
     Get.snackbar(
       'Invalid',
       "Something went wrong. Please try again.",
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
+      // backgroundColor: Colors.redAccent.withOpacity(0.1),
+      // colorText: Colors.red,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
   }
 }
@@ -197,6 +171,8 @@ Future<void> loginUser(
           'Logout',
           'You have been successfully logged out',
           duration: const Duration(seconds: 2),
+          backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+          colorText: Color(0xFFF6F3E7)
         );
       }
     } catch (e) {

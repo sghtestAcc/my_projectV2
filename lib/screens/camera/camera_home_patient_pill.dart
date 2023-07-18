@@ -5,8 +5,6 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:my_project/components/navigation.tab.dart';
-import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
 class CameraHomePatientPillScreen extends StatefulWidget {
@@ -22,10 +20,7 @@ class CameraHomePatientPillScreen extends StatefulWidget {
 
 class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScreen> {
   bool textScanning = false;
-
   XFile? imageFilepills;
-
-
   String scannedTextpills = "";
   File? croppedImageFile;
 
@@ -116,17 +111,9 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
           ElevatedButton(
               onPressed: () {
                 // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const NavigatorBar(
-                //               loginType: LoginType.patient,
-                //             )));
-                // Navigator.of(context)
-                // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetaken: imageFilepills)));  
                 if (imageFilepills == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Please select an image Pill')),
+                const SnackBar(content: Text('Please select an image Pill')),
                 );
                 } else {
                 Navigator.of(context)
@@ -163,43 +150,10 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                 fit: BoxFit.fitWidth,
               ),
             ),
-        
-          // const SizedBox(
-          //   height: 10,
-          // ),
-          // Column(
-          //   children: [
-          //     // Text(scannedText),
-          //     Row(
-          //       children: [
-          //         Expanded(
-          //           child: Container(
-          //             padding: const EdgeInsets.all(20),
-          //             child: TextFormField(
-          //               style: const TextStyle(
-          //                 color: Colors.black,
-          //               ),
-          //               controller: controller,
-          //               maxLines: 1,
-          //               enabled: false,
-          //               decoration: const InputDecoration(
-          //                 hintText: "Your Medication will appear here...",
-          //                 border:
-          //                     InputBorder.none, // Set this to remove the border
-          //               ),
-          //             ),
-          //           ),
-          //         )
-          //       ],
-          //     ),
-          //   ],
-          // ),
         ]),
       ),
     );
   }
-
-
 
   Future<void> imageCropperView(String? path, BuildContext context) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(

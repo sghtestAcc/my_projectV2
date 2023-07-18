@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
+import 'package:my_project/controllers/select_patient_controller.dart';
+import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
+import 'package:my_project/repos/user_repo.dart';
+import 'package:my_project/screens/home/patient_card.dart';
 
 class CaregiverPrescription extends StatefulWidget {
   const CaregiverPrescription({super.key});
@@ -11,9 +16,12 @@ class CaregiverPrescription extends StatefulWidget {
 
 class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
   bool isDropdownOpen = false;
-
+final userRepo = Get.put(UserRepository());
   @override
   Widget build(BuildContext context) {
+
+     final controller = Get.put(SelectPatientController());
+    String lol = '';
     List<int> values = [
       2,
       4,
@@ -198,20 +206,100 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
           const SizedBox(
             height: 10,
           ),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(10.0),
-              itemCount: 10,
-              separatorBuilder: (context, index) {
-                return const SizedBox(
-                  height: 10,
-                );
-              },
-              itemBuilder: (context, index) {
-                return buildCard(index);
-              },
-            ),
-          )
+          FutureBuilder<List<GraceUser>>(
+          future: userRepo.getAllPatientsWithMedications(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData) {
+                        List<GraceUser> patients = snapshot.data!;
+                        // Apply search filter
+                        List<GraceUser> filteredPatients =
+                            patients.where((patient) {
+                          String email = patient.email ?? '';
+                          String name = patient.name ?? '';
+                          return email
+                                  .toLowerCase()
+                                  .contains(lol.toLowerCase()) ||
+                              name.toLowerCase().contains(lol.toLowerCase());
+                        }).toList();
+                        return Expanded(
+                            child: ListView.separated(
+                                padding: const EdgeInsets.all(10.0),
+                                shrinkWrap: true,
+                                itemCount: filteredPatients.length,
+                                separatorBuilder: (context, index) {
+                                  return const SizedBox(
+                                    height: 10,
+                                  );
+                                },
+                                itemBuilder: (context, index) {
+                                  GraceUser patient = filteredPatients[index];
+                                  String uid = patient.id ?? '';
+                                  String email = patient.email ?? '';
+                                  String name = patient.name ?? '';
+                                  return 
+                                  Container(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        10, 10, 10, 0),
+                                    decoration: const BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(22)),
+                                      color: Color(0xDDF6F6F6),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color.fromRGBO(0, 0, 0, 0.5),
+                                          offset: Offset(0, 1),
+                                          blurRadius: 4,
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          email,
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                        Text(name),
+                                         if(isDropdownOpen)
+                                        Row(
+                                          children: [
+                                            const Text(
+                                              'View more for medication info',
+                                              style: TextStyle(fontSize: 10),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isDropdownOpen =
+                                                      !isDropdownOpen;
+                                                });
+                                              },
+                                              icon: Icon(isDropdownOpen
+                                                  ? Icons.expand_less
+                                                  : Icons.expand_more),
+                                            ),
+                                          ],
+                                        ),
+                                         patientcard(index,uid),
+                                      ],
+                                    ),
+                                  );
+                                }));
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text(snapshot.error.toString()));
+                      } else {
+                        return const Center(
+                            child: Text('Something went wrong'));
+                      }
+                    } else {
+                      // return const Center(child: Text(''));
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                )
         ],
       ),
       endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),

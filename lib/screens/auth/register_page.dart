@@ -1,8 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/repos/user_repo.dart';
 
 import '../../repos/authentication_repository.dart';
 

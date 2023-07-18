@@ -23,9 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final password = TextEditingController();
 
   var formData = GlobalKey<FormState>();
-//   void _resetForm() {
-//   formData.currentState?.reset();
-// }
 
   @override
   Widget build(BuildContext context) {

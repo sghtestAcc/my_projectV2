@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/communications/communications_patient.dart';
 
-
-    var formDataquestions = GlobalKey<FormState>();
-    final questionsText = TextEditingController();
+  final questionsText = TextEditingController();
+  var formDataquestions = GlobalKey<FormState>();
 
   void addQuestionsModal(BuildContext context) {
   showModalBottomSheet(
     context: context,
     builder: (context) {
-      return FutureBuilder<GraceUser?>(
+      return FutureBuilder(
         future: controller.getPatientData(),
         builder: (context, snapshot) {
               var patientsInfo = snapshot.data;
@@ -27,18 +28,22 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                         children: [
                           IconButton(
                             onPressed: () {
-                              // Handle the close button action here
+                              questionsText.clear();
+                              Navigator.pop(context);
                             },
                             icon: const Icon(Icons.close),
                           ),
                         ],
                       ),
-                      const Text(
-                        'Add Questions',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                      'Add Questions',
+                      style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      ),
+                      ),
                       ),
                       const SizedBox(
                         height: 10,
@@ -53,61 +58,85 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                           ),
                         ),
                         child: TextFormField(
-                          controller: questionsText,
-                          maxLines: 3,
-                          keyboardType: TextInputType.multiline,
-                          decoration: const InputDecoration(
-                            hintText: 'Enter your question here...',
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(10.0),
+                        controller: questionsText,
+                        maxLines: 3,
+                        keyboardType: TextInputType.multiline,
+                        decoration: const InputDecoration(
+                        hintText: 'Enter your question here...',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(10.0),
                           ),
-                          validator: (value) {
-                            if (value!.trim().isEmpty) {
-                              return 'Please enter a question';
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (formDataquestions.currentState!.validate()) {
+                              if(questionsText.text == null || questionsText.text.isEmpty) {
+                            Get.snackbar(
+                            "Error",
+                            "Please fill in, Question is required.",
+                            snackPosition: SnackPosition.TOP,
+                            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                            colorText: Color(0xFFF6F3E7)
+                            );
+                            return;
+                              } else {
+                                await UserRepository.instance.createPatientUserQuestions(
+                                  patientsInfo?.email ?? '',
+                                  questionsText.text.trim(),
+                                );
+                                questionsText.clear();
+                                Navigator.pop(context);
+                              }
                             }
-                            return null;
                           },
+                          style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0CE25C), // NEW
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // Rounded corner radius
+                        ),
+                      ) ,
+                          child: const Text(
+                            'Add',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),   
                         ),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (formDataquestions.currentState!.validate()) {
-                            if (questionsText.text.trim().isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Please enter a question'),
-                                ),
-                              );
-                            } else {
-                              UserRepository.instance.createPatientUserQuestions(
-                                patientsInfo?.email ?? '',
-                                questionsText.text.trim(),
-                              );
-                            }
-                          }
-                        },
-                        child: const Text(
-                          'Add',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                                questionsText.clear();
+                                Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0CE25C), // NEW
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // Rounded corner radius
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Close',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ) ,
+                          child: const Text(
+                            'Close',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),   
                         ),
                       ),
                     ],
@@ -120,105 +149,144 @@ import 'package:my_project/screens/communications/communications_patient.dart';
   );
 }
 
+
   void addQuestionsModal2(BuildContext context) {
    showModalBottomSheet(
-  context: context,
-  builder: (context) {
-    return FutureBuilder<GraceUser?>(
-      future: controller.getPatientData(),
-      builder: (context, snapshot) {
-        var patientsInfo = snapshot.data;
-        //  GraceUser userData = snapshot.data as GraceUser;
-        return SingleChildScrollView(
-          child: Form(
-            key: formDataquestions,
-            child: Container(
-              padding: const EdgeInsets.all(40.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+    context: context,
+    builder: (context) {
+      return FutureBuilder(
+        future: controller.getPatientData(),
+        builder: (context, snapshot) {
+              var patientsInfo = snapshot.data;
+              return Form(
+                key: formDataquestions,
+                child: Container(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          // Handle the close button action here
-                          //   Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                          // NavigatorBar()));
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.close),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              questionsText.clear();
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(Icons.close),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const Text(
-                    'Add Questions',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200], // Background color
-                      borderRadius: BorderRadius.circular(10.0), // Rounded border
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
+                      Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                      'Add Questions',
+                      style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    child: TextFormField(
-                      controller: questionsText,
-                      validator: (value) {
-                        if(value == null || value.isEmpty) {
-                          
-                        }
-                          return null;
-                        },
-                      maxLines: 6,
-                      keyboardType: TextInputType.multiline,
-                      decoration: const InputDecoration(
+                      ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200], // Background color
+                          borderRadius: BorderRadius.circular(10.0), // Rounded border
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: TextFormField(
+                        controller: questionsText,
+                        maxLines: 3,
+                        keyboardType: TextInputType.multiline,
+                        decoration: const InputDecoration(
                         hintText: 'Enter your question here...',
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.all(10.0),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (formDataquestions.currentState!.validate()) {
+                              if(questionsText.text == null || questionsText.text.isEmpty) {
+                            Get.snackbar(
+                            "Error",
+                            "Please fill in, Question is required.",
+                            snackPosition: SnackPosition.TOP,
+                            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                            colorText: Color(0xFFF6F3E7)
+                            );
+                            return;
+                              } else {
+                                await UserRepository.instance.createPatientUserQuestions(
+                                  patientsInfo?.email ?? '',
+                                  questionsText.text.trim(),
+                                );
+                                questionsText.clear();
+                                Navigator.pop(context);
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0CE25C), // NEW
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // Rounded corner radius
+                        ),
+                      ) ,
+                          child: const Text(
+                            'Add',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),   
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                                questionsText.clear();
+                                Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0CE25C), // NEW
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // Rounded corner radius
+                        ),
+                      ) ,
+                          child: const Text(
+                            'Close',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),   
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (formDataquestions.currentState!.validate()) {
-                        UserRepository.instance.createCaregiverUserQuestions(
-                          patientsInfo?.email ?? '',
-                          questionsText.text.trim(),
-                        );
-                        formDataquestions.currentState?.reset();
-                      }
-                    },
-                    child: const Text(
-                      'Add',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Close',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  },
-);
+                ),
+              );
+        }
+      );
+    },
+  );
 }

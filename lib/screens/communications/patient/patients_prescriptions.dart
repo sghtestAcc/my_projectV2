@@ -78,6 +78,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                           if(snapshot.hasData) {
                              var patientsInfo = snapshot.data;
                              return  Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                    Text(
                                         "${patientsInfo?.name}",
@@ -275,8 +276,6 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                       return const Center(child: CircularProgressIndicator());
                     }
                   }),
-
-
                                   ],
                                 );
                                } else if (snapshot.hasError) {

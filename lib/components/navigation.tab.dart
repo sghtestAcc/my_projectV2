@@ -17,29 +17,33 @@ class _NavigatorBarState extends State<NavigatorBar> {
   int selectedIndex = 0;
 
   final screens = [
-    const PatientHomeScreen(
+     PatientHomeScreen(
       loginType: LoginType.patient),
-    const CommunicationsScreen(
+     CommunicationsScreen(
       loginType: LoginType.patient,
     ),
     // RegisterScreen(registerType: LoginType2.caregiversRegister
   ];
 
   final screens2 = [
-    const PatientHomeScreen(
+     PatientHomeScreen(
       loginType: LoginType.caregiver),
-    const CommunicationsScreen(
+     CommunicationsScreen(
       loginType: LoginType.caregiver,
     ),
-    const SelectPatientScreen()
+    SelectPatientScreen()
   ];
 
   @override
   Widget build(BuildContext context) {
     return widget.loginType == LoginType.patient
         ? Scaffold(
+
             body: screens[selectedIndex],
             bottomNavigationBar: BottomNavigationBar(
+              backgroundColor:Color(0xff0CE25C),
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.white,
               currentIndex: selectedIndex,
               onTap: (index) {
                 setState(() {
@@ -47,15 +51,20 @@ class _NavigatorBarState extends State<NavigatorBar> {
                 });
               },
               items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home', ),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.comment), label: 'Communications'),
+                //  BottomNavigationBarItem(
+                //     icon: Icon(Icons.comment), label: 'Communications'),
               ],
             ),
           )
         : Scaffold(
             body: screens2[selectedIndex],
             bottomNavigationBar: BottomNavigationBar(
+              backgroundColor:Color(0xff1CA77A),
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.white,
               currentIndex: selectedIndex,
               onTap: (index) {
                 setState(() {

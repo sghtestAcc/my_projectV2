@@ -20,10 +20,9 @@ class PatientsVocalScreen extends StatefulWidget {
   State<PatientsVocalScreen> createState() => _PatientsVocalScreenState();
 }
  final _authRepo = Get.put(AuthenticationRepository());
-// final userRepo = Get.put(UserRepository());
 
 class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
-  final currentEmail = _authRepo.firebaseUser.value?.email;
+  final currentUid = _authRepo.firebaseUser.value?.uid;
   String? _translatedText;
   final _controller = TextEditingController();
   final controller2 = TextEditingController();
@@ -142,7 +141,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Medication>>(
-      future: userRepo.getPatientMedications(currentEmail!),
+      future: userRepo.getPatientMedications(currentUid!),
       builder: (context, snapshot) {
         if(snapshot.connectionState == ConnectionState.done) {
           if(snapshot.hasData) {

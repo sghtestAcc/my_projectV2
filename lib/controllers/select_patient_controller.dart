@@ -3,7 +3,6 @@ import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/repos/user_repo.dart';
 
-import '../models/medications.dart';
 
 class SelectPatientController extends GetxController {
   static SelectPatientController get instance => Get.find();
@@ -27,4 +26,11 @@ class SelectPatientController extends GetxController {
   // Future<List<Medication>> displayAllPatientsMedications2() async {
   //   return await _userRepo.displayAllPatientsMedications();
   // }
+
+  Future<List<String>> getSingleUserQuestionPatient(String email) async {
+    return await _userRepo.getQuestionsofPatient(email);
+  }
+  
+
+
 }

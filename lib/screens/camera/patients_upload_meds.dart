@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,11 +26,10 @@ XFile? imageFile2;
 
 final _authRepo = Get.put(AuthenticationRepository());
 final userRepo = Get.put(UserRepository());
-  // TextEditingController medsQuantity = TextEditingController();
-  // TextEditingController medsSchedule = TextEditingController();
 
 class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   final currentEmail = _authRepo.firebaseUser.value?.email;
+  final currentUid = FirebaseAuth.instance.currentUser!.uid;
   TextEditingController medsLabel = TextEditingController();
   final controller = Get.put(SelectPatientController());
 
@@ -39,7 +39,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   TextEditingController medsScheduleInput = TextEditingController();
   
   var formDataQuestionsInput = GlobalKey<FormState>();
-  // XFile? receivedImage;
   var formDataQuestions = GlobalKey<FormState>();
 
   void convertText()  {
@@ -48,6 +47,8 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
       medsSchedule.text = medsScheduleInput.text;
       // medsScheduleInput.text = medsSchedule.text;
 }
+
+
 
     void showAddMedsScheduleModal(BuildContext context) {
     showModalBottomSheet(
@@ -252,7 +253,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
         child: FutureBuilder(
           future: controller.getPatientData(),
           builder: (context, snapshot) {
-            var patientsInfo = snapshot.data;
             return Container(
               padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
               child: Center(
@@ -361,30 +361,22 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                                 backgroundColor: Color(0xFF35365D),
                                 shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                  
-                      //           boxShadow: [
-                      //       BoxShadow(
-                      //   color: Colors.grey.withOpacity(0.5),
-                      //     spreadRadius: 5,
-                      // blurRadius: 10,
-                      //   offset: Offset(0, 3),
-                      // ),
-                      // ],
                       ),
                                 title: Text('Are you Sure?', style: TextStyle(color: Colors.white),),
                                 content: Text('This would take you to Home', style: TextStyle(color: Colors.white), ),
                                 actions: [
                                   MaterialButton(
                                   child: Text('Confirm', style: TextStyle(color: Colors.white),),
-                                  onPressed: () {
-                                    Navigator.push(
-                                     context,
-                                     MaterialPageRoute(
-                                     builder: (context) => const NavigatorBar(
-                                     loginType: LoginType.patient,
-                                     ),
-                                     ),
-                                    ); 
+                                  onPressed: () async {
+                                    await AuthenticationRepository.instance.MedicationChecksDoubleLayer(currentUid);
+                                    // Navigator.push(
+                                    //  context,
+                                    //  MaterialPageRoute(
+                                    //  builder: (context) => const NavigatorBar(
+                                    //  loginType: LoginType.patient,
+                                    //  ),
+                                    //  ),
+                                    // ); 
                                   },
                                   ),
                                    MaterialButton(onPressed: () {
@@ -446,7 +438,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       child: TextFormField(
                         validator: (value) {
                             if (value == null || value.isEmpty) {
-                              Get.snackbar(
+                          Get.snackbar(
                           "Error",
                           "Medication Quantity is required.",
                           // const Color(0xFF0CE25C)#35365D
