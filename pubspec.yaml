@@ -49,6 +49,8 @@ dependencies:
   speech_to_text: ^6.3.0
   flutter_image_compress: ^2.0.2
   flutter_tts: ^3.7.0
+  shared_preferences: ^2.0.0 
+
   
 
 

@@ -261,6 +261,41 @@ Future<List<GraceUser>> getAllPatientsWithMedications() async {
   return patientsWithMedications;
 }
 
+Future<List<GraceUser>> getPatientsWithMedications() async {
+  String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+  
+  // Step 1: Fetch the current user's subcollection and retrieve patient emails
+  final QuerySnapshot<Map<String, dynamic>> currentUserMedicationsSnapshot =
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUserUid)
+          .collection('medications')
+          .get();
+  
+  List<String> currentUserPatientEmails = currentUserMedicationsSnapshot.docs
+      .map((doc) => doc['Email'] as String) // Replace 'patientEmail' with the field containing the patient's email in the medications subcollection
+      .toList();
+
+  // Step 2: Query the "users" collection for patients with matching emails
+  final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
+      await FirebaseFirestore.instance.collection("users")
+      .where("LoginType", isEqualTo: LoginType.patient.name)
+      .where("Email", whereIn: currentUserPatientEmails)
+      .get();
+
+  List<GraceUser> patientsWithMedications = [];
+
+  for (var userDoc in usersSnapshot.docs) {
+    String uid = userDoc.id;
+    bool hasMedications = await isPatientMedicationsExists(uid);
+
+    if (hasMedications && uid != currentUserUid) {
+      var patientData = GraceUser.fromSnapshot(userDoc);
+      patientsWithMedications.add(patientData);
+    }
+  }
+  return patientsWithMedications;
+}
 
 
 Future<List<Medication>> displayAllPatientsMedications(String? uid) async {

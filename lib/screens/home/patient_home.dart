@@ -273,7 +273,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    'Medication status',
+                    'Medication Status',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ]),
