@@ -15,8 +15,8 @@ class CommunicationsScreen extends StatefulWidget {
   // LoginScreen
   final LoginType loginType;
   // const CommunicationsScreen({super.key});
-  const CommunicationsScreen({Key? key, required this.loginType})
-      : super(key: key);
+  const CommunicationsScreen({Key? key, required this.loginType}) : super(key: key);
+      
 
   @override
   State<CommunicationsScreen> createState() => _CommunicationsScreenState();
@@ -26,7 +26,7 @@ class CommunicationsScreen extends StatefulWidget {
   final controller = Get.put(SelectPatientController());
   
 class _CommunicationsScreenState extends State<CommunicationsScreen> {
-  final currentEmail = FirebaseAuth.instance.currentUser!.email;
+  String? currentEmail = FirebaseAuth.instance.currentUser!.email;
 
   var formData = GlobalKey<FormState>();
   String? _translatedText;
@@ -210,151 +210,152 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                   //patients view questions
               widget.loginType == LoginType.patient ?  
             Expanded(
-              child: FutureBuilder<List<String>>(
-  future: userRepo.getQuestionsofPatient(currentEmail!),
+              child: StreamBuilder<List<String>>(
+  stream: userRepo.getQuestionsofPatient(currentEmail),
   builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.done) {
-      if (snapshot.hasData) {
-        // Display the list of questions
-        return ListView.separated(
-          padding: const EdgeInsets.all(10.0),
-          itemCount: snapshot.data!.length,
-          separatorBuilder: (context, index) {
-            return const SizedBox(height: 15);
-          },
-          itemBuilder: (context, i) {
-                           return Container(
-          padding: const EdgeInsets.all(10.0),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(22)),
-            color: Color(0xFFF6F6F6),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.2),
-                offset: Offset(0, 1),
-                blurRadius: 4,
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SelectableText(
-                snapshot.data![i],
-                // patientInfo2[index].Question,
-                style: const TextStyle(fontSize: 20),
-              ),
-              IconButton(
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: snapshot.data![i],)).then(
-                    (_) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Copied to your clipboard !'),
-                        ),
-                      );
-                    },
-                  );
-                },
-                icon: const Icon(Icons.copy),
-              ),
-            ],
-          ),
-        );   
-          },
-        );
-      } else if (snapshot.data == null) {
-        return Center(
-          child: Column(
-            children: [
-              Image.asset('assets/images/world.png'), // Adjust the image path accordingly
-              SizedBox(height: 10,),
-              const Text('No questions added yet'),
-            ],
-          ),
-        );
-      } else {
-         return const Center(
-                              child: Text('Something went wrong'));
-      }
-    } else {
+    if (snapshot.connectionState == ConnectionState.waiting) {
       return Center(child: CircularProgressIndicator());
+    } else if (snapshot.hasError) {
+      return Center(child: Text(snapshot.error.toString()));
+    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+      return Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 10,),
+            Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
+            const SizedBox(height: 10,),
+            Text('No questions added yet'),
+          ],
+        ),
+      );
+    } else if (snapshot.hasData) {
+      return ListView.separated(
+        padding: const EdgeInsets.all(10.0),
+        itemCount: snapshot.data!.length,
+        separatorBuilder: (context, index) {
+          return const SizedBox(height: 15);
+        },
+        itemBuilder: (context, i) {
+          return Container(
+            padding: const EdgeInsets.all(10.0),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(22)),
+              color: Color(0xFFF6F6F6),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.2),
+                  offset: Offset(0, 1),
+                  blurRadius: 4,
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SelectableText(
+                  snapshot.data![i] ?? '',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: snapshot.data![i] ?? '',)).then(
+                      (_) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Copied to your clipboard !'),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      return const Center(child: Text('Something went wrong'));
     }
   },
-),
+)
             )
             :
             //caregivers view questions
              Expanded(
-              child: FutureBuilder<List<String>>(
-              future: userRepo.getQuestionsofCaregiver(currentEmail!),
-              builder: (context, snapshot) {
-                if(snapshot.connectionState == ConnectionState.done) {
-                  // var patientInfo2 = snapshot.data;
-                  if(snapshot.hasData) {
-                    return ListView.separated(
-                      padding: const EdgeInsets.all(10.0),
-                      itemCount: snapshot.data!.length,
-                      separatorBuilder: (context, index) {
-                        return const SizedBox(
-                    height: 15,
-                  );
-                      },
-                      itemBuilder: (context, i) {
-                          return Container(
-          padding: const EdgeInsets.all(10.0),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(22)),
-            color: Color(0xFFF6F6F6),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.2),
-                offset: Offset(0, 1),
-                blurRadius: 4,
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SelectableText(
-                snapshot.data![i],
-                // patientInfo2[index].Question,
-                style: const TextStyle(fontSize: 20),
-              ),
-              IconButton(
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: snapshot.data![i],)).then(
-                    (_) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Copied to your clipboard !'),
-                        ),
-                      );
-                    },
-                  );
-                },
-                icon: const Icon(Icons.copy),
-              ),
-            ],
-          ),
-        );
+              child: StreamBuilder<List<String>>(
+  stream: userRepo.getQuestionsofCaregiver(currentEmail),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Center(child: CircularProgressIndicator());
+    } else if (snapshot.hasError) {
+      return Center(child: Text(snapshot.error.toString()));
+    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+      return Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 10,),
+            Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
+            const SizedBox(height: 10,),
+            Text('No questions added yet'),
+          ],
+        ),
+      );
+    } else if (snapshot.hasData) {
+      return ListView.separated(
+        padding: const EdgeInsets.all(10.0),
+        itemCount: snapshot.data!.length,
+        separatorBuilder: (context, index) {
+          return const SizedBox(height: 15);
+        },
+        itemBuilder: (context, i) {
+          return Container(
+            padding: const EdgeInsets.all(10.0),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(22)),
+              color: Color(0xFFF6F6F6),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.2),
+                  offset: Offset(0, 1),
+                  blurRadius: 4,
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SelectableText(
+                  snapshot.data![i] ?? '',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: snapshot.data![i] ?? '',)).then(
+                      (_) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Copied to your clipboard !'),
+                          ),
+                        );
                       },
                     );
-                  } else if (snapshot.hasError) {
-                          return Center(child: Text(snapshot.error.toString()));
-                } else {
-                          return const Center(
-                              child: Text('Something went wrong'));
-                        }
-                }
-                else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-              } 
-              )
+                  },
+                  icon: const Icon(Icons.copy),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      return const Center(child: Text('Something went wrong'));
+    }
+  },
+)
             ),
             widget.loginType == LoginType.patient ?
             Container(
@@ -413,7 +414,10 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           ],
         ),
       ),
-      endDrawer: const AppDrawerNavigation(loginType: LoginType.patient),
+      
+      endDrawer: widget.loginType == LoginType.patient ? 
+      const AppDrawerNavigation(loginType: LoginType.patient) :
+      const AppDrawerNavigation(loginType: LoginType.caregiver) ,
     );
   }
 }

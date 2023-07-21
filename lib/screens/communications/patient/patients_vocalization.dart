@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/repos/authentication_repository.dart';
-import 'package:my_project/repos/user_repo.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
@@ -52,6 +52,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
     setState(() {
       _translatedText = result;
       _isLoading = false;
+
     });
   }
 
@@ -72,71 +73,10 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
 
   speak(String text) async {
     await flutterTts.setLanguage("en-US");
-    await flutterTts.setPitch(1);
-    await flutterTts.speak(text);
+    await flutterTts.setPitch(1.0);
+    await flutterTts.setVolume(1.0);
+    await flutterTts.speak(text);  
   }
-
-  // Widget buildCard(int index) => Container(
-  //       padding: const EdgeInsets.all(10.0),
-  //       width: 100,
-  //       decoration: BoxDecoration(
-  //         borderRadius: const BorderRadius.all(Radius.circular(22)),
-  //         color: const Color(0xFFF6F6F6),
-  //         boxShadow: const [
-  //           BoxShadow(
-  //             color: Color.fromRGBO(0, 0, 0, 0.2),
-  //             offset: Offset(0, 1),
-  //             blurRadius: 4,
-  //             spreadRadius: 0,
-  //           ),
-  //         ],
-  //         border: Border.all(
-  //           color: Colors.black, // Set your desired border color here
-  //           width: 1, // Set the border width
-  //         ),
-  //       ),
-  //       child: Column(
-  //         // crossAxisAlignment: CrossAxisAlignment.center,
-  //         children: [
-  //            Text('medications + $index'),
-  //           const SizedBox(height: 10),
-  //            ElevatedButton(
-  //           onPressed: () {
-  //             speak(text);
-  //             // setState(() {
-  //             //   text = containedtext;
-  //             //   speak(text);
-  //             // });
-  //           },
-  //           style: ElevatedButton.styleFrom(
-  //             shape: CircleBorder(),
-  //             backgroundColor: Color(0xff00A67E),
-  //           ),
-  //           child: Padding(
-  //             padding: EdgeInsets.all(1),
-  //             child: Icon(
-  //               Icons.volume_up,
-  //               color: Colors.white,
-  //             ),
-  //           ),
-  //         ),
-  //         IconButton(
-  //             onPressed: () {
-  //               Clipboard.setData(ClipboardData(text: 'medications + $index')).then(
-  //                 (_) {
-  //                   ScaffoldMessenger.of(context).showSnackBar(
-  //                     const SnackBar(
-  //                       content: Text('Copied to your clipboard !'),
-  //                     ),
-  //                   );
-  //                 },
-  //               );
-  //             },
-  //             icon: const Icon(Icons.copy),
-  //           ),
-  //         ],
-  //       ),
-  //     );
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +85,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
       builder: (context, snapshot) {
         if(snapshot.connectionState == ConnectionState.done) {
           if(snapshot.hasData) {
-                    return Scaffold(
+          return Scaffold(
           appBar: AppBar(
             title: const Text(
               'Vocalization',
@@ -155,6 +95,17 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
             elevation: 0,
             iconTheme: const IconThemeData(color: Colors.black),
             centerTitle: true,
+            leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+          Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+          builder: (context) => 
+          NavigatorBar(
+          loginType: LoginType.patient),
+          ));
+          },
+        ),
           ),
           body: Column(children: [
             Column(
@@ -262,7 +213,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  height: 160,
+                  height: 175,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: snapshot.data!.length,
@@ -270,11 +221,9 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                       width: 10,
                     ),
                     itemBuilder: (context, index) => 
-                    // buildCard(index),
-                    //items in builder 
                     Container(
             padding: const EdgeInsets.all(10.0),
-            width: 100,
+            width: 125,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(22)),
               color: const Color(0xFFF6F6F6),

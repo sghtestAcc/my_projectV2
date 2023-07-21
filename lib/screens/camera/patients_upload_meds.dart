@@ -15,7 +15,7 @@ class PatientUploadMedsScreen extends StatefulWidget {
   // final XFile? image;
   const PatientUploadMedsScreen({Key? key,this.imagetakenText,this.imagetakenPill}) : super(key: key);
 
-  final String? imagetakenText;
+  final TextEditingController? imagetakenText;
   final XFile? imagetakenPill;
 
   @override
@@ -42,11 +42,10 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   var formDataQuestions = GlobalKey<FormState>();
 
   void convertText()  {
-
       medsQuantity.text = medicineInput.text;
       medsSchedule.text = medsScheduleInput.text;
-      // medsScheduleInput.text = medsSchedule.text;
 }
+
 
 
 
@@ -70,7 +69,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                       medsScheduleInput.clear();
                       Navigator.pop(context);
                       },
-                      icon: const Icon(Icons.close),
+                      icon: Image.asset('assets/images/x-mark.png', height: 28, width: 28, fit: BoxFit.contain,),
                     ),
                   ],
                 ),
@@ -232,6 +231,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
  
   @override
   Widget build(BuildContext context) {
+      final textController1 = widget.imagetakenText ?? TextEditingController();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -317,7 +317,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Text(widget.imagetakenText ?? ''),
+                    // Text(widget.imagetakenText ?? ''),
                     //upload schdules button
                     SizedBox(
                       width: double
@@ -421,7 +421,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                         style: const TextStyle(
                           color: Colors.black,
                         ),
-                        controller: medsLabel,
+                        controller: textController1,
                         enabled: false,
                         decoration: const InputDecoration(
                           hintText: "Your Medication Label... ",
@@ -504,7 +504,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                         onPressed: () async {
                            if (formDataQuestions.currentState!.validate()) {
                             await userRepo.createPatientMedications(
-                            widget.imagetakenText, 
+                            textController1.text.trim(), 
                             widget.imagetakenPill, 
                             medsQuantity.text.trim(), 
                             medsSchedule.text.trim(), 

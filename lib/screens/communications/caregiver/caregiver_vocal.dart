@@ -72,6 +72,7 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
   speak(String text) async {
     await flutterTts.setLanguage("en-US");
     await flutterTts.setPitch(1);
+    await flutterTts.setVolume(1.0);
     await flutterTts.speak(text);
   }
 

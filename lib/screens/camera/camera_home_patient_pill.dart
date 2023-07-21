@@ -9,7 +9,7 @@ import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
 class CameraHomePatientPillScreen extends StatefulWidget {
   final String? path;
-  final String? imagetakenText;
+  final TextEditingController? imagetakenText;
   final XFile? imagetakenPill;
 
   const CameraHomePatientPillScreen({Key? key, this.path, this.imagetakenText,this.imagetakenPill}) : super(key: key);

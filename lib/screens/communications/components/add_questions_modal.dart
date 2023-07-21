@@ -1,12 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/communications/communications_patient.dart';
 
   final questionsText = TextEditingController();
   var formDataquestions = GlobalKey<FormState>();
+
 
   void addQuestionsModal(BuildContext context) {
   showModalBottomSheet(
@@ -76,7 +76,7 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                         child: ElevatedButton(
                           onPressed: () async {
                             if (formDataquestions.currentState!.validate()) {
-                              if(questionsText.text == null || questionsText.text.isEmpty) {
+                            } if(questionsText.text == null || questionsText.text.isEmpty) {
                             Get.snackbar(
                             "Error",
                             "Please fill in, Question is required.",
@@ -87,13 +87,13 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                             return;
                               } else {
                                 await UserRepository.instance.createPatientUserQuestions(
-                                  patientsInfo?.email ?? '',
+                                  context,
+                                  currentEmail!,
                                   questionsText.text.trim(),
                                 );
                                 questionsText.clear();
-                                Navigator.pop(context);
-                              }
-                            }
+                                // Navigator.pop(context);
+                              } 
                           },
                           style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0CE25C), // NEW
@@ -149,15 +149,18 @@ import 'package:my_project/screens/communications/communications_patient.dart';
   );
 }
 
+ String? currentEmail = FirebaseAuth.instance.currentUser!.email;
 
   void addQuestionsModal2(BuildContext context) {
    showModalBottomSheet(
     context: context,
     builder: (context) {
-      return FutureBuilder(
-        future: controller.getPatientData(),
-        builder: (context, snapshot) {
-              var patientsInfo = snapshot.data;
+      // return FutureBuilder<GraceUser?>(
+      //   future: controller.getPatientData(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.connectionState == ConnectionState.done) {
+      //     if (snapshot.hasData) {
+      //         var patientsInfo = snapshot.data;
               return Form(
                 key: formDataquestions,
                 child: Container(
@@ -173,7 +176,7 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                               questionsText.clear();
                               Navigator.pop(context);
                             },
-                            icon: const Icon(Icons.close),
+                            icon: Image.asset('assets/images/x-mark.png', height: 28, width: 28, fit: BoxFit.contain,),
                           ),
                         ],
                       ),
@@ -218,24 +221,45 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                         child: ElevatedButton(
                           onPressed: () async {
                             if (formDataquestions.currentState!.validate()) {
-                              if(questionsText.text == null || questionsText.text.isEmpty) {
-                            Get.snackbar(
-                            "Error",
-                            "Please fill in, Question is required.",
-                            snackPosition: SnackPosition.TOP,
-                            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-                            colorText: Color(0xFFF6F3E7)
-                            );
-                            return;
-                              } else {
-                                await UserRepository.instance.createPatientUserQuestions(
-                                  patientsInfo?.email ?? '',
-                                  questionsText.text.trim(),
-                                );
-                                questionsText.clear();
-                                Navigator.pop(context);
-                              }
-                            }
+                            } 
+                            
+                            // if(questionsText.text == null || questionsText.text.isEmpty) {
+                            // Get.snackbar(
+                            // "Error",
+                            // "Please fill in, Question is required.",
+                            // snackPosition: SnackPosition.TOP,
+                            // backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                            // colorText: Color(0xFFF6F3E7)
+                            // );
+                            // return;
+                            //   } else {
+                            //     await UserRepository.instance.createCaregiverUserQuestions(
+                            //       context,
+                            //       currentEmail!,
+                            //       questionsText.text.trim(),
+                            //     );
+                            //     questionsText.clear();
+                            //   }      
+                            if (questionsText.text == null || questionsText.text.trim().isEmpty) {
+  // Show a snackbar with an error message if the questionsText is empty
+  Get.snackbar(
+    "Error",
+    "Please fill in, Question is required.",
+    snackPosition: SnackPosition.TOP,
+    backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+    colorText: Color(0xFFF6F3E7),
+  );
+}  else {
+  // Execute the action when the questionsText contains meaningful content
+  await UserRepository.instance.createCaregiverUserQuestions(
+    context,
+    currentEmail!,
+    questionsText.text.trim(),
+  );
+  questionsText.clear();
+}
+// value.trim().split(' ').length < 2
+                    
                           },
                           style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0CE25C), // NEW
@@ -285,8 +309,18 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                   ),
                 ),
               );
-        }
-      );
+      //       } else if (snapshot.hasError) {
+      //                     return Center(child: Text(snapshot.error.toString()));
+      //       } else {
+      //                     return const Center(
+      //                         child: Text('Something went wrong'));
+      //       }
+      //       } else {
+      //                   return const Center(child: CircularProgressIndicator());
+      //       }
+
+      //   }
+      // );
     },
   );
 }

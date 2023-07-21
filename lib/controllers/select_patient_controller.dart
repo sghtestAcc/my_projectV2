@@ -27,10 +27,4 @@ class SelectPatientController extends GetxController {
   //   return await _userRepo.displayAllPatientsMedications();
   // }
 
-  Future<List<String>> getSingleUserQuestionPatient(String email) async {
-    return await _userRepo.getQuestionsofPatient(email);
-  }
-  
-
-
 }

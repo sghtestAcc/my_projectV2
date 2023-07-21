@@ -44,9 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Column(
               children: [
                 Image.asset(
-                  'assets/images/Grace-bg-new-edited.png',
-                  height: 150,
-                  width: 150,
+                  'assets/images/final-grace-background.png',
+                  height: 175,
+                  width: 175,
                   fit: BoxFit.cover,
                 ),
                 Image.asset(
@@ -214,12 +214,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
+             widget.loginType == LoginType.patient
+                ?
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Image.asset('assets/images/sghDesign.png'),
               ),
-            ),
+            ):  Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Image.asset('assets/images/sgh-design-caregiver.png'),
+              ),
+            )
           ],
         ),
       ),

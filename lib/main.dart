@@ -35,8 +35,9 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            Image.asset('assets/images/Grace-bg-new-edited.png',
-                height: 200, width: 200, fit: BoxFit.cover),
+            Image.asset('assets/images/final-grace-background.png',
+                height: 200, width: 200, fit: BoxFit.cover
+                ),
             const Text(
               'Guided Resources, Assistance',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),

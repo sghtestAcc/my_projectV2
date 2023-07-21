@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/medications.dart';
+import 'package:my_project/screens/home/patient_home.dart';
 
 import '../../../repos/authentication_repository.dart';
 import '../../../repos/user_repo.dart';
@@ -33,6 +35,17 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
         elevation: 0,
         iconTheme:  IconThemeData(color: Colors.black),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+          Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+          builder: (context) => 
+          NavigatorBar(
+          loginType: LoginType.patient),
+          ));
+          },
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,6 +310,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
           ),
         ],
       ),
+      //  endDrawer: AppDrawerNavigation(loginType: widget.loginType),
       endDrawer: const AppDrawerNavigation(loginType: LoginType.patient),
     );
   }

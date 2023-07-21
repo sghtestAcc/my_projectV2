@@ -5,17 +5,18 @@ import 'package:my_project/screens/home/patient_home.dart';
 import 'package:my_project/screens/patients/select_patients.dart';
 
 class NavigatorBar extends StatefulWidget {
-  // const NavigatorBar({super.key});
 
   final LoginType loginType;
-  const NavigatorBar({Key? key, required this.loginType}) : super(key: key);
+  int selectedIndex = 0;
+
+  // const NavigatorBar({Key? key, required this.loginType}) : super(key: key);
+  NavigatorBar({Key? key, required this.loginType,  this.selectedIndex = 0}) : super(key: key);
   @override
   State<NavigatorBar> createState() => _NavigatorBarState();
 }
 
 class _NavigatorBarState extends State<NavigatorBar> {
-  int selectedIndex = 0;
-
+  // int selectedIndex = 0;
   final screens = [
      PatientHomeScreen(
       loginType: LoginType.patient),
@@ -38,37 +39,34 @@ class _NavigatorBarState extends State<NavigatorBar> {
   Widget build(BuildContext context) {
     return widget.loginType == LoginType.patient
         ? Scaffold(
-
-            body: screens[selectedIndex],
+            body: screens[widget.selectedIndex],
             bottomNavigationBar: BottomNavigationBar(
               backgroundColor:Color(0xff0CE25C),
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.white,
-              currentIndex: selectedIndex,
+              currentIndex: widget.selectedIndex,
               onTap: (index) {
                 setState(() {
-                  selectedIndex = index;
+                  widget.selectedIndex = index;
                 });
               },
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home', ),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.comment), label: 'Communications'),
-                //  BottomNavigationBarItem(
-                //     icon: Icon(Icons.comment), label: 'Communications'),
+                icon: Icon(Icons.comment), label: 'Communications'),
               ],
             ),
           )
         : Scaffold(
-            body: screens2[selectedIndex],
+            body: screens2[widget.selectedIndex],
             bottomNavigationBar: BottomNavigationBar(
               backgroundColor:Color(0xff1CA77A),
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.white,
-              currentIndex: selectedIndex,
+              currentIndex: widget.selectedIndex,
               onTap: (index) {
                 setState(() {
-                  selectedIndex = index;
+                  widget.selectedIndex = index;
                 });
               },
               items: const [
@@ -78,6 +76,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.comment),
+                  // assets/images/chat-box.png
                   label: 'Communications',
                 ),
                 BottomNavigationBarItem(

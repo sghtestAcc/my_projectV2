@@ -44,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 children: [
                   Image.asset(
-                    'assets/images/Grace-bg-new-edited.png',
+                    'assets/images/final-grace-background.png',
                     height: 150,
                     width: 150,
                     fit: BoxFit.cover,
@@ -181,10 +181,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Expanded(
               child: Stack(
                 children: [
+                  widget.registerType == LoginType.patient
+                ?
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Image.asset(
                       'assets/images/sghDesign.png',
+                    ),
+                  ): Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Image.asset(
+                      'assets/images/sgh-design-caregiver.png',
                     ),
                   ),
                   Container(
@@ -198,17 +205,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             name: fullName.text.trim(),
                             loginType: widget.registerType,
                           );
-
-                          // String uid = FirebaseAuth.instance.currentUser!.uid;
-                          // if (await UserRepository.instance.createUser(user,uid)) {
-                          //   await AuthenticationRepository.instance
-                          //       .registerUser(
-                          //     email.text.trim(),
-                          //     password.text.trim(),
-                          //     widget.registerType,
-                          //   );
-                          // }
-
                           // if (await UserRepository.instance.createUser(user)) {
                             await AuthenticationRepository.instance
                                 .registerUser(
@@ -218,7 +214,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               user
                             );
                           // }
-                         
                           formData.currentState?.reset();
                         }
                       },

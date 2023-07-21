@@ -24,7 +24,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   XFile? imageFile;
 
   String scannedText = "";
-  File? croppedImageFile;
+  // File? croppedImageFile;
 
   TextEditingController controller = TextEditingController();
 
@@ -155,7 +155,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 );
                 } else {
                 Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetakenText: controller.text)));  
+                .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetakenText: controller)));  
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -267,7 +267,6 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       log('do nothing');
     }
   }
-
     void getRecognisedText(XFile image) async {
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
@@ -289,7 +288,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
     textScanning = false;
     setState(() {});
   }
-  // imageQuality: 50
+
 
   Future<String> pickImage({ImageSource? source,}) async {
     final picker = ImagePicker();

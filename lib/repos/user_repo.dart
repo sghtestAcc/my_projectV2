@@ -67,63 +67,78 @@ class UserRepository extends GetxController {
   }
 
 
+// //retrieve caregivers questions function(of single users)
+Stream<List<String>> getQuestionsofPatient(String? email) {
+  return firestore
+      .collection("questions")
+      .where("Email", isEqualTo: email)
+      .snapshots()
+      .map((querySnapshot) =>
+          querySnapshot.docs.map((doc) => doc.data()["Question"].toString()).toList());
+}
+
+// //retrieve caregivers questions function(of single users)
+//   Future<List<String>> getQuestionsofCaregiver(String? email) async {
+//     // final doesUserExists = await isEmailExists(email, LoginType.caregiver);
+//     // if (!doesUserExists) throw Exception('User does not exists');
+//     final snapshot = await firestore
+//         .collection("questions")
+//         .where("Email", isEqualTo: email)
+//         .get();
+//     return snapshot.docs
+//         .map(
+//           (e) => e.data()["Question"].toString(),
+//         )
+//         .toList();
+// }
 
 //retrieve patient questions function(of single users)
-  Future<List<String>> getQuestionsofPatient(String? email) async {
-    // final doesUserExists = await isEmailExists(email, LoginType.patient);
-    // if (!doesUserExists) throw Exception('User does not exists');
-    final snapshot = await firestore
-        .collection("questions")
-        .where("Email", isEqualTo: email)
-        .get();
-    return snapshot.docs
-        .map(
-          (e) => e.data()["Question"].toString(),
-        )
-        .toList();
-}
+//   Future<List<String>> getQuestionsofPatient(String? email) async {
+//     // final doesUserExists = await isEmailExists(email, LoginType.patient);
+//     // if (!doesUserExists) throw Exception('User does not exists');
+//     final snapshot = await firestore
+//         .collection("questions")
+//         .where("Email", isEqualTo: email)
+//         .get();
+//     return snapshot.docs
+//         .map(
+//           (e) => e.data()["Question"].toString(),
+//         )
+//         .toList();
+// }
 
 //retrieve caregivers questions function(of single users)
-  Future<List<String>> getQuestionsofCaregiver(String email) async {
+  Stream<List<String>> getQuestionsofCaregiver(String? email)  {
     // final doesUserExists = await isEmailExists(email, LoginType.caregiver);
     // if (!doesUserExists) throw Exception('User does not exists');
-    final snapshot = await firestore
-        .collection("questions")
-        .where("Email", isEqualTo: email)
-        .get();
-    return snapshot.docs
-        .map(
-          (e) => e.data()["Question"].toString(),
-        )
-        .toList();
+     return firestore
+      .collection("questions")
+      .where("Email", isEqualTo: email)
+      .snapshots()
+      .map((querySnapshot) =>
+          querySnapshot.docs.map((doc) => doc.data()["Question"].toString()).toList());
 }
 
-Future<bool> isPatientQuestionsEmailExists(String email, String question) async {
+
+Future<bool> isQuestionsEmailExists(String email, String question) async {
   final CollectionReference usersCollection = firestore.collection('questions');
   String lowerCaseQuestion = question.toLowerCase();
-
-  print("Searching for: $lowerCaseQuestion");
-
   var snapshot = await usersCollection
       .where("Email", isEqualTo: email)
-      .where("LowerCaseQuestion", isEqualTo: lowerCaseQuestion)
+      .where("Question", isEqualTo: lowerCaseQuestion)
       .get();
-
-  print("Snapshot documents: ${snapshot.docs}");
-
   var isEmailExists = snapshot.docs.isNotEmpty;
   return isEmailExists;
 }
 
-
 //create patients questions function
   Future<void> createPatientUserQuestions(
+  BuildContext context, 
   String email,
   String question,
 ) async {
   final doesUserExists = await isEmailExists(email, LoginType.patient);
-  final doesUserQuestionExists = await isPatientQuestionsEmailExists(email, question);
-
+  final doesUserQuestionExists = await isQuestionsEmailExists(email, question);
   if (!doesUserExists) return;
 
   if (doesUserQuestionExists) {
@@ -144,27 +159,23 @@ Future<bool> isPatientQuestionsEmailExists(String email, String question) async 
     Get.snackbar(
       "Congrats",
       "A new question has been created.",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
   } catch (error) {
     Get.snackbar(
       "Error",
       "Failed to create a new question.",
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
     print(error.toString());
   }
 }
-
-
-
-
-
-
 
 Future<bool> isPatientMedicationsExists(String uid) async {
     final CollectionReference usersCollection = firestore.collection('users')
@@ -199,11 +210,6 @@ Future<void> createPatientMedications(
   String quantity,
   String schedule,
 ) async {
-  // final doesUserExist = await isEmailExists(email, LoginType.patient);
-  // if (!doesUserExist) {
-  //   throw Exception('User does not exist');
-  // }
-
   try {
     final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     final pathRoute = 'medicationPills/$fileName';
@@ -213,8 +219,6 @@ Future<void> createPatientMedications(
     await FirebaseFirestore.instance.collection("users").doc(uid)
     .collection('medications')
     .add({
-      // "Email": email,
-      // "Name" : name,
       "Labels":labels,
       "Pills":imageUrl,
       "Quantity":quantity,
@@ -260,8 +264,6 @@ Future<List<GraceUser>> getAllPatientsWithMedications() async {
   }
   return patientsWithMedications;
 }
-
-
 
 Future<List<Medication>> displayAllPatientsMedications(String? uid) async {
   var patientDataMedications = await firestore
@@ -318,34 +320,15 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
 }
 
 
-// //original patient medication -- do not delete---
-//   Future<List<Medication>> getAllPatientsMedications(String email) async {
-//   final doesUserExists = await isEmailExists(email, LoginType.patient);
-//   // final doesUserExists = await isEmailExists2(email);
-//   if (!doesUserExists) throw Exception('User does not exists');
-//   final snapshot = await firestore
-//       .collection("medications")
-//       .where("Email", isEqualTo: email)
-//       .get();
-//   final patientDataMedications = snapshot.docs
-//       .map(
-//         (e) => Medication.fromSnapshot(e),
-//       )
-//       .toList();
-//   return patientDataMedications;
-// }
-
-
   //create caregivers questions function
   Future<void> createCaregiverUserQuestions(
+    BuildContext context, 
     String email,
     String question,
-
   ) async {
     final doesUserExists = await isEmailExists(email, LoginType.caregiver);
-    final doesUserQuestionExists = await isPatientQuestionsEmailExists(email, question);
+    final doesUserQuestionExists = await isQuestionsEmailExists(email, question);
     if (!doesUserExists) return;
-
      if (doesUserQuestionExists) {
     Get.snackbar(
       "Error",
@@ -365,17 +348,19 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
       Get.snackbar(
         "Congrats",
         "A new question has been created.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
       );
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
     } catch (error) {
       Get.snackbar(
         "Error",
         "Failed to create a new question.",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
       );
       print(error.toString());
     }
@@ -394,6 +379,22 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
         .single;
     return patientData;
   }
+
+
+   Future<List<GraceUser>> getMultipleUser(String email) async {
+    final snapshot = await firestore
+        .collection("users")
+        .where("Email", isEqualTo: email)
+        .get();
+    final patientData = snapshot.docs
+        .map(
+          (e) => GraceUser.fromSnapshot(e),
+        )
+        .toList();
+    return patientData;
+  }
+
+  
 
   Future<List<GraceUser>> getAllPatients() async {
     final snapshot = await firestore

@@ -84,7 +84,7 @@ Future<void> MedicationChecksDoubleLayer(
       return;
   } else {
      Get.to(
-        () => const NavigatorBar(
+        () => NavigatorBar(
               loginType: LoginType.patient,
             ),
       );
@@ -124,13 +124,13 @@ Future<void> loginUser(
     } else {
       if (loginType == LoginType.patient && patientMedicationExists) {
         Get.to(
-        () => const NavigatorBar(
+        () => NavigatorBar(
               loginType: LoginType.patient,
             ),
       );
       } else {
         Get.to(
-          () => const NavigatorBar(
+          () => NavigatorBar(
                 loginType: LoginType.caregiver,
               ),
         );
