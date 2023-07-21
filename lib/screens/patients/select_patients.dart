@@ -223,13 +223,12 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
   },
 )
             ),
-          
+          // Include the PatientsWithMedicationsWidget here
         ],
       ),
       endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
     );
   }
-
 
 Future<void> addPatientsToCurrentUser() async {
   try {
