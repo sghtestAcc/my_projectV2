@@ -11,6 +11,8 @@ import 'package:my_project/screens/camera/camera_home_patient.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/patient_home.dart';
 
+import '../../components/navigation_drawer_new.dart';
+
 class PatientUploadMedsScreen extends StatefulWidget {
   // final XFile? image;
   const PatientUploadMedsScreen({Key? key,this.imagetakenText,this.imagetakenPill}) : super(key: key);
@@ -44,11 +46,8 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   void convertText()  {
       medsQuantity.text = medicineInput.text;
       medsSchedule.text = medsScheduleInput.text;
+      Navigator.pop(context);
 }
-
-
-
-
     void showAddMedsScheduleModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -103,23 +102,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                         ),
                       ),
                       child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              Get.snackbar(
-                          "Error",
-                          "Please fill in Medication Quantity.",
-                          // const Color(0xFF0CE25C)#35365D
-                          snackPosition: SnackPosition.TOP,
-                          //  backgroundColor: Colors.redAccent.withOpacity(0.1),
-                          // colorText: Colors.red,
-                          backgroundColor: Color(0xFF35365D).withOpacity(0.3),
-                          // colorText: Colors.white,
-                          colorText: Color(0xFFF6F3E7),
-                      );
-                      return null;
-                    }
-                          return null;
-                        },
                         controller: medicineInput,
                         decoration: const InputDecoration(
                           hintText: '2 tabs...',
@@ -152,23 +134,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                         ),
                       ),
                       child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              Get.snackbar(
-                          "Error",
-                          "Please fill in Medication Schedule.",
-                          // const Color(0xFF0CE25C)#35365D
-                          snackPosition: SnackPosition.TOP,
-                          //  backgroundColor: Colors.redAccent.withOpacity(0.1),
-                          // colorText: Colors.red,
-                          backgroundColor: Color(0xFF35365D).withOpacity(0.3),
-                          // colorText: Colors.white,
-                          colorText: Color(0xFFF6F3E7),
-                      );
-                      return null;
-                    }
-                          return null;
-                        },
                         controller: medsScheduleInput,
                         decoration: const InputDecoration(
                           hintText: 'Morning After meal...',
@@ -189,12 +154,29 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                           ),
                         ),
                     onPressed: () async {
-                      if (formDataQuestionsInput.currentState!.validate()) {
+                        if (medicineInput.text == null || medicineInput.text.isEmpty) {
+                        Get.snackbar(
+                        "Error",
+                        "Medication Quantity is required.",
+                        snackPosition: SnackPosition.TOP,
+                        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                        colorText: Color(0xFFF6F3E7),
+                        );
+                        return;
+                        } else if (medsScheduleInput.text == null || medsScheduleInput.text.isEmpty) {
+                         Get.snackbar(
+                        "Error",
+                        "Medication Schedule is required.",
+                        snackPosition: SnackPosition.TOP,
+                        backgroundColor: Color(0xFF35365D).withOpacity(0.3),
+                        colorText: Color(0xFFF6F3E7),
+                        );
+                      return;
+                        } else {
                         convertText();
                         medicineInput.clear();
                         medsScheduleInput.clear();
-                        Navigator.pop(context);
-                                      }
+                        }
                     },
                     child: const Text(
                       'Add',
@@ -232,317 +214,310 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   @override
   Widget build(BuildContext context) {
       final textController1 = widget.imagetakenText ?? TextEditingController();
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                    'assets/images/Grace-bg-new-edited.png',
-                  ),
-                  fit: BoxFit.contain)),
+    return WillPopScope(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(
+                      'assets/images/Grace-bg-new-edited.png',
+                    ),
+                    fit: BoxFit.contain)),
+          ),
+          backgroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.black),
         ),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: Form(
-        key: formDataQuestions,
-        child: FutureBuilder(
-          future: controller.getPatientData(),
-          builder: (context, snapshot) {
-            return Container(
-              padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
-              child: Center(
-                child: Column(
-                  children: [
-                    const Text(
-                      'New Patients Must',
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                    const Text(
-                      'upload your medication',
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      'These information would assist caregivers',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    const Text(
-                      'in managing your medication effectively',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    //upload images button
-                    SizedBox(
-                      width: double
-                          .infinity, // Set the width to expand to the available space
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Add your onPressed logic here
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CameraHomePatientScreen()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0CE25C),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12), // Adjust the padding as needed
-                          child: const Text(
-                            'Upload Images',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
+        body: Form(
+          key: formDataQuestions,
+          child: FutureBuilder(
+            future: controller.getPatientData(),
+            builder: (context, snapshot) {
+              return Container(
+                padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      const Text(
+                        'New Patients Must',
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                       ),
-                    ),
-        
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    // Text(widget.imagetakenText ?? ''),
-                    //upload schdules button
-                    SizedBox(
-                      width: double
-                          .infinity, // Set the width to expand to the available space
-                      child: ElevatedButton(
-                        onPressed: () {
-                          showAddMedsScheduleModal(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0CE25C),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12), // Adjust the padding as needed
-                          child: const Text(
-                            'Upload Schedules',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
+                      const Text(
+                        'upload your medication',
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                // Color(0xFF35365D).withOpacity(0.3),
-                                backgroundColor: Color(0xFF35365D),
-                                shape: RoundedRectangleBorder(
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'These information would assist caregivers',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      const Text(
+                        'in managing your medication effectively',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      //upload images button
+                      SizedBox(
+                        width: double
+                            .infinity, // Set the width to expand to the available space
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Add your onPressed logic here
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CameraHomePatientScreen()));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0CE25C),
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                      ),
-                                title: Text('Are you Sure?', style: TextStyle(color: Colors.white),),
-                                content: Text('This would take you to Home', style: TextStyle(color: Colors.white), ),
-                                actions: [
-                                  MaterialButton(
-                                  child: Text('Confirm', style: TextStyle(color: Colors.white),),
-                                  onPressed: () async {
-                                    await AuthenticationRepository.instance.MedicationChecksDoubleLayer(currentUid);
-                                    // Navigator.push(
-                                    //  context,
-                                    //  MaterialPageRoute(
-                                    //  builder: (context) => const NavigatorBar(
-                                    //  loginType: LoginType.patient,
-                                    //  ),
-                                    //  ),
-                                    // ); 
-                                  },
-                                  ),
-                                   MaterialButton(onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text('cancel', style: TextStyle(color: Colors.white),),
-                                  )
-                                ],
-                              );
-                            });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0CE25C),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: const Text(
-                            'Proceed to home',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12), // Adjust the padding as needed
+                            child: const Text(
+                              'Upload Images',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-        
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      'Medication Label:',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: TextFormField(
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                        controller: textController1,
-                        enabled: false,
-                        decoration: const InputDecoration(
-                          hintText: "Your Medication Label... ",
-                          border: InputBorder.none, // Set this to remove the border
+          
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      // Text(widget.imagetakenText ?? ''),
+                      //upload schdules button
+                      SizedBox(
+                        width: double
+                            .infinity, // Set the width to expand to the available space
+                        child: ElevatedButton(
+                          onPressed: () {
+                            showAddMedsScheduleModal(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0CE25C),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12), // Adjust the padding as needed
+                            child: const Text(
+                              'Upload Schedules',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    const Text(
-                      'Medication Quantity:',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: TextFormField(
-                        validator: (value) {
-                            if (value == null || value.isEmpty) {
-                          Get.snackbar(
-                          "Error",
-                          "Medication Quantity is required.",
-                          // const Color(0xFF0CE25C)#35365D
-                          snackPosition: SnackPosition.TOP,
-                          //  backgroundColor: Colors.redAccent.withOpacity(0.1),
-                          // colorText: Colors.red,
-                          backgroundColor: Color(0xFF35365D).withOpacity(0.3),
-                          // colorText: Colors.white,
-                          colorText: Color(0xFFF6F3E7),
-                      );
-                      return null;
-                    }
-                          return null;
-                        },
-                        style: const TextStyle(
-                          color: Colors.black,
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  // Color(0xFF35365D).withOpacity(0.3),
+                                  backgroundColor: Color(0xFF35365D),
+                                  shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                         ),
-                        // controller: controller,
-                        enabled: false,
-                        controller: medsQuantity,
-                        decoration: const InputDecoration(
-                          hintText: "Your Medication Quantity...",
-                          border: InputBorder.none, // Set this to remove the border
+                                  title: Text('Are you Sure?', style: TextStyle(color: Colors.white),),
+                                  content: Text('This would take you to Home', style: TextStyle(color: Colors.white), ),
+                                  actions: [
+                                    MaterialButton(
+                                    child: Text('Confirm', style: TextStyle(color: Colors.white),),
+                                    onPressed: () async {
+                                      await AuthenticationRepository.instance.MedicationChecksDoubleLayer(currentUid);
+                                    },
+                                    ),
+                                     MaterialButton(onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('cancel', style: TextStyle(color: Colors.white),),
+                                    )
+                                  ],
+                                );
+                              });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0CE25C),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: const Text(
+                              'Proceed to home',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    const Text(
-                      'Medication Schedules:',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                              Get.snackbar(
-                          "Error",
-                          "Medication schedule is required.",
-                          snackPosition: SnackPosition.TOP,
-                          backgroundColor: Colors.redAccent.withOpacity(0.1),
-                          colorText: Colors.red,
-                      );
-                      return null;
-                    }
-                    return null;
-                        },
-                        controller: medsSchedule,
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                        // controller: controller,
-                        enabled: false,
-                        decoration: const InputDecoration(
-                          hintText: "Your Medication Schedule...",
-                          border: InputBorder.none, // Set this to remove the border
+          
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'Medication Label:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        child: TextFormField(
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                          controller: textController1,
+                          enabled: false,
+                          decoration: const InputDecoration(
+                            hintText: "Your Medication Label... ",
+                            border: InputBorder.none, // Set this to remove the border
+                          ),
                         ),
                       ),
-                    ),
-        
-                    SizedBox(
-                      width: double.infinity, // Set the width to expand to the available space
-                      child: ElevatedButton(
-                        onPressed: () async {
-                           if (formDataQuestions.currentState!.validate()) {
-                            await userRepo.createPatientMedications(
-                            textController1.text.trim(), 
-                            widget.imagetakenPill, 
-                            medsQuantity.text.trim(), 
-                            medsSchedule.text.trim(), 
-                            // currentEmail!,
-                            // patientsInfo?.name
+                      const Text(
+                        'Medication Quantity:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        child: TextFormField(
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                          enabled: false,
+                          controller: medsQuantity,
+                          decoration: const InputDecoration(
+                            hintText: "Your Medication Quantity...",
+                            border: InputBorder.none, // Set this to remove the border
+                          ),
+                        ),
+                      ),
+                      const Text(
+                        'Medication Schedules:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        child: TextFormField(
+                          controller: medsSchedule,
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                          // controller: controller,
+                          enabled: false,
+                          decoration: const InputDecoration(
+                            hintText: "Your Medication Schedule...",
+                            border: InputBorder.none, // Set this to remove the border
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: double.infinity, // Set the width to expand to the available space
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (textController1.text == null || textController1.text.isEmpty) {
+                            Get.snackbar(
+                            "Error",
+                            "Please fill in the Medication Label.",
+                            snackPosition: SnackPosition.TOP,
+                            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                            colorText: Color(0xFFF6F3E7),
                             );
-                            formDataQuestions.currentState?.reset();
+                            return;
+                            } else if (medsQuantity.text == null || medsQuantity.text.isEmpty) {
+                            Get.snackbar(
+                            "Error",
+                            "Please fill in the Medication Quantity.",
+                            snackPosition: SnackPosition.TOP,
+                            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                            colorText: Color(0xFFF6F3E7),
+                            );
+                            return;
+                            } else if (medsSchedule.text == null || medsSchedule.text.isEmpty) {
+                            Get.snackbar(
+                            "Error",
+                            "Please fill in the Medication Schedule.",
+                            snackPosition: SnackPosition.TOP,
+                            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                            colorText: Color(0xFFF6F3E7),
+                            );
+                            return;
                             }
-                        
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0CE25C),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          if (formDataQuestions.currentState!.validate()) {
+                            await userRepo.createPatientMedications(
+                              textController1.text.trim(), 
+                              widget.imagetakenPill, 
+                              medsQuantity.text.trim(), 
+                              medsSchedule.text.trim(),
+                            );
+                            textController1.clear();
+                            medsQuantity.clear();
+                            medsSchedule.clear();
+                          }  
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0CE25C),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12,
-                          ), // Adjust the padding as needed
-                          child: const Text(
-                            'Add Medications',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                            ), // Adjust the padding as needed
+                            child: const Text(
+                              'Add Medications',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }
+              );
+            }
+          ),
         ),
+      endDrawer: AppDrawerNavigationNew(),
       ),
+      onWillPop: () async {
+        return false;
+      },
     );
   }
 }

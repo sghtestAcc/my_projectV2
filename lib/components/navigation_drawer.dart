@@ -188,10 +188,13 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     width: 28,
                   ),
                   title: const Text('PhotoScanner'),
-                  onTap:
-                      () {
-                        
-                      } // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
+                  onTap: () async {
+                  await pickImage(source: ImageSource.gallery).then((value) {
+                  if (value != '') {
+                  imageCropperView(value, context);
+                  }
+                  });
+                  }
                   ),
               const Divider(height: 3, color: Colors.blueGrey),
                ListTile(
@@ -312,8 +315,13 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     width: 28,
                   ),
                   title: const Text('PhotoScanner'),
-                  onTap:
-                      () {} // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
+                  onTap: () async {
+                  await pickImage(source: ImageSource.gallery).then((value) {
+                  if (value != '') {
+                  imageCropperView(value, context);
+                  }
+                  });
+                  }
                   ),
               ListTile(
                   leading: const Icon(Icons.home),

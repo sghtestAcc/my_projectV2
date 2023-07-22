@@ -28,205 +28,210 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
 
     bool isDropdownOpen = false;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Patients',
-          style: TextStyle(color: Colors.black),
-        ),
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        centerTitle: true,
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-          color: const Color(0xFF9EE8BF),
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
-          child: const Text(
-            'Select Patient',
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Patients',
+            style: TextStyle(color: Colors.black),
           ),
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+          centerTitle: true,
         ),
-                 FutureBuilder<List<GraceUser>>(
-                   future: userRepo.getAllPatientsWithMedications(),
-                   builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                         if(snapshot.hasData) {
-                            return ListView.builder(
-                             shrinkWrap: true,
-                           itemCount: snapshot.data!.length,
-                       itemBuilder: (context, index) {
-                            GraceUser patient = snapshot.data![index];
-                               String uid = patient.id ?? '';
-                               String email = patient.email ?? '';
-                               String name = patient.name ?? '';
-                               bool isChecked = _isCheckedMap[uid] ?? false;
-                           return Container(
-          decoration: BoxDecoration(
-                 border: Border.all(
-                   color: Colors.black,
-                   width: 1.0,
-                 ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+            color: const Color(0xFF9EE8BF),
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
+            child: const Text(
+              'Select Patient',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
           ),
-          child: CheckboxListTile(
-                 title: Column(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     Text(
-                       name,
-                       style: const TextStyle(fontSize: 15),
-                     ),
-                     Text(email,
-                         style: const TextStyle(fontSize: 12)),
-                   ],
-                 ),
-                 value:  isChecked,
-                 onChanged: (newValue) {
-                   setState(() {
-                     _isCheckedMap[uid] = newValue ?? false;
-                   });
-                 },
-                 activeColor: const Color(0xFF0CE25C),
+                   FutureBuilder<List<GraceUser>>(
+                     future: userRepo.getAllPatientsWithMedications(),
+                     builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                           if(snapshot.hasData) {
+                              return ListView.builder(
+                               shrinkWrap: true,
+                             itemCount: snapshot.data!.length,
+                         itemBuilder: (context, index) {
+                              GraceUser patient = snapshot.data![index];
+                                 String uid = patient.id ?? '';
+                                 String email = patient.email ?? '';
+                                 String name = patient.name ?? '';
+                                 bool isChecked = _isCheckedMap[uid] ?? false;
+                             return Container(
+            decoration: BoxDecoration(
+                   border: Border.all(
+                     color: Colors.black,
+                     width: 1.0,
+                   ),
+            ),
+            child: CheckboxListTile(
+                   title: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Text(
+                         name,
+                         style: const TextStyle(fontSize: 15),
+                       ),
+                       Text(email,
+                           style: const TextStyle(fontSize: 12)),
+                     ],
+                   ),
+                   value:  isChecked,
+                   onChanged: (newValue) {
+                     setState(() {
+                       _isCheckedMap[uid] = newValue ?? false;
+                     });
+                   },
+                   activeColor: const Color(0xFF0CE25C),
+            ),
+          );
+                         },
+                       );
+    
+                           }else if (snapshot.hasError) {
+                             return Center(child: Text(snapshot.error.toString()));
+                           } else {
+                             return const Center(child: Text('Something went wrong'));
+                           }
+    
+                        }  else {
+                           return const Center(child: CircularProgressIndicator());
+                         }
+                      
+                     }
+                   ),
+                      Container(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+            child: ElevatedButton(
+              onPressed: () {
+                addPatientsToCurrentUser();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    const Color(0xFF0CE25C), // Button background color
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(12), // Rounded corner radius
+                ),
+                minimumSize: const Size(double.infinity,
+                    40), // Adjust the width by modifying the minimumSize property
+              ),
+              child: const Text(
+                'Add Patients',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+              Expanded(
+                child: StreamBuilder<List<Map<String, dynamic>>>(
+      stream:  fetchSecondListData(),
+      builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text(snapshot.error.toString()));
+      } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+        return Center(
+          child: Column(
+            children: [
+              const SizedBox(height: 10,),
+              Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
+              const SizedBox(height: 10,),
+              Text('No patients added yet'),
+            ],
           ),
         );
-                       },
-                     );
-
-                         }else if (snapshot.hasError) {
-                           return Center(child: Text(snapshot.error.toString()));
-                         } else {
-                           return const Center(child: Text('Something went wrong'));
-                         }
-
-                      }  else {
-                         return const Center(child: CircularProgressIndicator());
-                       }
+      } else if (snapshot.hasData) {
+        return ListView.separated(
+          padding: const EdgeInsets.all(10.0),
+          itemCount: snapshot.data!.length,
+          separatorBuilder: (context, index) {
+            return const SizedBox(height: 15);
+          },
+          itemBuilder: (context, i) {
+            String patientName = snapshot.data![i]['name'];
+            String patientEmail = snapshot.data![i]['email'];
+            String patientid = snapshot.data![i]['id'];
+                  return Container(
                     
-                   }
-                 ),
-                    Container(
-          padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-          child: ElevatedButton(
-            onPressed: () {
-              addPatientsToCurrentUser();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  const Color(0xFF0CE25C), // Button background color
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(12), // Rounded corner radius
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(22)),
+                      color: Color(0xDDF6F6F6),
+                      border: Border.all(
+                      color: Colors.black.withOpacity(0.5),
+                      width: 1,
+                    ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color.fromRGBO(0, 0, 0, 0.5),
+                          offset: Offset(0, 1),
+                          blurRadius: 4,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                      
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          patientEmail,
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        Text(patientName),
+                         if(isDropdownOpen)
+                        Row(
+                          children: [
+                            const Text(
+                              'View more for medication info',
+                              style: TextStyle(fontSize: 10),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isDropdownOpen = !isDropdownOpen;
+                                });
+                              },
+                              icon: Icon(isDropdownOpen
+                                  ? Icons.expand_less
+                                  : Icons.expand_more),
+                            ),
+                          ],
+                        ),
+                         patientcard(i, patientid),
+                      ],
+                    ),
+                  );
+          },
+        );
+      } else {
+        return const Center(child: Text('Something went wrong'));
+      }
+      },
+    )
               ),
-              minimumSize: const Size(double.infinity,
-                  40), // Adjust the width by modifying the minimumSize property
-            ),
-            child: const Text(
-              'Add Patients',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-            Expanded(
-              child: StreamBuilder<List<Map<String, dynamic>>>(
-  stream:  fetchSecondListData(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return Center(child: CircularProgressIndicator());
-    } else if (snapshot.hasError) {
-      return Center(child: Text(snapshot.error.toString()));
-    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-      return Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 10,),
-            Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
-            const SizedBox(height: 10,),
-            Text('No patients added yet'),
+            // Include the PatientsWithMedicationsWidget here
           ],
         ),
-      );
-    } else if (snapshot.hasData) {
-      return ListView.separated(
-        padding: const EdgeInsets.all(10.0),
-        itemCount: snapshot.data!.length,
-        separatorBuilder: (context, index) {
-          return const SizedBox(height: 15);
-        },
-        itemBuilder: (context, i) {
-          String patientName = snapshot.data![i]['name'];
-          String patientEmail = snapshot.data![i]['email'];
-          String patientid = snapshot.data![i]['id'];
-                return Container(
-                  
-                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(22)),
-                    color: Color(0xDDF6F6F6),
-                    border: Border.all(
-                    color: Colors.black.withOpacity(0.5),
-                    width: 1,
-                  ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.5),
-                        offset: Offset(0, 1),
-                        blurRadius: 4,
-                        spreadRadius: 0,
-                      ),
-                    ],
-                    
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        patientEmail,
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      Text(patientName),
-                       if(isDropdownOpen)
-                      Row(
-                        children: [
-                          const Text(
-                            'View more for medication info',
-                            style: TextStyle(fontSize: 10),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                isDropdownOpen = !isDropdownOpen;
-                              });
-                            },
-                            icon: Icon(isDropdownOpen
-                                ? Icons.expand_less
-                                : Icons.expand_more),
-                          ),
-                        ],
-                      ),
-                       patientcard(i, patientid),
-                    ],
-                  ),
-                );
-        },
-      );
-    } else {
-      return const Center(child: Text('Something went wrong'));
-    }
-  },
-)
-            ),
-          // Include the PatientsWithMedicationsWidget here
-        ],
+        endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
       ),
-      endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
+        onWillPop: () async {
+        return false;
+      },
     );
   }
 

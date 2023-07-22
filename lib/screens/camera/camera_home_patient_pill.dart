@@ -80,7 +80,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               ),
               child: const Text(
                 'Capture Photo',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               )),
           const SizedBox(
             height: 20,
@@ -103,7 +103,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               ),
               child: const Text(
                 'Photo Files',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               )),
           const SizedBox(
             height: 20,
@@ -130,7 +130,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               ),
               child: const Text(
                 'Continue',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               )),
           const SizedBox(
             height: 20,

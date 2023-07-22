@@ -223,43 +223,24 @@ import 'package:my_project/screens/communications/communications_patient.dart';
                             if (formDataquestions.currentState!.validate()) {
                             } 
                             
-                            // if(questionsText.text == null || questionsText.text.isEmpty) {
-                            // Get.snackbar(
-                            // "Error",
-                            // "Please fill in, Question is required.",
-                            // snackPosition: SnackPosition.TOP,
-                            // backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-                            // colorText: Color(0xFFF6F3E7)
-                            // );
-                            // return;
-                            //   } else {
-                            //     await UserRepository.instance.createCaregiverUserQuestions(
-                            //       context,
-                            //       currentEmail!,
-                            //       questionsText.text.trim(),
-                            //     );
-                            //     questionsText.clear();
-                            //   }      
-                            if (questionsText.text == null || questionsText.text.trim().isEmpty) {
-  // Show a snackbar with an error message if the questionsText is empty
-  Get.snackbar(
-    "Error",
-    "Please fill in, Question is required.",
-    snackPosition: SnackPosition.TOP,
-    backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-    colorText: Color(0xFFF6F3E7),
-  );
-}  else {
-  // Execute the action when the questionsText contains meaningful content
-  await UserRepository.instance.createCaregiverUserQuestions(
-    context,
-    currentEmail!,
-    questionsText.text.trim(),
-  );
-  questionsText.clear();
-}
+                            if(questionsText.text == null || questionsText.text.isEmpty) {
+                            Get.snackbar(
+                            "Error",
+                            "Please fill in, Question is required.",
+                            snackPosition: SnackPosition.TOP,
+                            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                            colorText: Color(0xFFF6F3E7)
+                            );
+                            return;
+                              } else {
+                                await UserRepository.instance.createCaregiverUserQuestions(
+                                  context,
+                                  currentEmail!,
+                                  questionsText.text.trim(),
+                                );
+                                questionsText.clear();
+                              }      
 // value.trim().split(' ').length < 2
-                    
                           },
                           style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0CE25C), // NEW
