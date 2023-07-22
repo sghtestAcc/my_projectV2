@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/repos/authentication_repository.dart';
+import 'package:my_project/screens/auth/forget_password.dart';
 import 'package:my_project/screens/auth/register_page.dart';
 
 import '../../models/login_type.dart';
@@ -15,7 +16,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
-
   // String? email;
   // String? password;
 
@@ -39,195 +39,199 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: false,
       body: Form(
         key: formData,
-        child: Column(
-          children: [
-            Column(
-              children: [
-                Image.asset(
-                  'assets/images/final-grace-background.png',
-                  height: 175,
-                  width: 175,
-                  fit: BoxFit.cover,
-                ),
-                Image.asset(
-                  'assets/images/sgh.png',
-                  height: 100,
-                  width: 180,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  widget.loginType == LoginType.patient
-                      ? 'Patient Login'
-                      : 'Caregiver Login',
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-              child: Column(
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              Column(
                 children: [
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Email', style: TextStyle(fontSize: 20)),
+                  Image.asset(
+                    'assets/images/final-grace-background.png',
+                    height: 175,
+                    width: 175,
+                    fit: BoxFit.cover,
+                  ),
+                  Image.asset(
+                    'assets/images/sgh.png',
+                    height: 100,
+                    width: 180,
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  TextFormField(
-                    controller: email,
-                    obscureText: false,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        scaffoldMessengerKey.currentState?.showSnackBar(
-                          const SnackBar(content: Text('Email is required.')),
-                        );
-                        return 'Email is required.';
-                      } else if (!value.contains('@')) {
-                        scaffoldMessengerKey.currentState?.showSnackBar(
-                          const SnackBar(
-                              content: Text('Invalid email format.')),
-                        );
-                        return 'Invalid email format.';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
+                  Text(
+                    widget.loginType == LoginType.patient
+                        ? 'Patient Login'
+                        : 'Caregiver Login',
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Password', style: TextStyle(fontSize: 20)),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextFormField(
-                    controller: password,
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        scaffoldMessengerKey.currentState?.showSnackBar(
-                          const SnackBar(
-                              content: Text('Password is required.')),
-                        );
-                        return 'Password is required.';
-                      } else if (value.length < 6) {
-                        scaffoldMessengerKey.currentState?.showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                                  'Password must be at least 6 characters long.')),
-                        );
-                        return 'Password must be at least 6 characters long.';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formData.currentState!.validate()) {
-                          AuthenticationRepository.instance.loginUser(
-                            email.text.trim(),
-                            password.text.trim(),
-                            widget.loginType,
-                          );
-                          formData.currentState?.reset();
-                        }
-                        // Navigator.push(context, MaterialPageRoute(builder: (context)=> CameraHomeScreenPatient()));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0CE25C), // NEW
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            12,
-                          ), // Rounded corner radius
-                        ),
-                      ),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RegisterScreen(
-                            registerType: widget.loginType,
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Don\'t have an account? Sign up',
-                      style: TextStyle(
-                        fontSize: 20,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-
-                  //  GestureDetector(
-                  //     onTap: () {
-                  //       // Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterScreen()));
-                  //       // Text(widget.loginType == LoginType.patient
-                  //       // ? 'Patient Login'
-                  //       // : 'Caregiver Login', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
-
-                  //          Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(registerType: LoginType2.caregiversRegister)));
-                  //     },
-                  //     child: Text('Dont have an account? Sign up', style: TextStyle(
-                  //   fontSize: 20,
-                  //   decoration: TextDecoration.underline),),
-                  //  ),
                 ],
               ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                child: Column(
+                  children: [
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Email', style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextFormField(
+                      controller: email,
+                      obscureText: false,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          scaffoldMessengerKey.currentState?.showSnackBar(
+                            const SnackBar(content: Text('Email is required.')),
+                          );
+                          return 'Email is required.';
+                        } else if (!value.contains('@')) {
+                          scaffoldMessengerKey.currentState?.showSnackBar(
+                            const SnackBar(
+                                content: Text('Invalid email format.')),
+                          );
+                          return 'Invalid email format.';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Password', style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextFormField(
+                      controller: password,
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          scaffoldMessengerKey.currentState?.showSnackBar(
+                            const SnackBar(
+                                content: Text('Password is required.')),
+                          );
+                          return 'Password is required.';
+                        } else if (value.length < 6) {
+                          scaffoldMessengerKey.currentState?.showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Password must be at least 6 characters long.')),
+                          );
+                          return 'Password must be at least 6 characters long.';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) => ResetPasswordScreen()
+                      ),
+                  );
+                    },
+                  child: Align(
+                  alignment: Alignment.centerRight, // Align the text to the right
+                  child: Text(
+                  'Forget Password?',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+              ),
             ),
-             widget.loginType == LoginType.patient
+                    SizedBox(
+                      width: double.infinity,
+                      // height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (formData.currentState!.validate()) {
+                            AuthenticationRepository.instance.loginUser(
+                              email.text.trim(),
+                              password.text.trim(),
+                              widget.loginType,
+                            );
+                            formData.currentState?.reset();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0CE25C), // NEW
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              12,
+                            ), // Rounded corner radius
+                          ),
+                        ),
+                        child: const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegisterScreen(
+                              registerType: widget.loginType,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Don\'t have an account? Sign up',
+                        style: TextStyle(
+                          fontSize: 20,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),                
+                  ],
+                ),
+              ),
+              SizedBox(height: 30,),
+              Container(
+                child:   widget.loginType == LoginType.patient
                 ?
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Image.asset('assets/images/sghDesign.png'),
-              ),
-            ):  Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Image.asset('assets/images/sgh-design-caregiver.png'),
-              ),
-            )
-          ],
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Image.asset('assets/images/sghDesign.png'),
+            ):  Align(
+              alignment: Alignment.bottomCenter,
+              child: Image.asset('assets/images/sgh-design-caregiver.png'),
+            ),
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -66,6 +66,28 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
+  Future<void> forgetpassword(email) async {
+    try{
+      await _auth.sendPasswordResetEmail(email: email);
+       Get.snackbar(
+        'Congrats',
+        'Your password reset link will be send to your email',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
+      );
+    } catch (ex) {
+      Get.snackbar(
+        'Invalid',
+        "This email does not exist.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.redAccent.withOpacity(0.1),
+        colorText: Colors.red,
+      );
+    }
+  }
+
+
 Future<void> MedicationChecksDoubleLayer(
   String uid
 ) async {

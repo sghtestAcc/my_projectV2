@@ -127,8 +127,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
- 
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
@@ -224,7 +222,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Hi Welcome Patient"),
+                              Text("Hi Welcome ${currentEmail}"),
                               // Text('Hi Welcome' + patientUser.Name!;, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
                               Text(
                                 'How can I help you today?',
@@ -527,7 +525,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             height: 10,
                                           ),
                                         ]),
-                                    //  SizedBox(height: 10,),
                                   );
                                   children.add(SizedBox(
                                     height: 10,
@@ -552,21 +549,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   ),
                 )
               :
-              // Expanded(
-              //     child: ListView.separated(
-              //       padding: const EdgeInsets.all(10.0),
-              //       itemCount: 10,
-              //       separatorBuilder: (context, index) {
-              //         return const SizedBox(
-              //           height: 10,
-              //         );
-              //       },
-              //       itemBuilder: (context, index) {
-              //         return buildCard(index);
-              //         // return patientcard(index);
-              //       },
-              //     ),
-              //   )
               FutureBuilder<List<GraceUser>>(
                   future: controller.getPatients(),
                   builder: (context, snapshot) {
