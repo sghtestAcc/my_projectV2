@@ -7,6 +7,8 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
+import '../../components/navigation_drawer_new.dart';
+
 class CameraHomePatientPillScreen extends StatefulWidget {
   final String? path;
   final TextEditingController? imagetakenText;
@@ -152,6 +154,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
             ),
         ]),
       ),
+      endDrawer: AppDrawerNavigationNew(),
     );
   }
 

@@ -9,6 +9,8 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/camera/camera_home_patient_pill.dart';
 import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
+import '../../components/navigation_drawer_new.dart';
+
 class CameraHomePatientScreen extends StatefulWidget {
   final String? path;
 
@@ -189,7 +191,9 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
           ),
         ]),
       ),
+   endDrawer: AppDrawerNavigationNew(),
     );
+    
   }
 
   Future<void> imageCropperView(String? path, BuildContext context) async {
