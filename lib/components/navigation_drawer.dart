@@ -20,7 +20,6 @@ class AppDrawerNavigation extends StatefulWidget {
   // const AppDrawerNavigation({super.key});
 
   const AppDrawerNavigation({Key? key, required this.loginType}): super(key: key);
-
   @override
   State<AppDrawerNavigation> createState() => _AppDrawerNavigationState();
 }
@@ -158,7 +157,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   onTap: () {
                     Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                    builder: (context) => PatientsPrescripScreen(),
+                    builder: (context) => const PatientsPrescripScreen(),
                     ),
                     );
                   }
@@ -173,9 +172,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   title: const Text('Vocalizations'),
                   onTap:
                       () {
-                        Navigator.of(context).pushReplacement(
+                    Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                    builder: (context) => PatientsVocalScreen(),
+                    builder: (context) => const PatientsVocalScreen(),
                     ),
                     );
                       } 
@@ -206,7 +205,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                         Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: widget.loginType, selectedIndex: 0,),
+                        builder: (context) => NavigatorBar(loginType: LoginType.patient, selectedIndex: 0,),
                       ),
                   );
                       }
@@ -220,7 +219,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                         Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: widget.loginType, selectedIndex: 1,),
+                        builder: (context) => NavigatorBar(loginType: LoginType.patient, selectedIndex: 1,),
                       ),
                   );
                       }
@@ -282,7 +281,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => CaregiverPrescription()
+                        builder: (context) => const CaregiverPrescription()
                       ),
                   );
                   }
@@ -301,7 +300,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                          Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => CaregiverPrescriptionViewPatient()
+                        builder: (context) => const CaregiverPrescriptionViewPatient()
                       ),
                   );
                             
@@ -332,7 +331,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                         Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: widget.loginType, selectedIndex: 0,),
+                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 0,),
                       ),
                   );
                       }
@@ -347,10 +346,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                         Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: widget.loginType, selectedIndex: 1,),
+                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 1,),
                       ),
                   );
-
                       } // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
               const Divider(height: 3, color: Colors.blueGrey),
@@ -363,10 +361,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                         Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: widget.loginType, selectedIndex: 2,),
+                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 2,),
                       ),
                   );
-
                       } 
                   ),
             ]),
