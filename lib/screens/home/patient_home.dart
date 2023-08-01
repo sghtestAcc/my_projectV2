@@ -203,54 +203,70 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       }
                     },
                   )
-                : Stack(alignment: Alignment.topCenter, 
-                children: [
-                    Image.asset(
-                      'assets/images/new-sgh-design.png',
-                    ),
-                    Image.asset(
-                       'assets/images/final-grace-background.png',
-                                height: 125,
-                                width: 125,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned.fill(
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Hi Welcome ${currentEmail}"),
-                                // Text('Hi Welcome' + patientUser.Name!;, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
-                                Text(
-                                  'How can I help you today?',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: TextField(
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.search),
-                                      hintText: 'Quick search a patient here',
-                                    ),
-                                    onChanged: (val) {
-                                      setState(() {
-                                        lol = val;
-                                      });
-                                    },
-                                  ),
-                                )
-                              ],
-                            )),
-                      ),
-                    )
-                  ]),
+                : Stack(
+  alignment: Alignment.topCenter,
+  children: [
+    Image.asset(
+      'assets/images/new-sgh-design.png',
+    ),
+    Image.asset(
+      'assets/images/final-grace-background.png',
+      height: 125,
+      width: 125,
+      fit: BoxFit.cover,
+    ),
+    Positioned.fill(
+      child: Transform.translate(
+        offset: Offset(0, 40), // Adjust the vertical offset to move the TextField downward
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end, // Align the content to the end (bottom)
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Hi Welcome $currentEmail",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'How can I help you today?',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 10,),
+              Container(
+                 decoration: BoxDecoration(
+                  color: Colors.white,
+             borderRadius: BorderRadius.all(Radius.circular(18)), 
+             border: Border.all(color: Colors.black, width: 1),
+              ),
+                child: TextField(
+                  decoration: InputDecoration(
+                     border: InputBorder.none,
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Quick search a patient here',
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      lol = val;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ],
+),
             widget.loginType == LoginType.patient
                 ?  Container(
                       padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -287,7 +303,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       
                           GestureDetector(
                             onTap: () async {
-                           await pickImage(source: ImageSource.gallery).then((value) {
+                           await pickImage(source: ImageSource.camera).then((value) {
                             if (value != '') {
                             imageCropperView(value, context);
                            }
@@ -303,7 +319,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       ),
                     )
                   : Container(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      padding: const EdgeInsets.fromLTRB(0, 35, 0, 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -334,10 +350,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 height: 90,
                                 width: 90,
                               )),
-      
                           GestureDetector(
                             onTap: () async {
-                           await pickImage(source: ImageSource.gallery).then((value) {
+                           await pickImage(source: ImageSource.camera).then((value) {
                             if (value != '') {
                             imageCropperView(value, context);
                            }

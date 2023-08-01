@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/services.dart';
@@ -80,12 +82,8 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Medication>>(
-      future: userRepo.getPatientMedications(currentUid!),
-      builder: (context, snapshot) {
-        if(snapshot.connectionState == ConnectionState.done) {
-          if(snapshot.hasData) {
-          return Scaffold(
+         return Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: const Text(
               'Vocalization',
@@ -165,7 +163,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                 TextFormField(
                   controller: _controller,
                   onChanged: translateTextFunction,
-                  maxLines: 4,
+                  maxLines: 6,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
                     hintText: "Enter Text",
@@ -208,104 +206,101 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                         const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
+
                 const SizedBox(
                   height: 10,
                 ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  height: 175,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: snapshot.data!.length,
-                    separatorBuilder: (context, _) => const SizedBox(
-                      width: 10,
+
+                StreamBuilder<List<Medication>>(
+                  stream: userRepo.getPatientMedications2(currentUid!),
+                  builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error.toString()));
+                }  else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                  return Center(
+                child: const Text('No questions added yet'),
+                );
+            } else if (snapshot.hasData) {
+              return Container(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      height: 175,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: snapshot.data!.length,
+                        separatorBuilder: (context, _) => const SizedBox(
+                          width: 10,
+                        ),
+                        itemBuilder: (context, index) => 
+                        Container(
+                            padding: const EdgeInsets.all(10.0),
+                            width: 125,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(22)),
+                              color: const Color(0xFFF6F6F6),
+                              boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.2),
+                      offset: Offset(0, 1),
+                      blurRadius: 4,
+                      spreadRadius: 0,
                     ),
-                    itemBuilder: (context, index) => 
-                    Container(
-            padding: const EdgeInsets.all(10.0),
-            width: 125,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(22)),
-              color: const Color(0xFFF6F6F6),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.2),
-                  offset: Offset(0, 1),
-                  blurRadius: 4,
-                  spreadRadius: 0,
-                ),
-              ],
-              border: Border.all(
-                color: Colors.black, // Set your desired border color here
-                width: 1, // Set the border width
-              ),
-            ),
-            child: Column(
-              // crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                 Text(snapshot.data![index].labels),
-                const SizedBox(height: 10),
-                 ElevatedButton(
-                onPressed: () {
-                  speak(snapshot.data![index].labels);
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
-                  backgroundColor: Color(0xff00A67E),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(1),
-                  child: Icon(
-                    Icons.volume_up,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              IconButton(
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: snapshot.data![index].labels)).then(
-                      (_) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Copied to your clipboard !'),
-                          ),
+                              ],
+                              border: Border.all(
+                    color: Colors.black, // Set your desired border color here
+                    width: 1, // Set the border width
+                              ),
+                            ),
+                            child: Column(
+                              // crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                     Text(snapshot.data![index].labels),
+                    const SizedBox(height: 10),
+                     ElevatedButton(
+                    onPressed: () {
+                      speak(snapshot.data![index].labels);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      backgroundColor: Color(0xff00A67E),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(1),
+                      child: Icon(
+                        Icons.volume_up,
+                        color: Colors.white,
+                      ),
+                    ),
+                              ),
+                              IconButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: snapshot.data![index].labels)).then(
+                          (_) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Copied to your clipboard !'),
+                              ),
+                            );
+                          },
                         );
                       },
+                      icon: const Icon(Icons.copy),
+                    ),
+                              ],
+                            ),
+                          )
+                      ),
                     );
-                  },
-                  icon: const Icon(Icons.copy),
+            }  else {
+        return const Center(child: Text('Something went wrong'));
+      } 
+                  }
                 ),
-              ],
-            ),
-          )
-                  ),
-                ),
-                // Container(
-                //   padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                //   height: 130,
-                //   child: Text(
-                //     text,
-                //     style: TextStyle(
-                //         fontSize: 24,
-                //         color: isListening ? Colors.black87 : Colors.black54,
-                //         fontWeight: FontWeight.w600),
-                //   ),
-                // ),
               ],
             )
           ]),
           endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
         );
-          } else if (snapshot.hasError) {
-                          return Center(child: Text(snapshot.error.toString()));
-          } else {
-                          return const Center(
-                          child: Text('Something went wrong'));
-          } 
-        }  else {
-                          return const Center(child: CircularProgressIndicator());
-        }
-      }
-    );
-  }
+}
 }

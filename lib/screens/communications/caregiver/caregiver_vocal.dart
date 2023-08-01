@@ -248,7 +248,7 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
                     //items in builder 
                     Container(
             padding: const EdgeInsets.all(10.0),
-            width: 100,
+            width: 125,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(22)),
               color: const Color(0xFFF6F6F6),

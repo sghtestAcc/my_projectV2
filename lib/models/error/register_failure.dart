@@ -19,7 +19,7 @@ class RegisterFailure {
         );
       default:
         return const RegisterFailure(
-          message: "An Unknown error occured.",
+          message: "Email already exists.",
         );
     }
   }

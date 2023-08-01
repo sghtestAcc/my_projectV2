@@ -38,7 +38,6 @@ class AuthenticationRepository extends GetxController {
     GraceUser user
   ) async {
     try {
-      // var emailExists = await userRepo.isEmailExists(email, loginType);
       // if (!emailExists) throw Exception("");
       await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -51,15 +50,17 @@ class AuthenticationRepository extends GetxController {
       Get.snackbar(
         'Invalid',
         RegisterFailure.fromCode(e.code).message,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        // backgroundColor: Colors.redAccent.withOpacity(0.1),
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
+        // colorText: Colors.red,
       );
     } catch (ex) {
       Get.snackbar(
         'Invalid',
         "Something went wrong. Please try again.",
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.redAccent.withOpacity(0.1),
         colorText: Colors.red,
       );
@@ -81,11 +82,30 @@ class AuthenticationRepository extends GetxController {
         'Invalid',
         "This email does not exist.",
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
+        // backgroundColor: Colors.redAccent.withOpacity(0.1),
+        // colorText: Colors.red,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
       );
     }
   }
+
+
+Future<void> changepassword(String email, String oldpassword, String newpassword) async {
+  try {
+    var cred = EmailAuthProvider.credential(email: email, password: oldpassword);
+
+    await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(cred);
+    // Your code to change the password here
+    // For example:
+    // await FirebaseAuth.instance.currentUser!.updatePassword(newpassword);
+  } catch (e) {
+    // Handle the exception here or print the error message
+    print('An error occurred: $e');
+    // You can also throw the exception again to propagate it to the calling code
+    // throw e;
+  }
+}
 
 
 Future<void> MedicationChecksDoubleLayer(
@@ -125,7 +145,7 @@ Future<void> loginUser(
       Get.snackbar(
         'Invalid',
         'Login information, please sign up for an account',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         // backgroundColor: Colors.redAccent.withOpacity(0.1),
         // colorText: Colors.red,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
@@ -163,7 +183,7 @@ Future<void> loginUser(
     Get.snackbar(
       'Invalid',
       RegisterFailure.fromCode(e.code).message,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       // backgroundColor: Colors.redAccent.withOpacity(0.1),
       // colorText: Colors.red,
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
@@ -173,7 +193,7 @@ Future<void> loginUser(
     Get.snackbar(
       'Invalid',
       "Something went wrong. Please try again.",
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       // backgroundColor: Colors.redAccent.withOpacity(0.1),
       // colorText: Colors.red,
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),

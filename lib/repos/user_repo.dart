@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_project/models/images_user.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/medications.dart';
@@ -66,6 +67,55 @@ class UserRepository extends GetxController {
     }
   }
 
+  Future<void> addImage(
+  // String? labels,
+  XFile? image,
+  String uid,
+  // String quantity,
+  // String schedule,
+) async {
+  try {
+    final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final pathRoute = 'profileImages/$fileName';
+    String imageUrl = await uploadImageToStorage(pathRoute, image!);
+    // String uid = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance.collection("users")
+    .doc(uid)
+    .collection('profile')
+    .doc(uid)
+    .set({
+      "images": imageUrl,
+    });
+    Get.snackbar(
+      "Congrats",
+      "A new image has been added",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green.withOpacity(0.1),
+      colorText: Colors.green,
+    );
+  } catch (error) {
+    Get.snackbar(
+      "Error",
+      "Failed to edit image",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
+    print(error.toString());
+  }
+}
+
+Stream<ImagesUser?> getUserimages(String? uid) {
+  return firestore
+      .collection("users")
+      .doc(uid)
+      .collection('profile')
+      .snapshots()
+      .map((querySnapshot) {
+          return ImagesUser?.fromSnapshot(querySnapshot.docs.first);
+      });
+}
+
 
 // //retrieve caregivers questions function(of single users)
 Stream<List<String>> getQuestionsofPatient(String? email) {
@@ -76,36 +126,6 @@ Stream<List<String>> getQuestionsofPatient(String? email) {
       .map((querySnapshot) =>
           querySnapshot.docs.map((doc) => doc.data()["Question"].toString()).toList());
 }
-
-// //retrieve caregivers questions function(of single users)
-//   Future<List<String>> getQuestionsofCaregiver(String? email) async {
-//     // final doesUserExists = await isEmailExists(email, LoginType.caregiver);
-//     // if (!doesUserExists) throw Exception('User does not exists');
-//     final snapshot = await firestore
-//         .collection("questions")
-//         .where("Email", isEqualTo: email)
-//         .get();
-//     return snapshot.docs
-//         .map(
-//           (e) => e.data()["Question"].toString(),
-//         )
-//         .toList();
-// }
-
-//retrieve patient questions function(of single users)
-//   Future<List<String>> getQuestionsofPatient(String? email) async {
-//     // final doesUserExists = await isEmailExists(email, LoginType.patient);
-//     // if (!doesUserExists) throw Exception('User does not exists');
-//     final snapshot = await firestore
-//         .collection("questions")
-//         .where("Email", isEqualTo: email)
-//         .get();
-//     return snapshot.docs
-//         .map(
-//           (e) => e.data()["Question"].toString(),
-//         )
-//         .toList();
-// }
 
 //retrieve caregivers questions function(of single users)
   Stream<List<String>> getQuestionsofCaregiver(String? email)  {
@@ -292,6 +312,21 @@ Future<List<Medication>> getPatientMedications(String? uid) async {
         )
         .toList();
     return patientData;
+}
+
+Stream<List<Medication>> getPatientMedications2(String? uid) {
+  // Fetch the data using Firestore's future method
+  return firestore
+      .collection("users")
+      .doc(uid)
+      .collection('medications')
+      .get()
+      .then((querySnapshot) {
+    final patientData = querySnapshot.docs
+        .map((e) => Medication.fromSnapshot(e))
+        .toList();
+    return patientData;
+  }).asStream(); // Convert the Future to a Stream
 }
 
 Future<bool> isEmailExists2(String email) async {

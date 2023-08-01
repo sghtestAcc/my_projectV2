@@ -3,6 +3,7 @@ import 'package:my_project/screens/communications/communications_patient.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/patient_home.dart';
 import 'package:my_project/screens/patients/select_patients.dart';
+import 'package:my_project/screens/profile/profile_page.dart';
 
 class NavigatorBar extends StatefulWidget {
 
@@ -23,6 +24,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
      CommunicationsScreen(
       loginType: LoginType.patient,
     ),
+    MyProfile()
     // RegisterScreen(registerType: LoginType2.caregiversRegister
   ];
 
@@ -54,6 +56,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home', ),
                 BottomNavigationBarItem(
                 icon: Icon(Icons.comment), label: 'Communications'),
+                BottomNavigationBarItem(icon: Icon(Icons.person_2_sharp), label: 'Profile', ),
               ],
             ),
           )

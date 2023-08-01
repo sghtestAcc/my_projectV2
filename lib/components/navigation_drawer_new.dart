@@ -43,9 +43,6 @@ class AppDrawerNavigationNew extends StatelessWidget {
                     // Navigator.of(context).pushReplacementNamed(WeatherScreen.routeName);
                   }),
 
-
-
-         
               //  Divider(height: 3, color: Colors.blueGrey),
               //  ListTile(
               //   leading: Icon(Icons.logout),

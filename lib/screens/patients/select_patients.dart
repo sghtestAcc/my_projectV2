@@ -25,9 +25,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     bool isDropdownOpen = false;
-
     return WillPopScope(
       child: Scaffold(
         appBar: AppBar(
@@ -53,62 +51,64 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
           ),
-                   FutureBuilder<List<GraceUser>>(
-                     future: userRepo.getAllPatientsWithMedications(),
-                     builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                           if(snapshot.hasData) {
-                              return ListView.builder(
-                               shrinkWrap: true,
-                             itemCount: snapshot.data!.length,
-                         itemBuilder: (context, index) {
-                              GraceUser patient = snapshot.data![index];
-                                 String uid = patient.id ?? '';
-                                 String email = patient.email ?? '';
-                                 String name = patient.name ?? '';
-                                 bool isChecked = _isCheckedMap[uid] ?? false;
-                             return Container(
-            decoration: BoxDecoration(
-                   border: Border.all(
-                     color: Colors.black,
-                     width: 1.0,
-                   ),
-            ),
-            child: CheckboxListTile(
-                   title: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       Text(
-                         name,
-                         style: const TextStyle(fontSize: 15),
-                       ),
-                       Text(email,
-                           style: const TextStyle(fontSize: 12)),
-                     ],
-                   ),
-                   value:  isChecked,
-                   onChanged: (newValue) {
-                     setState(() {
-                       _isCheckedMap[uid] = newValue ?? false;
-                     });
-                   },
-                   activeColor: const Color(0xFF0CE25C),
-            ),
-          );
-                         },
-                       );
-    
-                           }else if (snapshot.hasError) {
-                             return Center(child: Text(snapshot.error.toString()));
-                           } else {
-                             return const Center(child: Text('Something went wrong'));
+                   Container(
+                    height: 200,
+                     child: FutureBuilder<List<GraceUser>>(
+                       future: userRepo.getAllPatientsWithMedications(),
+                       builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done) {
+                             if(snapshot.hasData) {
+                                return ListView.builder(
+                                 shrinkWrap: true,
+                               itemCount: snapshot.data!.length,
+                           itemBuilder: (context, index) {
+                                GraceUser patient = snapshot.data![index];
+                                   String uid = patient.id ?? '';
+                                   String email = patient.email ?? '';
+                                   String name = patient.name ?? '';
+                                   bool isChecked = _isCheckedMap[uid] ?? false;
+                               return Container(
+                               decoration: BoxDecoration(
+                     border: Border.all(
+                       color: Colors.black,
+                       width: 1.0,
+                     ),
+                               ),
+                               child: CheckboxListTile(
+                     title: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                       children: [
+                         Text(
+                           name,
+                           style: const TextStyle(fontSize: 15),
+                         ),
+                         Text(email,
+                             style: const TextStyle(fontSize: 12)),
+                       ],
+                     ),
+                     value:  isChecked,
+                     onChanged: (newValue) {
+                       setState(() {
+                         _isCheckedMap[uid] = newValue ?? false;
+                       });
+                     },
+                     activeColor: const Color(0xFF0CE25C),
+                               ),
+                             );
+                           },
+                         );
+                       
+                             }else if (snapshot.hasError) {
+                               return Center(child: Text(snapshot.error.toString()));
+                             } else {
+                               return const Center(child: Text('Something went wrong'));
+                             }
+                       
+                          }  else {
+                             return const Center(child: CircularProgressIndicator());
                            }
-    
-                        }  else {
-                           return const Center(child: CircularProgressIndicator());
-                         }
-                      
-                     }
+                       }
+                     ),
                    ),
                       Container(
             padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
