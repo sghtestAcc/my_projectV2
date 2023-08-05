@@ -112,9 +112,37 @@ Stream<ImagesUser?> getUserimages(String? uid) {
       .collection('profile')
       .snapshots()
       .map((querySnapshot) {
-          return ImagesUser?.fromSnapshot(querySnapshot.docs.first);
+        if (querySnapshot.docs.isNotEmpty) {
+          return ImagesUser.fromSnapshot(querySnapshot.docs.first);
+        } else {
+          return null; // Or return some default value if you prefer
+        }
       });
 }
+
+Future<ImagesUser?> getUserImages2(String? uid) async {
+  final snapshot = await firestore
+      .collection("users")
+      .doc(uid)
+      .collection('profile')
+      .get();
+  final imagesList = snapshot.docs
+      .map((docSnapshot) => ImagesUser.fromSnapshot(docSnapshot))
+      .single;
+  return imagesList;
+}
+  // Future<GraceUser?> getUser(String email) async {
+  //   final snapshot = await firestore
+  //       .collection("users")
+  //       .where("Email", isEqualTo: email)
+  //       .get();
+  //   final patientData = snapshot.docs
+  //       .map(
+  //         (e) => GraceUser?.fromSnapshot(e),
+  //       )
+  //       .single;
+  //   return patientData;
+  // }
 
 
 // //retrieve caregivers questions function(of single users)
@@ -222,8 +250,7 @@ Future<String> uploadImageToStorage(String childName, XFile file) async {
   }
 }
 
-
-// // Create patient medications
+// Create patient medications
 Future<void> createPatientMedications(
   String? labels,
   XFile? pills,
@@ -248,17 +275,17 @@ Future<void> createPatientMedications(
     Get.snackbar(
       "Congrats",
       "A new medication has been added.",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
   } catch (error) {
     Get.snackbar(
       "Error",
       "Failed to add a medication",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
     print(error.toString());
   }
@@ -299,22 +326,7 @@ Future<List<Medication>> displayAllPatientsMedications(String? uid) async {
     return patientData;
 }
 
-//get single patinet Medications
-Future<List<Medication>> getPatientMedications(String? uid) async {
-    var patientDataMedications = await firestore
-      .collection("users")
-      .doc(uid)
-      .collection('medications')
-      .get();
-      final patientData = patientDataMedications.docs
-        .map(
-          (e) => Medication.fromSnapshot(e),
-        )
-        .toList();
-    return patientData;
-}
-
-Stream<List<Medication>> getPatientMedications2(String? uid) {
+Stream<List<Medication>> getPatientMedications(String? uid) {
   // Fetch the data using Firestore's future method
   return firestore
       .collection("users")

@@ -1,17 +1,19 @@
  
  
  
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:my_project/repos/user_repo.dart';
+import 'package:my_project/repos/authentication_repository.dart';
 
  var formChangepassword = GlobalKey<FormState>();
 
  TextEditingController oldpasswordText = TextEditingController();
   TextEditingController newpasswordText =  TextEditingController();
+  final authRepo = Get.put(AuthenticationRepository());
+  String? email = FirebaseAuth.instance.currentUser!.email;
  
-
  void ChangePasswordModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -139,6 +141,7 @@ import 'package:my_project/repos/user_repo.dart';
                             );
                           return;
                             } else {
+                            await authRepo.changepassword(email, oldpasswordText.text.trim(), newpasswordText.text.trim(),context);
                             oldpasswordText.clear();
                             newpasswordText.clear();
                             }

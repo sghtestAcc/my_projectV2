@@ -91,15 +91,29 @@ class AuthenticationRepository extends GetxController {
   }
 
 
-Future<void> changepassword(String email, String oldpassword, String newpassword) async {
+Future<void> changepassword(String? email, String oldpassword, String newpassword,BuildContext context) async {
   try {
-    var cred = EmailAuthProvider.credential(email: email, password: oldpassword);
-
-    await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(cred);
-    // Your code to change the password here
-    // For example:
+    var cred = EmailAuthProvider.credential(email: email ?? '', password: oldpassword);
+    await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(cred).then
+    ((value) => FirebaseAuth.instance.currentUser!.updatePassword(newpassword));
+     Get.snackbar(
+        'Congrats',
+        'Your password has been successfully changed',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
+      );
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
     // await FirebaseAuth.instance.currentUser!.updatePassword(newpassword);
   } catch (e) {
+     Get.snackbar(
+        'Invalid',
+        'Your old password is not matching',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+        colorText: Color(0xFFF6F3E7)
+      );
     // Handle the exception here or print the error message
     print('An error occurred: $e');
     // You can also throw the exception again to propagate it to the calling code
@@ -109,7 +123,7 @@ Future<void> changepassword(String email, String oldpassword, String newpassword
 
 
 Future<void> MedicationChecksDoubleLayer(
-  String uid
+  String uid, BuildContext context
 ) async {
     // String uid = FirebaseAuth.instance.currentUser!.uid;
     var patientMedicationExists = await userRepo.isPatientMedicationsExists(uid);
@@ -123,6 +137,8 @@ Future<void> MedicationChecksDoubleLayer(
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7)
       );
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
       return;
   } else {
      Get.to(

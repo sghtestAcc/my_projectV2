@@ -23,7 +23,7 @@ final userRepo = Get.put(UserRepository());
   @override
   Widget build(BuildContext context) {
 
-     final controller = Get.put(SelectPatientController());
+    final controller = Get.put(SelectPatientController());
     String lol = '';
     List<int> values = [
       2,

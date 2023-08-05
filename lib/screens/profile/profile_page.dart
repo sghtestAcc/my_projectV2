@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -105,63 +104,153 @@ Future<String> pickImage({ImageSource? source,}) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //     title: const Text(
+      //       'Profile',
+      //       style: TextStyle(color: Colors.black, fontSize: 25),
+      //     ),
+      //     backgroundColor: Colors.transparent,
+      //     automaticallyImplyLeading: false,
+      //     elevation: 0,
+      //     iconTheme: const IconThemeData(color: Colors.black),
+      //     centerTitle: true,
+      //   ),
       body: Column(
-        children: [Image.asset('assets/images/new-sgh-design.png'),
+        children: [
+          Image.asset('assets/images/new-sgh-design.png'),
            SizedBox(height: 10,),
 
   Stack(
   children: [
-// Stream<List<String>>
-    StreamBuilder(
-      stream: userRepo.getUserimages(profileuid),
-      builder: (context, snapshot) {
-          //  var userimages = snapshot.data;
-         if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Center(child: Text(snapshot.error.toString()));
-      } else if (snapshot.hasData) {
-         var userimages = snapshot.data;
-                    return ClipRRect(
-           borderRadius: BorderRadius.circular(12),
+StreamBuilder(
+  stream: userRepo.getUserimages(profileuid),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      // Show a static image when waiting for data or loading
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset('assets/images/user.png', fit: BoxFit.contain),
+      );
+    } else if (snapshot.hasError) {
+      // Show an error message if there is an error with the stream
+      return Center(child: Text(snapshot.error.toString()));
+    } else if (!snapshot.hasData || snapshot.data == null) {
+      // Show a static image when there is no data available in the stream
+      // return ClipRRect(
+      //   borderRadius: BorderRadius.circular(12),
+      //   child: Image.asset('assets/images/user.png', fit: BoxFit.contain),
+      // );
+
+      //  if (imageFile != null)
+      //       Container(
+      //         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      //         height: 200,
+      //         child: Image.file(
+      //           File(imageFilepills!.path),
+      //           fit: BoxFit.fitWidth,
+      //         ),
+      //       ),
+          return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
           child: Container(
-                height: 128,
-                width: 128,
-                decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.black, // Set the color of the border here
-            width: 2.0, // Set the width of the border here
+            height: 128,
+            width: 128,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.black, // Set the color of the border here
+                width: 2.0, // Set the width of the border here
+              ),
+            ),
+            child:
+            imageFile != null
+                ?
+            ClipOval(
+                    child: Image.file(
+                      File(imageFile!.path),
+                      height: 128,
+                      width: 128,
+                      fit: BoxFit.contain,
+                    ),
+                  )
+          : Image.asset('assets/images/user.png',
+                    fit: BoxFit.contain,
+                  ),
+        )
+          );
+    } else {
+      // Show the streamed image data
+      var userimages = snapshot.data;
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          height: 128,
+          width: 128,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.black, // Set the color of the border here
+              width: 2.0, // Set the width of the border here
+            ),
           ),
+          child:  ClipOval(
+                  child: Image.network(
+                    userimages?.images ?? '',
+                    height: 128,
+                    width: 128,
+                    fit: BoxFit.contain,
+                  ),
+                )
         ),
-                child: 
-                imageFile != null ?
-                ClipOval(
-                  child: Image.network(userimages?.images ?? '', height: 128, width: 128, fit: BoxFit.contain)) :
-                  Image.asset('assets/images/user.png', fit: BoxFit.contain)
-        ));       
-      }  else {
-         return const Center(child: Text('Something went wrong'));
-        //  return ClipRRect(
-        //    borderRadius: BorderRadius.circular(12),
-        //   child: imageFile != null
-        //       ? Container(
-        //         height: 128,
-        //         width: 128,
-        //         decoration: BoxDecoration(
-        //   shape: BoxShape.circle,
-        //   border: Border.all(
-        //     color: Colors.black, // Set the color of the border here
-        //     width: 2.0, // Set the width of the border here
-        //   ),
-        // ),
-        //         child: 
-        //         ClipOval(child: Image.file(File(imageFile!.path), fit: BoxFit.contain)))
-        //       : Image.asset('assets/images/user.png', fit: BoxFit.contain),
-        // );   
-      }
-                                      }
-    ),
+      );
+    }
+  },
+),
+
+
+//    FutureBuilder(
+//   future: userRepo.getUserImages2(profileuid),
+//   builder: (context, snapshot) {
+//     if (snapshot.connectionState == ConnectionState.waiting) {
+//       return Center(child: CircularProgressIndicator());
+//     } else if (snapshot.hasError) {
+//       return Center(child: Text(snapshot.error.toString()));
+//     } else {
+//       if (snapshot.hasData) {
+//         var userimages = snapshot.data!;
+//         return ClipRRect(
+//           borderRadius: BorderRadius.circular(12),
+//           child: Container(
+//             height: 128,
+//             width: 128,
+//             decoration: BoxDecoration(
+//               shape: BoxShape.circle,
+//               border: Border.all(
+//                 color: Colors.black, // Set the color of the border here
+//                 width: 2.0, // Set the width of the border here
+//               ),
+//             ),
+//             child: imageFile != null
+//                 ? ClipOval(
+//                     child: Image.network(
+//                       userimages[0].images ?? '',
+//                       height: 128,
+//                       width: 128,
+//                       fit: BoxFit.contain,
+//                     ),
+//                   )
+//                 : Image.asset(
+//                     'assets/images/user.png',
+//                     fit: BoxFit.contain,
+//                   ),
+//           ),
+//         );
+//       } else {
+//         return const Center(child: Text('Something went wrong'));
+//       }
+//     }
+//   },
+// ),
 
     Positioned(
       bottom: 8, // Adjust the position of the button as needed
@@ -216,7 +305,7 @@ FutureBuilder(
             Text('Password:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
             GestureDetector(
               onTap: () {
-                //  ChangePasswordModal(context);
+                 ChangePasswordModal(context);
               },
               child: Text("edit", style: 
               TextStyle(fontSize: 20, fontWeight: FontWeight.normal),

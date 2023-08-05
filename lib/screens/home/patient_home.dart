@@ -150,7 +150,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         if (snapshot.hasData) {
                           var patientsInfo = snapshot.data;
                           return Stack(
-                            alignment: Alignment.center,
+                            alignment: Alignment.topCenter,
                             children: [
                               Image.asset('assets/images/new-sgh-design.png'),
                               Image.asset(
@@ -490,7 +490,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           height: 20,
                         ),
                         FutureBuilder<List<Medication>>(
-                            future: userRepo.getPatientMedications(currentUid),
+                            future: userRepo.displayAllPatientsMedications(currentUid),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.done) {
