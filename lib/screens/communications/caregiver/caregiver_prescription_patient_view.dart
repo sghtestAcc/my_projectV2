@@ -7,7 +7,6 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/camera/patients_upload_meds.dart';
 import 'package:my_project/screens/communications/caregiver/caregiver_prescription.dart';
 import 'package:my_project/screens/communications/caregiver/caregiver_vocal.dart';
-
 import '../../../components/navigation.tab.dart';
 import '../../../repos/user_repo.dart';
 
@@ -58,14 +57,26 @@ class _CaregiverPrescriptionViewPatientState extends State<CaregiverPrescription
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-
-// getAllPatientsWithMedications
-        FutureBuilder<List<GraceUser>>(
-          future: userRepo.getAllPatientsWithMedications(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if(snapshot.hasData) {
-                return Expanded(
+StreamBuilder<List<GraceUser>>(
+  stream: userRepo.getAllPatientsWithMedications2(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+  }  else if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+  } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+            return Center(
+              child: Column(
+                children: [
+                  const SizedBox(height: 10,),
+                  Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
+                  const SizedBox(height: 10,),
+                  Text('No questions added yet'),
+                ],
+              ),
+            );
+                } else if (snapshot.hasData) {
+                                  return Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.all(10.0),
                 shrinkWrap: true,  // Add shrinkWrap property
@@ -138,22 +149,13 @@ class _CaregiverPrescriptionViewPatientState extends State<CaregiverPrescription
                 },
               ),
             );
-              } else if (snapshot.hasError) {
-                          return Center(
-                    child: Text(snapshot.error
-              .toString()));
-              } else {
-                                                  return const Center(
-                                                      child: Text(
-                                                          'Something went wrong'));
-              } 
-            } else {
-            return const Center(
-                    child:
-                     CircularProgressIndicator());
-                                              }            
-          }
-        ),
+                } else {
+            return const Center(child: Text('Something went wrong'));
+                }
+
+} 
+
+),
         SizedBox(height: 20,),
       ],
     ),

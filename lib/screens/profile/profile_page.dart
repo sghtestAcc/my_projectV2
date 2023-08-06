@@ -104,290 +104,301 @@ Future<String> pickImage({ImageSource? source,}) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //     title: const Text(
-      //       'Profile',
-      //       style: TextStyle(color: Colors.black, fontSize: 25),
-      //     ),
-      //     backgroundColor: Colors.transparent,
-      //     automaticallyImplyLeading: false,
-      //     elevation: 0,
-      //     iconTheme: const IconThemeData(color: Colors.black),
-      //     centerTitle: true,
-      //   ),
-      body: Column(
-        children: [
-          Image.asset('assets/images/new-sgh-design.png'),
-           SizedBox(height: 10,),
-
-  Stack(
-  children: [
-StreamBuilder(
-  stream: userRepo.getUserimages(profileuid),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      // Show a static image when waiting for data or loading
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.asset('assets/images/user.png', fit: BoxFit.contain),
-      );
-    } else if (snapshot.hasError) {
-      // Show an error message if there is an error with the stream
-      return Center(child: Text(snapshot.error.toString()));
-    } else if (!snapshot.hasData || snapshot.data == null) {
-      // Show a static image when there is no data available in the stream
-      // return ClipRRect(
-      //   borderRadius: BorderRadius.circular(12),
-      //   child: Image.asset('assets/images/user.png', fit: BoxFit.contain),
-      // );
-
-      //  if (imageFile != null)
-      //       Container(
-      //         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-      //         height: 200,
-      //         child: Image.file(
-      //           File(imageFilepills!.path),
-      //           fit: BoxFit.fitWidth,
-      //         ),
-      //       ),
-          return ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            height: 128,
-            width: 128,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.black, // Set the color of the border here
-                width: 2.0, // Set the width of the border here
-              ),
-            ),
-            child:
-            imageFile != null
-                ?
-            ClipOval(
-                    child: Image.file(
-                      File(imageFile!.path),
-                      height: 128,
-                      width: 128,
-                      fit: BoxFit.contain,
-                    ),
-                  )
-          : Image.asset('assets/images/user.png',
-                    fit: BoxFit.contain,
-                  ),
-        )
-          );
-    } else {
-      // Show the streamed image data
-      var userimages = snapshot.data;
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          height: 128,
-          width: 128,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.black, // Set the color of the border here
-              width: 2.0, // Set the width of the border here
-            ),
-          ),
-          child:  ClipOval(
-                  child: Image.network(
-                    userimages?.images ?? '',
-                    height: 128,
-                    width: 128,
-                    fit: BoxFit.contain,
-                  ),
-                )
-        ),
-      );
-    }
-  },
-),
-
-
-//    FutureBuilder(
-//   future: userRepo.getUserImages2(profileuid),
-//   builder: (context, snapshot) {
-//     if (snapshot.connectionState == ConnectionState.waiting) {
-//       return Center(child: CircularProgressIndicator());
-//     } else if (snapshot.hasError) {
-//       return Center(child: Text(snapshot.error.toString()));
-//     } else {
-//       if (snapshot.hasData) {
-//         var userimages = snapshot.data!;
-//         return ClipRRect(
-//           borderRadius: BorderRadius.circular(12),
-//           child: Container(
-//             height: 128,
-//             width: 128,
-//             decoration: BoxDecoration(
-//               shape: BoxShape.circle,
-//               border: Border.all(
-//                 color: Colors.black, // Set the color of the border here
-//                 width: 2.0, // Set the width of the border here
-//               ),
-//             ),
-//             child: imageFile != null
-//                 ? ClipOval(
-//                     child: Image.network(
-//                       userimages[0].images ?? '',
-//                       height: 128,
-//                       width: 128,
-//                       fit: BoxFit.contain,
-//                     ),
-//                   )
-//                 : Image.asset(
-//                     'assets/images/user.png',
-//                     fit: BoxFit.contain,
-//                   ),
-//           ),
-//         );
-//       } else {
-//         return const Center(child: Text('Something went wrong'));
-//       }
-//     }
-//   },
-// ),
-
-    Positioned(
-      bottom: 8, // Adjust the position of the button as needed
-      right: 8, // Adjust the position of the button as needed
-      child: Transform.translate(
-      offset: Offset(0, 8), // Adjust the vertical shift to your desired position
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.black, width: 1), // Adjust the border color and width as needed
-          color: Color(0xFF999999), // Replace this with your desired background color
-        ),
-        child: IconButton(
-          onPressed: () {
-             pickImage(source: ImageSource.gallery).then((value) {
-                  if (value != '') {
-                    imageCropperView(value, context);
-                  }
-                });
-            // Add your button onPressed logic here
-          },
-          icon: Icon(Icons.edit), // Replace this with your desired icon
-          iconSize: 30, // Adjust the icon size as needed
-          color: Colors.white, // Replace this with your desired icon color
-        ),
-      ),
+      appBar: AppBar(
+  title: const Text(
+    'Profile',
+    style: TextStyle(color: Colors.black, fontSize: 25),
+  ),
+  backgroundColor: Colors.transparent,
+  automaticallyImplyLeading: false,
+  elevation: 0,
+  iconTheme: const IconThemeData(color: Colors.black),
+  centerTitle: true,
+  flexibleSpace: Container(
+    decoration: BoxDecoration(
+      border: Border.all(
+        color: Colors.black, // Border color
+        width: 2.0, // Border width
       ),
     ),
-  ],
+  ),
 ),
-const SizedBox(height: 20,),
-FutureBuilder(
-  future: controller.getPatientData(),
-  builder: (context, snapshot) {
-       if (snapshot.connectionState == ConnectionState.done) {
-        if(snapshot.hasData) {
-          var patientsInfo = snapshot.data;
-              return Container(
-      padding: EdgeInsets.all(20.0),
-      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-      decoration: BoxDecoration(
-      border: Border.all(color: Colors.black, width: 1), 
-      borderRadius: BorderRadius.circular(12),
-      ),
-      child: 
-      Column(
-        children: [
-          Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Container(
+           height: MediaQuery.of(context).size.height/ 1,
+          child: Column(
+            children: [
+              // Image.asset('assets/images/new-sgh-design.png', height: 100, fit:BoxFit.cover,),
+               SizedBox(height: 10,),
+              
+          Stack(
           children: [
-            Text('Password:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-            GestureDetector(
-              onTap: () {
-                 ChangePasswordModal(context);
-              },
-              child: Text("edit", style: 
-              TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
-              ),)
-          ],
-          ),
-          const Divider(
-          color: Colors.black, // Adjust the color of the separator line as needed
-          thickness: 1, // Adjust the thickness of the separator line as needed
-        ),
-          const SizedBox(height: 10,),
-          Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Email', style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-            Text('${patientsInfo?.email}', style: const TextStyle(fontSize: 20),),
-          ],
-          ),
-          const Divider(
-          color: Colors.black, // Adjust the color of the separator line as needed
-          thickness: 1, // Adjust the thickness of the separator line as needed
-        ),
-          const SizedBox(height: 10,),
-          Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Full Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-            Text('${patientsInfo?.name}', style: const TextStyle(fontSize: 20),),
-          ],
-          ),
-          const Divider(
-          color: Colors.black, // Adjust the color of the separator line as needed
-          thickness: 1, // Adjust the thickness of the separator line as needed
-        ),
-        const SizedBox(height: 10,), 
-        ],
-      ),
-    );
-        }  else if (snapshot.hasError) {
-        return Center(child: Text(snapshot.error.toString()));
-        } else {
-        return const Center(
-        child: Text('Something went wrong'));
-        }
-       } else {
-        return const Center(child: CircularProgressIndicator());
-        }
-
-  }
-),
- Container(
-  padding: EdgeInsets.all(20.0),
-  width: double.infinity,
-   child: ElevatedButton(
-                onPressed: () {
-                  UserRepository.instance.addImage(imageFile,profileuid);
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
-                  // if (imageFilepills == null) {
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  // const SnackBar(content: Text('Please select an image Pill')),
-                  // );
-                  // } else {
-                  // Navigator.of(context)
-                  // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetakenText: widget.imagetakenText,imagetakenPill: imageFilepills)));  
-                  // }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0CE25C),
-                  // minimumSize: const Size(320, 50), // NEW
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(12), // Rounded corner radius
+              StreamBuilder(
+          stream: userRepo.getUserimages(profileuid),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show a static image when waiting for data or loading
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset('assets/images/user.png', fit: BoxFit.contain),
+          );
+            } else if (snapshot.hasError) {
+          // Show an error message if there is an error with the stream
+          return Center(child: Text(snapshot.error.toString()));
+            } else if (!snapshot.hasData || snapshot.data == null) {
+          // Show a static image when there is no data available in the stream
+          // return ClipRRect(
+          //   borderRadius: BorderRadius.circular(12),
+          //   child: Image.asset('assets/images/user.png', fit: BoxFit.contain),
+          // );
+              
+          //  if (imageFile != null)
+          //       Container(
+          //         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          //         height: 200,
+          //         child: Image.file(
+          //           File(imageFilepills!.path),
+          //           fit: BoxFit.fitWidth,
+          //         ),
+          //       ),
+              return ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                height: 128,
+                width: 128,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.black, // Set the color of the border here
+                    width: 2.0, // Set the width of the border here
                   ),
                 ),
-                child: const Text(
-                  'Edit Profile',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                )),
- ),
-      ],
+                child:
+                imageFile != null
+                    ?
+                ClipOval(
+                        child: Image.file(
+                          File(imageFile!.path),
+                          height: 128,
+                          width: 128,
+                          fit: BoxFit.contain,
+                        ),
+                      )
+              : Image.asset('assets/images/user.png',
+                        fit: BoxFit.contain,
+                      ),
+            )
+              );
+            } else {
+          // Show the streamed image data
+          var userimages = snapshot.data;
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              height: 128,
+              width: 128,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.black, // Set the color of the border here
+                  width: 2.0, // Set the width of the border here
+                ),
+              ),
+              child:  ClipOval(
+                      child: Image.network(
+                        userimages?.images ?? '',
+                        height: 128,
+                        width: 128,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+            ),
+          );
+            }
+          },
+              ),
+              //    FutureBuilder(
+              //   future: userRepo.getUserImages2(profileuid),
+              //   builder: (context, snapshot) {
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return Center(child: CircularProgressIndicator());
+              //     } else if (snapshot.hasError) {
+              //       return Center(child: Text(snapshot.error.toString()));
+              //     } else {
+              //       if (snapshot.hasData) {
+              //         var userimages = snapshot.data!;
+              //         return ClipRRect(
+              //           borderRadius: BorderRadius.circular(12),
+              //           child: Container(
+              //             height: 128,
+              //             width: 128,
+              //             decoration: BoxDecoration(
+              //               shape: BoxShape.circle,
+              //               border: Border.all(
+              //                 color: Colors.black, // Set the color of the border here
+              //                 width: 2.0, // Set the width of the border here
+              //               ),
+              //             ),
+              //             child: imageFile != null
+              //                 ? ClipOval(
+              //                     child: Image.network(
+              //                       userimages[0].images ?? '',
+              //                       height: 128,
+              //                       width: 128,
+              //                       fit: BoxFit.contain,
+              //                     ),
+              //                   )
+              //                 : Image.asset(
+              //                     'assets/images/user.png',
+              //                     fit: BoxFit.contain,
+              //                   ),
+              //           ),
+              //         );
+              //       } else {
+              //         return const Center(child: Text('Something went wrong'));
+              //       }
+              //     }
+              //   },
+              // ),
+              
+            Positioned(
+          bottom: 8, // Adjust the position of the button as needed
+          right: 8, // Adjust the position of the button as needed
+          child: Transform.translate(
+          offset: Offset(0, 8), // Adjust the vertical shift to your desired position
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black, width: 1), // Adjust the border color and width as needed
+              color: Color(0xFF999999), // Replace this with your desired background color
+            ),
+            child: IconButton(
+              onPressed: () {
+                 pickImage(source: ImageSource.gallery).then((value) {
+                      if (value != '') {
+                        imageCropperView(value, context);
+                      }
+                    });
+                // Add your button onPressed logic here
+              },
+              icon: Icon(Icons.edit), // Replace this with your desired icon
+              iconSize: 30, // Adjust the icon size as needed
+              color: Colors.white, // Replace this with your desired icon color
+            ),
+          ),
+          ),
+            ),
+          ],
+              ),
+              const SizedBox(height: 20,),
+              FutureBuilder(
+          future: controller.getPatientData(),
+          builder: (context, snapshot) {
+           if (snapshot.connectionState == ConnectionState.done) {
+            if(snapshot.hasData) {
+              var patientsInfo = snapshot.data;
+                  return Container(
+          padding: EdgeInsets.all(20.0),
+          margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 1), 
+          borderRadius: BorderRadius.circular(12),
+          ),
+          child: 
+          Column(
+            children: [
+              Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Password:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                GestureDetector(
+                  onTap: () {
+                     ChangePasswordModal(context);
+                  },
+                  child: Text("edit", style: 
+                  TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+                  ),)
+              ],
+              ),
+              const Divider(
+              color: Colors.black, // Adjust the color of the separator line as needed
+              thickness: 1, // Adjust the thickness of the separator line as needed
+            ),
+              const SizedBox(height: 10,),
+              Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Email', style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                Text('${patientsInfo?.email}', style: const TextStyle(fontSize: 20),),
+              ],
+              ),
+              const Divider(
+              color: Colors.black, // Adjust the color of the separator line as needed
+              thickness: 1, // Adjust the thickness of the separator line as needed
+            ),
+              const SizedBox(height: 10,),
+              Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Full Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                Text('${patientsInfo?.name}', style: const TextStyle(fontSize: 20),),
+              ],
+              ),
+              const Divider(
+              color: Colors.black, // Adjust the color of the separator line as needed
+              thickness: 1, // Adjust the thickness of the separator line as needed
+            ),
+            const SizedBox(height: 10,), 
+            ],
+          ),
+            );
+            }  else if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+            } else {
+            return const Center(
+            child: Text('Something went wrong'));
+            }
+           } else {
+            return const Center(child: CircularProgressIndicator());
+            }
+              
+          }
+              ),
+               Container(
+          padding: EdgeInsets.all(20.0),
+          width: double.infinity,
+           child: ElevatedButton(
+                    onPressed: () {
+                      UserRepository.instance.addImage(imageFile,profileuid);
+                      // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+                      // if (imageFilepills == null) {
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      // const SnackBar(content: Text('Please select an image Pill')),
+                      // );
+                      // } else {
+                      // Navigator.of(context)
+                      // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetakenText: widget.imagetakenText,imagetakenPill: imageFilepills)));  
+                      // }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0CE25C),
+                      // minimumSize: const Size(320, 50), // NEW
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Rounded corner radius
+                      ),
+                    ),
+                    child: const Text(
+                      'Edit Profile',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                    )),
+               ),
+          ],
+          ),
+        ),
       ),
     );
   }

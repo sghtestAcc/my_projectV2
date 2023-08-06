@@ -11,7 +11,7 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/models/login_type.dart';
 
-import '../communications_patient.dart';
+import '../communications_screen.dart';
 
 class PatientsVocalScreen extends StatefulWidget {
   const PatientsVocalScreen({super.key});

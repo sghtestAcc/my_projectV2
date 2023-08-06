@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/screens/communications/communications_patient.dart';
+import 'package:my_project/screens/communications/communications_screen.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/patient_home.dart';
 import 'package:my_project/screens/patients/select_patients.dart';
@@ -9,8 +9,6 @@ class NavigatorBar extends StatefulWidget {
 
   final LoginType loginType;
   int selectedIndex = 0;
-
-  // const NavigatorBar({Key? key, required this.loginType}) : super(key: key);
   NavigatorBar({Key? key, required this.loginType,  this.selectedIndex = 0}) : super(key: key);
   @override
   State<NavigatorBar> createState() => _NavigatorBarState();
@@ -25,7 +23,6 @@ class _NavigatorBarState extends State<NavigatorBar> {
       loginType: LoginType.patient,
     ),
     MyProfile()
-    // RegisterScreen(registerType: LoginType2.caregiversRegister
   ];
 
   final screens2 = [

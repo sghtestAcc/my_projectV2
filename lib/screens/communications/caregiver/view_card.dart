@@ -64,57 +64,7 @@ class _myCardPrescriptionState extends State<myCardPrescription> {
                                         },
                                         child: Column(
                                           children: [
-
-                                        FutureBuilder<List<GraceUser>>(
-                        future: userRepo.getMultipleUser(widget.email),
-                        builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasData) {
-                        return ListView.separated(
-                              // padding: const EdgeInsets.all(10.0),
-                              shrinkWrap: true,
-                              itemCount: snapshot.data!.length,
-                              separatorBuilder: (context, index) {
-                                return const SizedBox(
-                                  height: 10,
-                                );
-                              },
-                              itemBuilder: (context, index) {
-                                return 
-                                Container(
-                                  child: Column(
-                                    crossAxisAlignment:CrossAxisAlignment.start,
-                                    children: [
-                                      Text(snapshot.data![index].name ?? '',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                      ),
-                                       const SizedBox(
-                                        height: 10,
-                                        ),
-                                      Text(snapshot.data![index].email ?? '',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                      ),    
-                                      const SizedBox(
-                                        height: 10,
-                                        ),                   
-                                      //  patientcard(index,uid),
-                                    ],
-                                  ),
-                                );
-                              });
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text(snapshot.error.toString()));
-                        } else {
-                          return const Center(
-                              child: Text('Something went wrong'));
-                        }
-                      } else {
-                        // return const Center(child: Text(''));
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
-                              Row(
+                                               Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text('Feed ${medications[i].labels} during the ${medications[i].schedule}',

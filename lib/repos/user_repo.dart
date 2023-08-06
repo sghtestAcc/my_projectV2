@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -131,19 +132,6 @@ Future<ImagesUser?> getUserImages2(String? uid) async {
       .single;
   return imagesList;
 }
-  // Future<GraceUser?> getUser(String email) async {
-  //   final snapshot = await firestore
-  //       .collection("users")
-  //       .where("Email", isEqualTo: email)
-  //       .get();
-  //   final patientData = snapshot.docs
-  //       .map(
-  //         (e) => GraceUser?.fromSnapshot(e),
-  //       )
-  //       .single;
-  //   return patientData;
-  // }
-
 
 // //retrieve caregivers questions function(of single users)
 Stream<List<String>> getQuestionsofPatient(String? email) {
@@ -291,6 +279,39 @@ Future<void> createPatientMedications(
   }
 }
 
+Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
+  String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+  final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
+      await FirebaseFirestore.instance.collection("users")
+      .where("LoginType", isEqualTo: LoginType.patient.name)
+      .get();
+
+  final List<Future<bool>> hasMedicationsFutures = [];
+  List<GraceUser> patientsWithMedications = [];
+
+  for (var userDoc in usersSnapshot.docs) {
+    String uid = userDoc.id;
+    hasMedicationsFutures.add(isPatientMedicationsExists(uid));
+  }
+
+  final List<bool> hasMedicationsResults = await Future.wait(hasMedicationsFutures);
+
+  for (int i = 0; i < usersSnapshot.docs.length; i++) {
+    var userDoc = usersSnapshot.docs[i];
+    String uid = userDoc.id;
+
+    if (hasMedicationsResults[i] && uid != currentUserUid) {
+      var patientData = GraceUser.fromSnapshot(userDoc);
+      patientsWithMedications.add(patientData);
+    }
+  }
+
+  yield patientsWithMedications;
+}
+
+
+
+
 Future<List<GraceUser>> getAllPatientsWithMedications() async {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
@@ -299,7 +320,6 @@ Future<List<GraceUser>> getAllPatientsWithMedications() async {
       .get();
 
   List<GraceUser> patientsWithMedications = [];
-
   for (var userDoc in usersSnapshot.docs) {
     String uid = userDoc.id;
     bool hasMedications = await isPatientMedicationsExists(uid);
