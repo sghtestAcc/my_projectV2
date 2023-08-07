@@ -6,6 +6,7 @@ import 'package:my_project/screens/communications/communications_screen.dart';
 
   final questionsText = TextEditingController();
   var formDataquestions = GlobalKey<FormState>();
+  String? currentEmail = FirebaseAuth.instance.currentUser!.email;
 
 
   void addQuestionsModal(BuildContext context) {
@@ -92,7 +93,6 @@ import 'package:my_project/screens/communications/communications_screen.dart';
                                   questionsText.text.trim(),
                                 );
                                 questionsText.clear();
-                                // Navigator.pop(context);
                               } 
                           },
                           style: ElevatedButton.styleFrom(
@@ -148,19 +148,10 @@ import 'package:my_project/screens/communications/communications_screen.dart';
     },
   );
 }
-
- String? currentEmail = FirebaseAuth.instance.currentUser!.email;
-
   void addQuestionsModal2(BuildContext context) {
    showModalBottomSheet(
     context: context,
     builder: (context) {
-      // return FutureBuilder<GraceUser?>(
-      //   future: controller.getPatientData(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.connectionState == ConnectionState.done) {
-      //     if (snapshot.hasData) {
-      //         var patientsInfo = snapshot.data;
               return Form(
                 key: formDataquestions,
                 child: Container(
@@ -240,7 +231,6 @@ import 'package:my_project/screens/communications/communications_screen.dart';
                                 );
                                 questionsText.clear();
                               }      
-// value.trim().split(' ').length < 2
                           },
                           style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0CE25C), // NEW
@@ -290,18 +280,6 @@ import 'package:my_project/screens/communications/communications_screen.dart';
                   ),
                 ),
               );
-      //       } else if (snapshot.hasError) {
-      //                     return Center(child: Text(snapshot.error.toString()));
-      //       } else {
-      //                     return const Center(
-      //                         child: Text('Something went wrong'));
-      //       }
-      //       } else {
-      //                   return const Center(child: CircularProgressIndicator());
-      //       }
-
-      //   }
-      // );
     },
   );
 }

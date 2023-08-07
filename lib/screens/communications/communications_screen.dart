@@ -225,9 +225,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
             return Center(
               child: Column(
                 children: [
-                  const SizedBox(height: 10,),
+                  SizedBox(height: 10,),
                   Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
-                  const SizedBox(height: 10,),
+                  SizedBox(height: 10,),
                   Text('No questions added yet'),
                 ],
               ),
@@ -261,20 +261,60 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                         snapshot.data![i] ?? '',
                         style: const TextStyle(fontSize: 20),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: snapshot.data![i] ?? '',)).then(
-                            (_) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Copied to your clipboard !'),
-                                ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: snapshot.data![i] ?? '',)).then(
+                                (_) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Copied to your clipboard !'),
+                                    ),
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                        icon: const Icon(Icons.copy),
+                            icon: const Icon(Icons.copy),
+                          ),
+                          IconButton(onPressed: () async  {
+                          showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      backgroundColor: Color(0xFF35365D),
+                                      shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                            ),
+                                      title: const Text('Are you Sure?', style: TextStyle(color: Colors.white),),
+                                      content: const Text('This would delete a question', 
+                                          style: TextStyle(color: Colors.white)),
+                                      actions: [
+                                        MaterialButton(
+                                        child: const Text('Delete', style: TextStyle(color: Colors.white),),
+                                        onPressed: () async {
+                                          // await AuthenticationRepository.instance.MedicationChecksDoubleLayer(currentUid,context);
+                                          await UserRepository.instance.deleteBothUserQuestions(
+                                            context,
+                                            currentEmail!,
+                                            snapshot.data![i] ?? '',
+                                );
+                                        },
+                                        ),
+                                         MaterialButton(onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text('cancel', style: TextStyle(color: Colors.white),),
+                                        )
+                                      ],
+                                    );
+                                  });
+
+                        }, icon: const Icon(Icons.delete)),
+                        ],
                       ),
+                      
                     ],
                   ),
                 );
@@ -287,7 +327,6 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
               )
                   )
                   :
-                  //caregivers view questions
                    Expanded(
                     child: StreamBuilder<List<String>>(
                 stream: userRepo.getQuestionsofCaregiver(currentEmail),
@@ -336,20 +375,60 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                         snapshot.data![i] ?? '',
                         style: const TextStyle(fontSize: 20),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: snapshot.data![i] ?? '',)).then(
-                            (_) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Copied to your clipboard !'),
-                                ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: snapshot.data![i] ?? '',)).then(
+                                (_) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Copied to your clipboard !'),
+                                    ),
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                        icon: const Icon(Icons.copy),
+                            icon: const Icon(Icons.copy),
+                          ),
+                          IconButton(onPressed: () async  {
+                          showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      backgroundColor: Color(0xFF35365D),
+                                      shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                            ),
+                                      title: const Text('Are you Sure?', style: TextStyle(color: Colors.white),),
+                                      content: const Text('This would delete a question', 
+                                          style: TextStyle(color: Colors.white)),
+                                      actions: [
+                                        MaterialButton(
+                                        child: const Text('Delete', style: TextStyle(color: Colors.white),),
+                                        onPressed: () async {
+                                          // await AuthenticationRepository.instance.MedicationChecksDoubleLayer(currentUid,context);
+                                          await UserRepository.instance.deleteBothUserQuestions(
+                                            context,
+                                            currentEmail!,
+                                            snapshot.data![i] ?? '',
+                                );
+                                        },
+                                        ),
+                                         MaterialButton(onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text('cancel', style: TextStyle(color: Colors.white),),
+                                        )
+                                      ],
+                                    );
+                                  });
+
+                        }, icon: const Icon(Icons.delete)),
+                        ],
                       ),
+                      
                     ],
                   ),
                 );
@@ -391,29 +470,30 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                   ) :  Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(10.0),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(22)),
-                    ),
                     child: ElevatedButton(
-                      onPressed: () {
-                        addQuestionsModal2(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF6F6F6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(22), // Rounded corner radius
-                        ),
-                      ),
-                      child: const Text(
-                        'Add Questions?',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+  onPressed: () {
+    addQuestionsModal2(context);
+  },
+  style: ElevatedButton.styleFrom(
+    primary: const Color(0xDDF6F6F6),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(22), // Rounded corner radius
+      side: BorderSide(
+        color: Colors.black, // Add your desired border color here
+        width: 1, // Add your desired border width here
+      ),
+    ),
+  ),
+  child: const Text(
+    'Add Questions?',
+    style: TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+  ),
+)
+
                   )
                 ],
               ),

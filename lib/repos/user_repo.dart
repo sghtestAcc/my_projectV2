@@ -35,9 +35,7 @@ class UserRepository extends GetxController {
       Get.snackbar(
         "Error",
         "Email already exists.",
-        snackPosition: SnackPosition.BOTTOM,
-        // backgroundColor: Colors.redAccent.withOpacity(0.1),
-        // colorText: Colors.red,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7)
       );
@@ -48,9 +46,7 @@ class UserRepository extends GetxController {
       Get.snackbar(
         "Congrats",
         "A new account has been created.",
-        snackPosition: SnackPosition.BOTTOM,
-        // backgroundColor: Colors.green.withOpacity(0.1),
-        // colorText: Colors.green,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7)
       );
@@ -59,7 +55,7 @@ class UserRepository extends GetxController {
       Get.snackbar(
         "Error",
         "Failed to create a new account.",
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.redAccent.withOpacity(0.1),
         colorText: Colors.red,
       );
@@ -69,17 +65,13 @@ class UserRepository extends GetxController {
   }
 
   Future<void> addImage(
-  // String? labels,
   XFile? image,
   String uid,
-  // String quantity,
-  // String schedule,
 ) async {
   try {
     final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     final pathRoute = 'profileImages/$fileName';
     String imageUrl = await uploadImageToStorage(pathRoute, image!);
-    // String uid = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection("users")
     .doc(uid)
     .collection('profile')
@@ -90,17 +82,17 @@ class UserRepository extends GetxController {
     Get.snackbar(
       "Congrats",
       "A new image has been added",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
   } catch (error) {
     Get.snackbar(
       "Error",
       "Failed to edit image",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
     print(error.toString());
   }
@@ -121,17 +113,17 @@ Stream<ImagesUser?> getUserimages(String? uid) {
       });
 }
 
-Future<ImagesUser?> getUserImages2(String? uid) async {
-  final snapshot = await firestore
-      .collection("users")
-      .doc(uid)
-      .collection('profile')
-      .get();
-  final imagesList = snapshot.docs
-      .map((docSnapshot) => ImagesUser.fromSnapshot(docSnapshot))
-      .single;
-  return imagesList;
-}
+// Future<ImagesUser?> getUserImages2(String? uid) async {
+//   final snapshot = await firestore
+//       .collection("users")
+//       .doc(uid)
+//       .collection('profile')
+//       .get();
+//   final imagesList = snapshot.docs
+//       .map((docSnapshot) => ImagesUser.fromSnapshot(docSnapshot))
+//       .single;
+//   return imagesList;
+// }
 
 // //retrieve caregivers questions function(of single users)
 Stream<List<String>> getQuestionsofPatient(String? email) {
@@ -145,8 +137,6 @@ Stream<List<String>> getQuestionsofPatient(String? email) {
 
 //retrieve caregivers questions function(of single users)
   Stream<List<String>> getQuestionsofCaregiver(String? email)  {
-    // final doesUserExists = await isEmailExists(email, LoginType.caregiver);
-    // if (!doesUserExists) throw Exception('User does not exists');
      return firestore
       .collection("questions")
       .where("Email", isEqualTo: email)
@@ -176,14 +166,13 @@ Future<bool> isQuestionsEmailExists(String email, String question) async {
   final doesUserExists = await isEmailExists(email, LoginType.patient);
   final doesUserQuestionExists = await isQuestionsEmailExists(email, question);
   if (!doesUserExists) return;
-
   if (doesUserQuestionExists) {
     Get.snackbar(
       "Error",
       "This question already exists for the given email.",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.1),
-      colorText: Colors.red,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
     );
     return;
   }
@@ -279,6 +268,42 @@ Future<void> createPatientMedications(
   }
 }
 
+Future<void> deleteBothUserQuestions(
+  BuildContext context,
+  String email,
+  String question,
+) async {
+  try {
+    final querySnapshot = await firestore.collection("questions")
+        .where("Email", isEqualTo: email)
+        .where("Question", isEqualTo: question)
+        .get();
+
+    for (final doc in querySnapshot.docs) {
+      await doc.reference.delete();
+    }
+    Get.snackbar(
+      "Success",
+      "The question has been deleted.",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7),
+    );
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
+  } catch (error) {
+    Get.snackbar(
+      "Error",
+      "Failed to delete the question.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7),
+    );
+    print(error.toString());
+  }
+}
+
+
 Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
@@ -305,11 +330,8 @@ Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
       patientsWithMedications.add(patientData);
     }
   }
-
   yield patientsWithMedications;
 }
-
-
 
 
 Future<List<GraceUser>> getAllPatientsWithMedications() async {
@@ -406,7 +428,6 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
     );
     return;
   }
-  
     try {
       await firestore.collection("questions").add({
         "Email": email,

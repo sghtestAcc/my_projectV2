@@ -131,7 +131,7 @@ Future<void> MedicationChecksDoubleLayer(
      Get.snackbar(
         'Invalid',
         'You have not entered any medication yet!',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         // backgroundColor: Colors.redAccent.withOpacity(0.1),
         // colorText: Colors.red,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),

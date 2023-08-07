@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:my_project/repos/user_repo.dart';
 
 import '../../controllers/select_patient_controller.dart';
-import '../../models/images_user.dart';
 import 'change_password_modal.dart';
 
 class MyProfile extends StatefulWidget {
@@ -33,7 +32,6 @@ Future<String> pickImage({ImageSource? source,}) async {
       final getImage = await picker.pickImage(source: source!,imageQuality: 50);
       if (getImage != null) {
         path = '';
-        // textScanning = true;
         imageFile = getImage;
         // Image.file(File(selectedImage!.path))
         // XFile? file = XFile(imageFile!.path); 
@@ -41,14 +39,11 @@ Future<String> pickImage({ImageSource? source,}) async {
         // File(imageFile!.path),
         path = getImage.path;
         setState(() {});
-        // getRecognisedText(getImage);
       } else {
         path = '';
       }
     } catch (e) {
-      // textScanning = false;
       imageFile = null;
-      // scannedText = "Error occured while scanning";
       setState(() {});
       log(e.toString());
     }
@@ -88,8 +83,7 @@ Future<String> pickImage({ImageSource? source,}) async {
     if (croppedFile != null) {
       log('image cropped');
       imageFile = XFile(croppedFile.path);
-      // getRecognisedText(imageFile!);
-      // });
+
     } else {
       // return '';
       log('do nothing');
@@ -146,21 +140,6 @@ Future<String> pickImage({ImageSource? source,}) async {
           // Show an error message if there is an error with the stream
           return Center(child: Text(snapshot.error.toString()));
             } else if (!snapshot.hasData || snapshot.data == null) {
-          // Show a static image when there is no data available in the stream
-          // return ClipRRect(
-          //   borderRadius: BorderRadius.circular(12),
-          //   child: Image.asset('assets/images/user.png', fit: BoxFit.contain),
-          // );
-              
-          //  if (imageFile != null)
-          //       Container(
-          //         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          //         height: 200,
-          //         child: Image.file(
-          //           File(imageFilepills!.path),
-          //           fit: BoxFit.fitWidth,
-          //         ),
-          //       ),
               return ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Container(
@@ -189,7 +168,7 @@ Future<String> pickImage({ImageSource? source,}) async {
                       ),
             )
               );
-            } else {
+            } else if(snapshot.hasData) {
           // Show the streamed image data
           var userimages = snapshot.data;
           return ClipRRect(
@@ -214,53 +193,42 @@ Future<String> pickImage({ImageSource? source,}) async {
                     )
             ),
           );
+            } else {
+              return Column(
+                children: [
+                  ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    height: 128,
+                    width: 128,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.black, // Set the color of the border here
+                        width: 2.0, // Set the width of the border here
+                      ),
+                    ),
+                    child:
+                    Column(
+                      children: [
+                          if (imageFile != null)
+                            ClipOval(
+                            child: Image.file(
+                              File(imageFile!.path),
+                              height: 128,
+                              width: 128,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                      ],)
+            )
+                  ),
+
+                ],
+              );
             }
           },
-              ),
-              //    FutureBuilder(
-              //   future: userRepo.getUserImages2(profileuid),
-              //   builder: (context, snapshot) {
-              //     if (snapshot.connectionState == ConnectionState.waiting) {
-              //       return Center(child: CircularProgressIndicator());
-              //     } else if (snapshot.hasError) {
-              //       return Center(child: Text(snapshot.error.toString()));
-              //     } else {
-              //       if (snapshot.hasData) {
-              //         var userimages = snapshot.data!;
-              //         return ClipRRect(
-              //           borderRadius: BorderRadius.circular(12),
-              //           child: Container(
-              //             height: 128,
-              //             width: 128,
-              //             decoration: BoxDecoration(
-              //               shape: BoxShape.circle,
-              //               border: Border.all(
-              //                 color: Colors.black, // Set the color of the border here
-              //                 width: 2.0, // Set the width of the border here
-              //               ),
-              //             ),
-              //             child: imageFile != null
-              //                 ? ClipOval(
-              //                     child: Image.network(
-              //                       userimages[0].images ?? '',
-              //                       height: 128,
-              //                       width: 128,
-              //                       fit: BoxFit.contain,
-              //                     ),
-              //                   )
-              //                 : Image.asset(
-              //                     'assets/images/user.png',
-              //                     fit: BoxFit.contain,
-              //                   ),
-              //           ),
-              //         );
-              //       } else {
-              //         return const Center(child: Text('Something went wrong'));
-              //       }
-              //     }
-              //   },
-              // ),
-              
+              ),   
             Positioned(
           bottom: 8, // Adjust the position of the button as needed
           right: 8, // Adjust the position of the button as needed
@@ -373,15 +341,6 @@ Future<String> pickImage({ImageSource? source,}) async {
            child: ElevatedButton(
                     onPressed: () {
                       UserRepository.instance.addImage(imageFile,profileuid);
-                      // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
-                      // if (imageFilepills == null) {
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      // const SnackBar(content: Text('Please select an image Pill')),
-                      // );
-                      // } else {
-                      // Navigator.of(context)
-                      // .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetakenText: widget.imagetakenText,imagetakenPill: imageFilepills)));  
-                      // }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0CE25C),
