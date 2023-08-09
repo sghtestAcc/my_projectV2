@@ -268,8 +268,7 @@ Future<void> deleteBothUserQuestions(
 
     for (final doc in querySnapshot.docs) {
       await doc.reference.delete();
-    }
-    Get.snackbar(
+          Get.snackbar(
       "Success",
       "The question has been deleted.",
       snackPosition: SnackPosition.TOP,
@@ -278,6 +277,8 @@ Future<void> deleteBothUserQuestions(
     );
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
+    }
+
   } catch (error) {
     Get.snackbar(
       "Error",
@@ -319,7 +320,6 @@ Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
   yield patientsWithMedications;
 }
 
-//getA
 Future<List<GraceUser>> getAllPatientsWithMedications() async {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =

@@ -38,7 +38,6 @@ class AuthenticationRepository extends GetxController {
     GraceUser user
   ) async {
     try {
-      // if (!emailExists) throw Exception("");
       await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,

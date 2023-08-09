@@ -420,7 +420,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                 ListTile(
                   leading: const Icon(Icons.person),
                   iconColor: Colors.black,
-                  title: const Text('Patients'),
+                  title: const Text('Profile'),
                   onTap:
                       () {
                         Navigator.pushReplacement(
