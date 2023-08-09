@@ -1,7 +1,7 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:get/get.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_project/components/navigation.tab.dart';
@@ -106,7 +106,15 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
     } else {
       log('do nothing');
     }
-  } 
+  }
+
+  String sourceLang = 'English';
+
+   final languagePicker = TranslateLanguage.values
+  .map(
+  (e) => e.name.capitalize!,
+  )
+  .toList(); 
 
   @override  
   Widget build(BuildContext context) {
@@ -144,7 +152,34 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   onTap: () {
-                    // Navigator.of(context).pushReplacementNamed(WeatherScreen.routeName);
+                        showDialog(
+                      context: context,
+                  builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select Language'),
+          content: Container(
+            padding: const EdgeInsets.all(10.0),
+            child: DropdownButton(
+              hint: const Text('English'),
+              value: sourceLang,
+              onChanged: (newValue) {
+                setState(() {
+                  sourceLang = newValue ?? '';
+                  // translateTextFunction(typedText);
+                });
+                 Navigator.pop(context); // Close the dialog
+              },
+              items: languagePicker.map((valueItem) {
+                return DropdownMenuItem(
+                  value: valueItem,
+                  child: Text(valueItem),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
@@ -224,6 +259,21 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   );
                       }
                   ),
+                const Divider(height: 3, color: Colors.blueGrey),
+               ListTile(
+                leading: const Icon(Icons.person),
+                iconColor: Colors.black,
+                title: const Text('Profile'),
+                onTap: () {
+                   Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) => NavigatorBar(loginType: LoginType.patient, selectedIndex: 2,),
+                      ),
+                  );
+
+                } 
+              ),
               //  Divider(height: 3, color: Colors.blueGrey),
               //  ListTile(
               //   leading: Icon(Icons.logout),
@@ -353,7 +403,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   ),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: const Icon(Icons.person),
+                  leading: const Icon(Icons.list),
                   iconColor: Colors.black,
                   title: const Text('Patients'),
                   onTap:
@@ -366,6 +416,22 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   );
                       } 
                   ),
+               const Divider(height: 3, color: Colors.blueGrey),
+                ListTile(
+                  leading: const Icon(Icons.person),
+                  iconColor: Colors.black,
+                  title: const Text('Patients'),
+                  onTap:
+                      () {
+                        Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 3,),
+                      ),
+                  );
+                      } 
+                  ),
+
             ]),
           );
   }

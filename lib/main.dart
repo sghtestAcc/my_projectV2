@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/screens/auth/login_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'firebase_options.dart';
 import 'repos/authentication_repository.dart';
@@ -9,15 +10,25 @@ import 'models/login_type.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
       .then((value) => Get.put(AuthenticationRepository()));
-  // Get.lazyPut(()=>AuthenticationRepository());
 
   runApp(
     const GetMaterialApp(
       title: "App",
-      home: HomeScreen(),
+  //     localizationsDelegates: [
+  //   GlobalMaterialLocalizations.delegate,
+  //   GlobalWidgetsLocalizations.delegate,
+  //   GlobalCupertinoLocalizations.delegate,
+  // ],
+  // supportedLocales: [
+  //   Locale('en', ''), // English
+  //   Locale('hi', ''), // Spanish
+  //   Locale('ar', ''),
+  //   Locale('fr', ''),
+  // ],
+  // locale: Locale('fr', ''),
+  home: HomeScreen(),
 // ...
     ),
   );
@@ -28,6 +39,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //  final localizations = AppLocalizations.of(context);
+
     return Scaffold(
   body: SingleChildScrollView(
     child: Center(

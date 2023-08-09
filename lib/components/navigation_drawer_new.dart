@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:my_project/screens/camera/camera_home_patient_pill.dart';
 
 import '../repos/authentication_repository.dart';
+import '../screens/camera/camera_home_patient_meds.dart';
 
-class AppDrawerNavigationNew extends StatelessWidget {
-  const AppDrawerNavigationNew({super.key});
+class AppDrawerNavigationNew extends StatefulWidget {
+  int selectedScreen = 0;
+  // const AppDrawerNavigationNew({super.key});
+  AppDrawerNavigationNew({Key? key, this.selectedScreen = 0}) : super(key: key);
+
+  @override
+  State<AppDrawerNavigationNew> createState() => _AppDrawerNavigationNewState();
+}
+
+class _AppDrawerNavigationNewState extends State<AppDrawerNavigationNew> {
+
+  String changedText = '';
+  String sourceLang = 'English';
+   final languagePicker = TranslateLanguage.values
+  .map(
+  (e) => e.name.capitalize!,
+  )
+  .toList(); 
+
+
+   final Selectedscreens = [
+    CameraHomePatientScreen(),
+    CameraHomePatientPillScreen(),
+  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +67,36 @@ class AppDrawerNavigationNew extends StatelessWidget {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   onTap: () {
-                    // Navigator.of(context).pushReplacementNamed(WeatherScreen.routeName);
+                      showDialog(
+                      context: context,
+                  builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Language'),
+          content: Container(
+            padding: const EdgeInsets.all(10.0),
+            child: DropdownButton(
+              hint: const Text('English'),
+              value: sourceLang,
+              onChanged: (newValue) {
+                setState(() {
+                  sourceLang = newValue!;
+                  // translateTextFunction(typedText);
+                });
+                //  Navigator.pop(context); // Close the dialog
+              },
+              items: languagePicker.map((valueItem) {
+                return DropdownMenuItem(
+                  value: valueItem,
+                  child: Text(valueItem),
+                );
+              }).toList(),
+              
+            ),
+          ),
+        );
+      },
+    );            
                   }),
-
-              //  Divider(height: 3, color: Colors.blueGrey),
-              //  ListTile(
-              //   leading: Icon(Icons.logout),
-              //   title: Text('Patients'),
-              //   onTap: () {
-
-              //   } // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
-              // ),
             ]),
           );
   }

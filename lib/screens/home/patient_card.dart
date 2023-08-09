@@ -9,17 +9,17 @@ import 'package:my_project/screens/camera/patients_upload_meds.dart';
 import 'package:flutter/material.dart';
 
 
-class patientcard extends StatefulWidget {
+class caregiverPatientCardView extends StatefulWidget {
   int index;
   final String uid;
   // patientcard(this.index, t{super.key});
-  patientcard(this.index, this.uid, {Key? key}) : super(key: key);
+  caregiverPatientCardView(this.index, this.uid, {Key? key}) : super(key: key);
 
   @override
-  State<patientcard> createState() => _patientcardState();
+  State<caregiverPatientCardView> createState() => _caregiverPatientCardViewState();
 }
 
-class _patientcardState extends State<patientcard> {
+class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
       bool isDropdownOpen = false;
   @override
   Widget build(BuildContext context) {
@@ -46,89 +46,91 @@ class _patientcardState extends State<patientcard> {
                 ],
               ),
                 if (isDropdownOpen)
-                            FutureBuilder<List<Medication>>(
-                            future: userRepo.getAllPatientsMedications(widget.uid),
+                          StreamBuilder<List<Medication>>(
+                            stream: userRepo.getPatientMedications(widget.uid) ,
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                if (snapshot.hasData) {
-                                  final medications = snapshot.data!; // List<Medication>
-                                  // Create a list of medication info items
-                                  List<bool> isItemExpanded = List.filled(snapshot.data!.length, false);
-                                  final children = <Widget>[];
-                                  for (int i = 0; i < medications.length; i++) {
-                                    children.add(
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            isItemExpanded[i] = !isItemExpanded[i];
-                                            // Handle the onTap event for each item if needed
-                                          });
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                border: Border.all(
-                                                  color: Colors.black,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: Image.network(
-                                                  medications[i].pills,
-                                                  height: 50,
-                                                  width: 50,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              medications[i].labels,
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            Text(
-                                              medications[i].quantity,
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            Text(
-                                              medications[i].schedule,
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                    children.add(SizedBox(height: 10,));
-                                  }
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:CrossAxisAlignment.start,
-                                    children: children,
-                                  );
-                                } else if (snapshot.hasError) {
-                                  return Center(
-                                    child: Text(snapshot.error.toString()),
-                                  );
-                                } else {
-                                  return const Center(
-                                    child: Text('Something went wrong'),
-                                  );
-                                }
-                              } else {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            },
+                               if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                              }  else if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+                } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+            return Center(
+              child: Column(
+                children: [
+                  const SizedBox(height: 10,),
+                  Container(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text('No medications to be found')),
+                ],
+              ),
+            );
+                } else if (snapshot.hasData) {
+                  final medications = snapshot.data!; // List<Medication>
+                    // Create a list of medication info items
+                    List<bool> isItemExpanded =
+                        List.filled(snapshot.data!.length, false);
+                    final children = <Widget>[];
+                    for (int i = 0; i < medications.length; i++) {
+                      children.add(
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isItemExpanded[i] = !isItemExpanded[i];
+                              // Handle the onTap event for each item if needed
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    medications[i].pills,
+                                    height: 50,
+                                    width: 50,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                medications[i].labels,
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              Text(
+                                medications[i].quantity,
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              Text(
+                                medications[i].schedule,
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ],
                           ),
-            ],
-          ),
-        );
+                        ),
+                      );
+                      children.add(SizedBox(
+                        height: 10,
+                      ));
+                    }
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: children,
+                    );
+                  } else {
+                    return const Center(child: Text('Something went wrong'));
+                  }
+                })
+        ],
+      ),
+    );
   }
 }

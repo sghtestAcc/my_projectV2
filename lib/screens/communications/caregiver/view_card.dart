@@ -44,7 +44,7 @@ class _myCardPrescriptionState extends State<myCardPrescription> {
               ),
                 if (isDropdownOpen)
                             FutureBuilder<List<Medication>>(
-                            future: userRepo.getAllPatientsMedications(widget.uid),
+                            future: userRepo.displayPatientsMedications(widget.uid),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.done) {

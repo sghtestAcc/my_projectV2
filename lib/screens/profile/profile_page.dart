@@ -6,14 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/repos/user_repo.dart';
 
 import '../../controllers/select_patient_controller.dart';
+import '../../models/login_type.dart';
 import 'change_password_modal.dart';
 
 class MyProfile extends StatefulWidget {
-  const MyProfile({super.key});
-
+  final LoginType loginType;
+  // const MyProfile({super.key});
+  const MyProfile({Key? key, required this.loginType}) : super(key: key);
+  
   @override
   State<MyProfile> createState() => _MyProfileState();
 }
@@ -33,10 +37,6 @@ Future<String> pickImage({ImageSource? source,}) async {
       if (getImage != null) {
         path = '';
         imageFile = getImage;
-        // Image.file(File(selectedImage!.path))
-        // XFile? file = XFile(imageFile!.path); 
-        // String fileName = file.path.split('/').last;
-        // File(imageFile!.path),
         path = getImage.path;
         setState(() {});
       } else {
@@ -359,6 +359,9 @@ Future<String> pickImage({ImageSource? source,}) async {
           ),
         ),
       ),
+        endDrawer: widget.loginType == LoginType.patient ? 
+        const AppDrawerNavigation(loginType: LoginType.patient) :
+        const AppDrawerNavigation(loginType: LoginType.caregiver) ,
     );
   }
 }

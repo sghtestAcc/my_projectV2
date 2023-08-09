@@ -1,10 +1,6 @@
 import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -403,21 +399,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
                 widget.loginType == LoginType.patient
                     ?
-                    // Expanded(
-                    //     child: ListView.separated(
-                    //       padding: const EdgeInsets.all(10.0),
-                    //       itemCount: 10,
-                    //       separatorBuilder: (context, index) {
-                    //         return const SizedBox(
-                    //           height: 10,
-                    //         );
-                    //       },
-                    //       itemBuilder: (context, index) {
-                    //         return buildCard(index);
-                    //         // return patientcard(index);
-                    //       },
-                    //     ),
-                    //   )
                     Container(
                         padding: const EdgeInsets.all(20.0),
                         child: Container(
@@ -493,7 +474,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               height: 20,
                             ),
                             FutureBuilder<List<Medication>>(
-                                future: userRepo.displayAllPatientsMedications(currentUid),
+                                future: userRepo.displayPatientsMedications(currentUid),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.done) {
@@ -645,7 +626,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                   ),
                                                 ],
                                               ),
-                                               patientcard(index,uid),
+                                               caregiverPatientCardView(index,uid),
                                             ],
                                           ),
                                         );

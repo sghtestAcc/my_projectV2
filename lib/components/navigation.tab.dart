@@ -17,21 +17,22 @@ class NavigatorBar extends StatefulWidget {
 class _NavigatorBarState extends State<NavigatorBar> {
   // int selectedIndex = 0;
   final screens = [
-     PatientHomeScreen(
+     const PatientHomeScreen(
       loginType: LoginType.patient),
-     CommunicationsScreen(
+     const CommunicationsScreen(
       loginType: LoginType.patient,
     ),
-    MyProfile()
+   const MyProfile(loginType: LoginType.patient)
   ];
 
   final screens2 = [
      PatientHomeScreen(
       loginType: LoginType.caregiver),
-     CommunicationsScreen(
+   CommunicationsScreen(
       loginType: LoginType.caregiver,
     ),
-    SelectPatientScreen()
+    SelectPatientScreen(),
+    const MyProfile(loginType: LoginType.caregiver)
   ];
 
   @override
@@ -60,7 +61,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
         : Scaffold(
             body: screens2[widget.selectedIndex],
             bottomNavigationBar: BottomNavigationBar(
-              backgroundColor:Color(0xff1CA77A),
+              backgroundColor:const Color(0xff1CA77A),
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.white,
               currentIndex: widget.selectedIndex,
@@ -73,15 +74,23 @@ class _NavigatorBarState extends State<NavigatorBar> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),
                   label: 'Home',
+                  backgroundColor:Color(0xff1CA77A),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.comment),
                   // assets/images/chat-box.png
                   label: 'Communications',
+                   backgroundColor:Color(0xff1CA77A),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.list_outlined),
+                  label: 'Patients',
+                   backgroundColor:Color(0xff1CA77A),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.person),
-                  label: 'Patients',
+                  label: 'Profile',
+                   backgroundColor:Color(0xff1CA77A),
                 ),
               ],
             ),

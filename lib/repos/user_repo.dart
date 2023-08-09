@@ -113,18 +113,6 @@ Stream<ImagesUser?> getUserimages(String? uid) {
       });
 }
 
-// Future<ImagesUser?> getUserImages2(String? uid) async {
-//   final snapshot = await firestore
-//       .collection("users")
-//       .doc(uid)
-//       .collection('profile')
-//       .get();
-//   final imagesList = snapshot.docs
-//       .map((docSnapshot) => ImagesUser.fromSnapshot(docSnapshot))
-//       .single;
-//   return imagesList;
-// }
-
 // //retrieve caregivers questions function(of single users)
 Stream<List<String>> getQuestionsofPatient(String? email) {
   return firestore
@@ -144,7 +132,6 @@ Stream<List<String>> getQuestionsofPatient(String? email) {
       .map((querySnapshot) =>
           querySnapshot.docs.map((doc) => doc.data()["Question"].toString()).toList());
 }
-
 
 Future<bool> isQuestionsEmailExists(String email, String question) async {
   final CollectionReference usersCollection = firestore.collection('questions');
@@ -303,7 +290,6 @@ Future<void> deleteBothUserQuestions(
   }
 }
 
-
 Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
@@ -333,7 +319,7 @@ Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
   yield patientsWithMedications;
 }
 
-
+//getA
 Future<List<GraceUser>> getAllPatientsWithMedications() async {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
@@ -354,7 +340,7 @@ Future<List<GraceUser>> getAllPatientsWithMedications() async {
   return patientsWithMedications;
 }
 
-Future<List<Medication>> displayAllPatientsMedications(String? uid) async {
+Future<List<Medication>> displayPatientsMedications(String? uid) async {
   var patientDataMedications = await firestore
       .collection("users")
       .doc(uid)
@@ -369,7 +355,6 @@ Future<List<Medication>> displayAllPatientsMedications(String? uid) async {
 }
 
 Stream<List<Medication>> getPatientMedications(String? uid) {
-  // Fetch the data using Firestore's future method
   return firestore
       .collection("users")
       .doc(uid)
@@ -382,32 +367,6 @@ Stream<List<Medication>> getPatientMedications(String? uid) {
     return patientData;
   }).asStream(); // Convert the Future to a Stream
 }
-
-Future<bool> isEmailExists2(String email) async {
-    final CollectionReference usersCollection = firestore.collection('medications');
-    var snapshot = await usersCollection
-        .where('Email', isEqualTo: email)
-        .get();
-    var isEmailExists = snapshot.docs.isNotEmpty;
-    return isEmailExists; // If the snapshot has documents, email exists
-  }
-
-Future<List<Medication>> getAllPatientsMedications(String uid) async {
-  // final doesUserExists = await isEmailExists(email, LoginType.patient);
-  // if (!doesUserExists) throw Exception('User does not exists');
-  var patientDataMedications = await firestore
-      .collection("users")
-      .doc(uid)
-      .collection('medications')
-      .get();
-      final patientData = patientDataMedications.docs
-        .map(
-          (e) => Medication.fromSnapshot(e),
-        )
-        .toList();
-    return patientData;
-}
-
 
   //create caregivers questions function
   Future<void> createCaregiverUserQuestions(
@@ -468,22 +427,6 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
     return patientData;
   }
 
-
-   Future<List<GraceUser>> getMultipleUser(String email) async {
-    final snapshot = await firestore
-        .collection("users")
-        .where("Email", isEqualTo: email)
-        .get();
-    final patientData = snapshot.docs
-        .map(
-          (e) => GraceUser.fromSnapshot(e),
-        )
-        .toList();
-    return patientData;
-  }
-
-  
-
   Future<List<GraceUser>> getAllPatients() async {
     final snapshot = await firestore
         .collection("users")
@@ -497,5 +440,4 @@ Future<List<Medication>> getAllPatientsMedications(String uid) async {
     return patientData;
   }
 
-  getSingleUserQuestionPatient(String s) {}
 }

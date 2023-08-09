@@ -456,6 +456,10 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.circular(22), // Rounded corner radius
+                          side: const BorderSide(
+                          color: Colors.black, // Add your desired border color here
+                          width: 1, // Add your desired border width here
+                          ),
                         ),
                       ),
                       child: const Text(
@@ -478,7 +482,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
     primary: const Color(0xDDF6F6F6),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(22), // Rounded corner radius
-      side: BorderSide(
+      side: const BorderSide(
         color: Colors.black, // Add your desired border color here
         width: 1, // Add your desired border width here
       ),

@@ -263,7 +263,7 @@ final userRepo = Get.put(UserRepository());
                                                 ),
                                               ],
                                             ),
-                                             patientcard(index,uid),
+                                             caregiverPatientCardView(index,uid),
                                           ],
                                         ),
                                       );
