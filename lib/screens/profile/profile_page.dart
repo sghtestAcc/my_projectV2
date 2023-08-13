@@ -248,7 +248,6 @@ Future<String> pickImage({ImageSource? source,}) async {
                         imageCropperView(value, context);
                       }
                     });
-                // Add your button onPressed logic here
               },
               icon: Icon(Icons.edit), // Replace this with your desired icon
               iconSize: 30, // Adjust the icon size as needed
