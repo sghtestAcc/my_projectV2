@@ -82,7 +82,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             scaffoldMessengerKey.currentState?.showSnackBar(
-                              const SnackBar(content: Text('Email is required.')),
+                              const SnackBar(
+                                  content: Text('Email is required.')),
                             );
                             return 'Email is required.';
                           } else if (!value.contains('@')) {
@@ -105,7 +106,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const Align(
                         alignment: Alignment.centerLeft,
-                        child: Text('Full name', style: TextStyle(fontSize: 20)),
+                        child:
+                            Text('Full name', style: TextStyle(fontSize: 20)),
                       ),
                       const SizedBox(
                         height: 10,
@@ -120,19 +122,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   content: Text('Full name is required.')),
                             );
                             return 'Full name is required.';
-                          } else if (value.trim().split(' ').length < 2) {
-                            scaffoldMessengerKey.currentState?.showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Full name should contain at least two words.')),
-                            );
-                            return 'Full name should contain at least two words.';
-                          } else if (!RegExp(r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
+                            // } else if (value.trim().split(' ').length < 2) {
+                            //   scaffoldMessengerKey.currentState?.showSnackBar(
+                            //     const SnackBar(
+                            //         content: Text(
+                            //             'Full name should contain at least two words.')),
+                            //   );
+                            //   return 'Full name should contain at least two words.';
+                          } else if (!RegExp(
+                                  r"^[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)*$")
                               .hasMatch(value.trim())) {
                             scaffoldMessengerKey.currentState?.showSnackBar(
                               const SnackBar(
-                                  content: Text(
-                                      'Full name should start with capital letters.')),
+                                content: Text(
+                                    'Full name should start with capital letters.'),
+                              ),
                             );
                             return 'Full name should start with capital letters.';
                           }
@@ -183,20 +187,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Stack(
                   children: [
                     widget.registerType == LoginType.patient
-                  ?
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Image.asset(
-                        'assets/images/sghDesign.png',
-                        fit: BoxFit.contain
-                      ),
-                    ): Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Image.asset(
-                        'assets/images/sgh-design-caregiver.png',
-                         fit: BoxFit.contain
-                      ),
-                    ),
+                        ? Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Image.asset('assets/images/sghDesign.png',
+                                fit: BoxFit.contain),
+                          )
+                        : Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Image.asset(
+                                'assets/images/sgh-design-caregiver.png',
+                                fit: BoxFit.contain),
+                          ),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -209,13 +210,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               loginType: widget.registerType,
                             );
                             // if (await UserRepository.instance.createUser(user)) {
-                              await AuthenticationRepository.instance
-                                  .registerUser(
-                                email.text.trim(),
-                                password.text.trim(),
-                                widget.registerType,
-                                user
-                              );
+                            await AuthenticationRepository.instance
+                                .registerUser(
+                                    email.text.trim(),
+                                    password.text.trim(),
+                                    widget.registerType,
+                                    user);
                             // }
                             formData.currentState?.reset();
                           }
