@@ -11,7 +11,7 @@ package="com.example.voice_assistant">
     </intent>
 </queries>
     <application
-        android:label="my_project"
+        android:label="Grace App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
