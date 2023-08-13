@@ -117,12 +117,24 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                   var patientsInfoMedication = snapshot.data;
                                   final children = <Widget>[];
                                   for (var i = 0; i < patientsInfoMedication!.length; i++) {
-                                  children.add(
+                                     children.add(
                                   Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                   Text(
-                                  'Feed ${patientsInfoMedication[i].labels} during the ${patientsInfoMedication[i].schedule}',
+                                  '${patientsInfoMedication[i].labels}',
+                                  style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                                    ),
+                                   ]),
+                                  );
+                                  children.add(SizedBox(height: 10,));
+                                  children.add(
+                                  Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                 
+                                  Text(
+                                  'Take ${patientsInfoMedication[i].quantity} during the ${patientsInfoMedication[i].schedule}',
                                   style: TextStyle(fontSize: 15),
                                     ),
                                   SizedBox(height: 10,),

@@ -104,7 +104,6 @@ Future<void> changepassword(String? email, String oldpassword, String newpasswor
       );
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
-    // await FirebaseAuth.instance.currentUser!.updatePassword(newpassword);
   } catch (e) {
      Get.snackbar(
         'Invalid',

@@ -202,70 +202,90 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           }
                         },
                       )
-                    : Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Image.asset(
-                'assets/images/new-sgh-design.png',
-              ),
-              Image.asset(
-                'assets/images/final-grace-background.png',
-                height: 125,
-                width: 125,
-                fit: BoxFit.cover,
-              ),
-              Positioned.fill(
-                child: Transform.translate(
-            offset: Offset(0, 40), // Adjust the vertical offset to move the TextField downward
-            child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end, // Align the content to the end (bottom)
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Hi Welcome $currentEmail",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                    : FutureBuilder(
+                      future: controller.getPatientData(),
+                      builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData) {
+                           var patientsInfo = snapshot.data;
+                                                  return Stack(
+                                alignment: Alignment.topCenter,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/new-sgh-design.png',
+                                  ),
+                                  Image.asset(
+                                    'assets/images/final-grace-background.png',
+                                    height: 125,
+                                    width: 125,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Positioned.fill(
+                                    child: Transform.translate(
+                                offset: Offset(0, 40), // Adjust the vertical offset to move the TextField downward
+                                child: Padding(
+                                  padding: EdgeInsets.all(20.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end, // Align the content to the end (bottom)
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                        "Hi Welcome ${patientsInfo?.name}",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                                      ),
+                                      Text(
+                        'How can I help you today?',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                                      ),
+                                      SizedBox(height: 10,),
+                                      Container(
+                         decoration: BoxDecoration(
+                          color: Colors.white,
+                                     borderRadius: BorderRadius.all(Radius.circular(18)), 
+                                     border: Border.all(color: Colors.black, width: 1),
+                                      ),
+                        child: TextField(
+                          decoration: InputDecoration(
+                             border: InputBorder.none,
+                            prefixIcon: Icon(Icons.search),
+                            hintText: 'Quick search a patient here',
+                          ),
+                          onChanged: (val) {
+                            setState(() {
+                              specificPatients = val;
+                            });
+                          },
+                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                    ),
+                                  ),
+                                ],
+                                      );
+
+                        }  else if (snapshot.hasError) {
+                          print("Error: ${snapshot.error}"); 
+                              return Center(child: Text(snapshot.error.toString()));
+                        } else {
+                              return const Center(
+                                  child: Text('Something went wrong'));
+                          }
+
+                      }  else {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                      }
                     ),
-                  ),
-                  Text(
-                    'How can I help you today?',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10,),
-                  Container(
-                     decoration: BoxDecoration(
-                      color: Colors.white,
-                 borderRadius: BorderRadius.all(Radius.circular(18)), 
-                 border: Border.all(color: Colors.black, width: 1),
-                  ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                         border: InputBorder.none,
-                        prefixIcon: Icon(Icons.search),
-                        hintText: 'Quick search a patient here',
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          specificPatients = val;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-                ),
-              ),
-            ],
-                  ),
                 widget.loginType == LoginType.patient
                     ?  Container(
                           padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -332,8 +352,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 },
                                 child: Image.asset(
                                   'assets/images/drugs.png',
-                                  height: 90,
-                                  width: 90,
+                                  height: 75,
+                                  width: 75,
                                 ),
                               ),
                               GestureDetector(
@@ -346,8 +366,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   },
                                   child: Image.asset(
                                     'assets/images/mic.png',
-                                    height: 90,
-                                    width: 90,
+                                    height: 75,
+                                    width: 75,
                                   )),
                               GestureDetector(
                                 onTap: () async {
@@ -359,8 +379,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                } ,
                                 child:  Image.asset(
                                 'assets/images/photo-camera.png',
-                                height: 90,
-                                width: 90,
+                                height: 75,
+                                width: 75,
                               ),
                               )
                             ],
@@ -371,15 +391,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   children: [
                     Text(
                       'Prescriptions',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Vocalization',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'PhotoScanner',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),

@@ -10,8 +10,9 @@ class SelectPatientController extends GetxController {
   final _authRepo = Get.put(AuthenticationRepository());
   final _userRepo = Get.put(UserRepository());
 
-  Future<GraceUser?> getPatientData() async {
-    final email = _authRepo.firebaseUser.value?.email;
+
+   Future<GraceUser?> getPatientData() async {
+    String? email = _authRepo.firebaseUser.value?.email;
     if (email == null) {
       Get.snackbar("Error", "Could not show email.");
       return null;

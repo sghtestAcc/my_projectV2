@@ -8,7 +8,6 @@ import '../screens/camera/camera_home_patient_meds.dart';
 
 class AppDrawerNavigationNew extends StatefulWidget {
   int selectedScreen = 0;
-  // const AppDrawerNavigationNew({super.key});
   AppDrawerNavigationNew({Key? key, this.selectedScreen = 0}) : super(key: key);
 
   @override
@@ -19,7 +18,7 @@ class _AppDrawerNavigationNewState extends State<AppDrawerNavigationNew> {
 
   String changedText = '';
   String sourceLang = 'English';
-   final languagePicker = TranslateLanguage.values
+  final languagePicker = TranslateLanguage.values
   .map(
   (e) => e.name.capitalize!,
   )

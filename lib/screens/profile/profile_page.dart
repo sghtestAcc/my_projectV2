@@ -8,6 +8,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/repos/user_repo.dart';
+import 'package:my_project/screens/profile/edit_profile_modal.dart';
 
 import '../../controllers/select_patient_controller.dart';
 import '../../models/login_type.dart';
@@ -259,12 +260,15 @@ Future<String> pickImage({ImageSource? source,}) async {
           ],
               ),
               const SizedBox(height: 20,),
-              FutureBuilder(
-          future: controller.getPatientData(),
+              StreamBuilder(
+          stream: userRepo.getUserStream(profileuid),
           builder: (context, snapshot) {
-           if (snapshot.connectionState == ConnectionState.done) {
-            if(snapshot.hasData) {
-              var patientsInfo = snapshot.data;
+            if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+                } else if (snapshot.hasData) {
+                  var patientsInfo = snapshot.data;
                   return Container(
           padding: EdgeInsets.all(20.0),
           margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -285,7 +289,7 @@ Future<String> pickImage({ImageSource? source,}) async {
                      ChangePasswordModal(context);
                   },
                   child: Text("edit", style: 
-                  TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+                  TextStyle(fontSize: 20, fontWeight: FontWeight.normal, color: Colors.blue),
                   ),)
               ],
               ),
@@ -298,7 +302,7 @@ Future<String> pickImage({ImageSource? source,}) async {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Email', style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                const Text('Email:', style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
                 Text('${patientsInfo?.email}', style: const TextStyle(fontSize: 20),),
               ],
               ),
@@ -311,7 +315,7 @@ Future<String> pickImage({ImageSource? source,}) async {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Full Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                const Text('Full Name:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                 Text('${patientsInfo?.name}', style: const TextStyle(fontSize: 20),),
               ],
               ),
@@ -323,16 +327,11 @@ Future<String> pickImage({ImageSource? source,}) async {
             ],
           ),
             );
-            }  else if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-            } else {
-            return const Center(
-            child: Text('Something went wrong'));
-            }
-           } else {
-            return const Center(child: CircularProgressIndicator());
-            }
-              
+
+                    
+                }  else {
+            return const Center(child: Text('Something went wrong'));
+                }
           }
               ),
                Container(
@@ -351,7 +350,27 @@ Future<String> pickImage({ImageSource? source,}) async {
                       ),
                     ),
                     child: const Text(
-                      'Edit Profile',
+                      'Edit Profile Image',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                    )),
+               ),
+              Container(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          width: double.infinity,
+           child: ElevatedButton(
+                    onPressed: () {
+                        EditUserDetailsModal(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0CE25C),
+                      // minimumSize: const Size(320, 50), // NEW
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Rounded corner radius
+                      ),
+                    ),
+                    child: const Text(
+                      'Edit Full Name',
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                     )),
                ),

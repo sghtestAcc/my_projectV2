@@ -59,8 +59,8 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                 children: [
                   const SizedBox(height: 10,),
                   Container(
-                    padding: EdgeInsets.all(20.0),
-                    child: Text('No medications to be found')),
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                    child: Text('No medications has been added yet.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),
                 ],
               ),
             );
@@ -76,7 +76,6 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                           onTap: () {
                             setState(() {
                               isItemExpanded[i] = !isItemExpanded[i];
-                              // Handle the onTap event for each item if needed
                             });
                           },
                           child: Row(

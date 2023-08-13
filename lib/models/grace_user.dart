@@ -51,7 +51,6 @@ class GraceUser {
       id: document.id,
       email: data["Email"],
       name: data["Name"],
-      // question: data["Question"],
       loginType: LoginType.values.firstWhere(
         (element) => element.name == data['LoginType'],
       ),

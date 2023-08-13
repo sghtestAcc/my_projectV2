@@ -160,7 +160,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
           content: Container(
             padding: const EdgeInsets.all(10.0),
             child: DropdownButton(
-              hint: const Text('English'),
+              hint: Text('English'),
               value: sourceLang,
               onChanged: (newValue) {
                 setState(() {

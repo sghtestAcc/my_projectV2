@@ -64,6 +64,39 @@ class UserRepository extends GetxController {
     }
   }
 
+  Future<void> editPatientDetails(
+  String name,
+  BuildContext context
+) async {
+  try {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance.collection("users")
+    .doc(uid)
+    .update({
+      "Name":name,
+    });
+
+    Get.snackbar(
+      "Congrats",
+      "Users Full Name has been updated.",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
+    );
+  // ignore: use_build_context_synchronously
+    Navigator.pop(context);
+  } catch (error) {
+    Get.snackbar(
+      "Error",
+      "Failed to update Users name.",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7)
+    );
+    print(error.toString());
+  }
+}
+
   Future<void> addImage(
   XFile? image,
   String uid,
@@ -89,7 +122,7 @@ class UserRepository extends GetxController {
   } catch (error) {
     Get.snackbar(
       "Error",
-      "Failed to edit image",
+      "Please select an image to set profile picture",
       snackPosition: SnackPosition.TOP,
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
       colorText: Color(0xFFF6F3E7)
@@ -300,7 +333,7 @@ Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
 
   final List<Future<bool>> hasMedicationsFutures = [];
   List<GraceUser> patientsWithMedications = [];
-
+  
   for (var userDoc in usersSnapshot.docs) {
     String uid = userDoc.id;
     hasMedicationsFutures.add(isPatientMedicationsExists(uid));
@@ -319,6 +352,7 @@ Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
   }
   yield patientsWithMedications;
 }
+
 
 Future<List<GraceUser>> getAllPatientsWithMedications() async {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
@@ -413,19 +447,37 @@ Stream<List<Medication>> getPatientMedications(String? uid) {
     }
   }
 
+  Future<GraceUser?> getUser(String? email) async {
+  String uid = FirebaseAuth.instance.currentUser!.uid;
+  final snapshot = await firestore
+      .collection("users")
+      .doc(uid)
+      .get();
 
-  Future<GraceUser?> getUser(String email) async {
-    final snapshot = await firestore
-        .collection("users")
-        .where("Email", isEqualTo: email)
-        .get();
-    final patientData = snapshot.docs
-        .map(
-          (e) => GraceUser?.fromSnapshot(e),
-        )
-        .single;
+  if (snapshot.exists) {
+    final patientData = GraceUser.fromSnapshot(snapshot);
     return patientData;
+  } else {
+    return null;  // Document doesn't exist
   }
+}
+
+Stream<GraceUser?> getUserStream(String? uid) {
+  // Create a StreamController
+  StreamController<GraceUser?> userStreamController = StreamController<GraceUser?>();
+
+  firestore.collection("users").doc(uid).snapshots().listen((snapshot) {
+    if (snapshot.exists) {
+      final patientData = GraceUser.fromSnapshot(snapshot);
+      userStreamController.add(patientData);
+    } else {
+      userStreamController.add(null);  // Document doesn't exist
+    }
+  });
+
+  return userStreamController.stream;
+}
+
 
   Future<List<GraceUser>> getAllPatients() async {
     final snapshot = await firestore

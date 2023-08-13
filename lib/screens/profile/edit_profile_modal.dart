@@ -5,22 +5,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/repos/authentication_repository.dart';
+import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
- var formChangepassword = GlobalKey<FormState>();
+ var formEditDetails = GlobalKey<FormState>();
 
- TextEditingController oldpasswordText = TextEditingController();
-  TextEditingController newpasswordText =  TextEditingController();
+ TextEditingController newFullNameText = TextEditingController();
   final authRepo = Get.put(AuthenticationRepository());
   String? email = FirebaseAuth.instance.currentUser!.email;
  
- void ChangePasswordModal(BuildContext context) {
+ void EditUserDetailsModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return Container(
           child: SingleChildScrollView(
             child: Form(
-              key: formChangepassword,
+              key: formEditDetails,
               child: Container(
                 height: MediaQuery.of(context).size.height/ 1.5,
                 padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
@@ -32,8 +32,7 @@ import 'package:my_project/repos/authentication_repository.dart';
                       children: [
                         IconButton(
                           onPressed: () {
-                          oldpasswordText.clear();
-                          newpasswordText.clear();
+                          newFullNameText.clear();
                           Navigator.pop(context);
                           },
                           icon: Image.asset('assets/images/x-mark.png', height: 28, width: 28, fit: BoxFit.contain,),
@@ -41,48 +40,20 @@ import 'package:my_project/repos/authentication_repository.dart';
                       ],
                     ),
                     const Text(
-                      'Change Password',
+                      'Change Full Name',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
-                    const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Old password',
-                            style:
-                              TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                     Container(
-                          decoration: BoxDecoration(
-                            // Background color
-                            borderRadius:
-                                BorderRadius.circular(10.0), // Rounded border
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 1.0,
-                            ),
-                          ),
-                          child: TextFormField(
-                            controller: oldpasswordText,
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                            ),
-                          ),
-                        ),
                         const SizedBox(
                           height: 10,
                         ),
                     const Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'New Password',
+                            'New Full Name',
                             style:
                               TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
@@ -101,8 +72,7 @@ import 'package:my_project/repos/authentication_repository.dart';
                             ),
                           ),
                           child: TextFormField(
-                            obscureText: true,
-                            controller: newpasswordText,
+                            controller: newFullNameText,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.all(10.0),
                             ),
@@ -121,32 +91,45 @@ import 'package:my_project/repos/authentication_repository.dart';
                               ),
                             ),
                         onPressed: () async {
-                            if (oldpasswordText.text == null || oldpasswordText.text.isEmpty) {
+                            if (newFullNameText.text == null || newFullNameText.text.isEmpty) {
                             Get.snackbar(
                             "Error",
-                            "Please fill up old password.",
+                            "Please fill up Full Name.",
                             snackPosition: SnackPosition.TOP,
                             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                             colorText: Color(0xFFF6F3E7),
                             );
                             return;
-                            } else if (newpasswordText.text == null || newpasswordText.text.isEmpty) {
-                             Get.snackbar(
-                            "Error",
-                            "Please fill up mew password.",
-                            snackPosition: SnackPosition.TOP,
-                            backgroundColor: Color(0xFF35365D).withOpacity(0.3),
-                            colorText: Color(0xFFF6F3E7),
-                            );
-                          return;
                             } else {
-                            await authRepo.changepassword(email, oldpasswordText.text.trim(), newpasswordText.text.trim(),context);
-                            oldpasswordText.clear();
-                            newpasswordText.clear();
+                                await userRepo.editPatientDetails(newFullNameText.text.trim(), context);
+                                newFullNameText.clear();
                             }
+                          //   if (oldpasswordText.text == null || oldpasswordText.text.isEmpty) {
+                          //   Get.snackbar(
+                          //   "Error",
+                          //   "Please fill up old password.",
+                          //   snackPosition: SnackPosition.TOP,
+                          //   backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+                          //   colorText: Color(0xFFF6F3E7),
+                          //   );
+                          //   return;
+                          //   } else if (newpasswordText.text == null || newpasswordText.text.isEmpty) {
+                          //    Get.snackbar(
+                          //   "Error",
+                          //   "Please fill up mew password.",
+                          //   snackPosition: SnackPosition.TOP,
+                          //   backgroundColor: Color(0xFF35365D).withOpacity(0.3),
+                          //   colorText: Color(0xFFF6F3E7),
+                          //   );
+                          // return;
+                          //   } else {
+                          //   await authRepo.changepassword(email, oldpasswordText.text.trim(), newpasswordText.text.trim(),context);
+                          //   oldpasswordText.clear();
+                          //   newpasswordText.clear();
+                          //   }
                         },
                         child: const Text(
-                          'Change Password',
+                          'Change Full Name',
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
