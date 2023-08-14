@@ -22,7 +22,7 @@ import 'package:my_project/repos/authentication_repository.dart';
             child: Form(
               key: formChangepassword,
               child: Container(
-                height: MediaQuery.of(context).size.height/ 1.5,
+                height: MediaQuery.of(context).size.height/ 1.2,
                 padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,

@@ -333,6 +333,27 @@ Future<String> pickImage({ImageSource? source,}) async {
                 }
           }
               ),
+              SizedBox(height: 10,),
+                  Container(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          width: double.infinity,
+           child: ElevatedButton(
+                    onPressed: () {
+                        EditUserDetailsModal(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0CE25C),
+                      // minimumSize: const Size(320, 50), // NEW
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Rounded corner radius
+                      ),
+                    ),
+                    child: const Text(
+                      'Edit Full Name',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                    )),
+               ),
                Container(
           padding: EdgeInsets.all(20.0),
           width: double.infinity,
@@ -350,26 +371,6 @@ Future<String> pickImage({ImageSource? source,}) async {
                     ),
                     child: const Text(
                       'Edit Profile Image',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                    )),
-               ),
-              Container(
-          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-          width: double.infinity,
-           child: ElevatedButton(
-                    onPressed: () {
-                        EditUserDetailsModal(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0CE25C),
-                      // minimumSize: const Size(320, 50), // NEW
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12), // Rounded corner radius
-                      ),
-                    ),
-                    child: const Text(
-                      'Edit Full Name',
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                     )),
                ),

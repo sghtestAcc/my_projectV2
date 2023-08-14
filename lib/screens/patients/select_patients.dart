@@ -270,6 +270,9 @@ Future<void> addPatientsToCurrentUser() async {
             'name': selectedPatient.name,
           };
           await userCollection.add(patientData);
+          _isCheckedMap[uid] = false; // Set to false after adding the patient
+        }
+      }
           Get.snackbar(
           "Congrats",
           "A new user has been added to your list.",
@@ -277,9 +280,6 @@ Future<void> addPatientsToCurrentUser() async {
           backgroundColor: Color(0xFF35365D).withOpacity(0.5),
           colorText: Color(0xFFF6F3E7)
           );
-          _isCheckedMap[uid] = false; // Set to false after adding the patient
-        }
-      }
       setState(() {
         // No need to modify _allPatients, as we only modify _selectedPatients now
       });
