@@ -8,13 +8,11 @@ import 'package:my_project/screens/camera/patients_upload_meds.dart';
 
 import 'package:flutter/material.dart';
 
-
 class caregiverPatientCardView extends StatefulWidget {
   int index;
   final String uid;
   // patientcard(this.index, t{super.key});
   caregiverPatientCardView(this.index, this.uid, {Key? key}) : super(key: key);
-
   @override
   State<caregiverPatientCardView> createState() => _caregiverPatientCardViewState();
 }
@@ -105,11 +103,11 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                               ),
                               Text(
                                 medications[i].quantity,
-                                style: TextStyle(fontSize: 15),
+                                style: TextStyle(fontSize: 12),
                               ),
                               Text(
                                 medications[i].schedule,
-                                style: TextStyle(fontSize: 15),
+                                style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),

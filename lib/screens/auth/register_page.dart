@@ -122,13 +122,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   content: Text('Full name is required.')),
                             );
                             return 'Full name is required.';
-                            // } else if (value.trim().split(' ').length < 2) {
-                            //   scaffoldMessengerKey.currentState?.showSnackBar(
-                            //     const SnackBar(
-                            //         content: Text(
-                            //             'Full name should contain at least two words.')),
-                            //   );
-                            //   return 'Full name should contain at least two words.';
                           } else if (!RegExp(
                                   r"^[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)*$")
                               .hasMatch(value.trim())) {

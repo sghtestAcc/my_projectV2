@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/screens/communications/communications_screen.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/screens/home/patient_home.dart';
+import 'package:my_project/screens/home/home.dart';
 import 'package:my_project/screens/patients/select_patients.dart';
 import 'package:my_project/screens/profile/profile_page.dart';
 

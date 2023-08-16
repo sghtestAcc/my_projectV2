@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/repos/authentication_repository.dart';
-import 'package:my_project/screens/auth/forget_password.dart';
+import 'package:my_project/screens/auth/forget_password_page.dart';
 import 'package:my_project/screens/auth/register_page.dart';
 
 import '../../models/login_type.dart';

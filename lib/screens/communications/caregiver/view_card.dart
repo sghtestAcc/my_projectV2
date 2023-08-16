@@ -64,10 +64,17 @@ class _myCardPrescriptionState extends State<myCardPrescription> {
                                         },
                                         child: Column(
                                           children: [
-                                               Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            Row(
                                               children: [
-                                                Text('Feed ${medications[i].labels} during the ${medications[i].schedule}',
+                                                Text('${medications[i].labels}',
+                                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 10,),
+                                               Row(
+                                              children: [
+                                                Text('Feed ${medications[i].quantity} during the ${medications[i].schedule}',
                                                   style: TextStyle(fontSize: 15),
                                                 ),
                                               ],

@@ -9,7 +9,7 @@ import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/Add_questions_modal.dart';
 import 'package:my_project/screens/camera/camera_home_patient_meds.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/screens/home/patient_home.dart';
+import 'package:my_project/screens/home/home.dart';
 
 import '../../components/navigation_drawer_new.dart';
 
@@ -84,8 +84,6 @@ bool doesSecondWordContainTablets(String text) {
   }
   return words[1].toLowerCase() == 'tabs' || words[1].toLowerCase() == 'tablets';
 }
-
-
 
   void showAddMedsScheduleModal(BuildContext context) {
     showModalBottomSheet(

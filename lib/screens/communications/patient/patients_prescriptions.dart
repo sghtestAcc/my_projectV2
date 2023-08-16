@@ -5,7 +5,7 @@ import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/medications.dart';
-import 'package:my_project/screens/home/patient_home.dart';
+import 'package:my_project/screens/home/home.dart';
 
 import '../../../repos/authentication_repository.dart';
 import '../../../repos/user_repo.dart';

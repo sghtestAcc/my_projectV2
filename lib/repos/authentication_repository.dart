@@ -30,7 +30,7 @@ class AuthenticationRepository extends GetxController {
   //       ? Get.offAll(() => HomeScreen())
   //       : Get.offAll(() => NavigatorBar());
   // }
-
+//register function with backend validation -applies to both patients and caregivers-  
   Future<void> registerUser(
     String email,
     String password,
@@ -50,10 +50,8 @@ class AuthenticationRepository extends GetxController {
         'Invalid',
         RegisterFailure.fromCode(e.code).message,
         snackPosition: SnackPosition.TOP,
-        // backgroundColor: Colors.redAccent.withOpacity(0.1),
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7)
-        // colorText: Colors.red,
       );
     } catch (ex) {
       Get.snackbar(
@@ -147,6 +145,7 @@ Future<void> MedicationChecksDoubleLayer(
   }
 }
 
+//login function with backend validation - applies to both patients and caregivers - 
 Future<void> loginUser(
   String email,
   String password,
@@ -154,25 +153,19 @@ Future<void> loginUser(
 ) async {
   try {
     var emailExists = await userRepo.isEmailExists(email, loginType);
-    
     if (!emailExists) {
       Get.snackbar(
         'Invalid',
         'Login information, please sign up for an account',
         snackPosition: SnackPosition.TOP,
-        // backgroundColor: Colors.redAccent.withOpacity(0.1),
-        // colorText: Colors.red,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7)
       );
       return;
     }
-
     await _auth.signInWithEmailAndPassword(email: email, password: password);
-
     String uid = FirebaseAuth.instance.currentUser!.uid;
     var patientMedicationExists = await userRepo.isPatientMedicationsExists(uid);
-
     if (loginType == LoginType.patient && !patientMedicationExists) {
         Get.to(
           () => const PatientUploadMedsScreen(),
@@ -198,22 +191,10 @@ Future<void> loginUser(
       'Invalid',
       RegisterFailure.fromCode(e.code).message,
       snackPosition: SnackPosition.TOP,
-      // backgroundColor: Colors.redAccent.withOpacity(0.1),
-      // colorText: Colors.red,
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
       colorText: Color(0xFFF6F3E7)
     );
-  } catch (ex) {
-    Get.snackbar(
-      'Invalid',
-      "Something went wrong. Please try again.",
-      snackPosition: SnackPosition.TOP,
-      // backgroundColor: Colors.redAccent.withOpacity(0.1),
-      // colorText: Colors.red,
-      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-      colorText: Color(0xFFF6F3E7)
-    );
-  }
+  } 
 }
 
 

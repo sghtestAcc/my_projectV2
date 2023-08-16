@@ -61,27 +61,14 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 
-    static void setLocale(BuildContext context, Locale newLocale) {
-    _HomeScreenState? state = context.findAncestorStateOfType<_HomeScreenState>();
-    state?.setLocale(newLocale);
-  }
 
 }
 
 class _HomeScreenState extends State<HomeScreen> {
 
- Locale? _locale;
-
-  setLocale(Locale locale) {
-    setState(() {
-      _locale = locale;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     //  final localizations = AppLocalizations.of(context);
-
     return Scaffold(
   body: SingleChildScrollView(
     child: Center(
