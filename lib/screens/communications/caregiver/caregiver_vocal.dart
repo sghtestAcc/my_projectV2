@@ -30,6 +30,7 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
 
   String typedText = '';
 
+  //traslate text function of medication label
   Future<void> translateTextFunction(String changedText) async {
     setState(() {
       typedText = changedText;
@@ -60,15 +61,14 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
       )
       .toList();
   // PatientHomeScreen
-
     SpeechToText speechToText = SpeechToText();
 
   var isListening = false;
-  String text = 'Hello world';
   var containedtext = 'coms';
 
+String text = 'Hello world';
   final FlutterTts flutterTts = FlutterTts();
-
+// function to get text to speech of medication labels/name
   speak(String text) async {
     await flutterTts.setLanguage("en-US");
     await flutterTts.setPitch(1);
@@ -156,6 +156,7 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
                     suffixIcon: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // icon button with paste function of medication label/name
                         InkWell(
                           onTap: () {
                             Clipboard.getData('text/plain').then((value) {
@@ -198,7 +199,7 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
                 ),
 
                 StreamBuilder<List<Medication>>(
-                  stream: userRepo.getPatientMedications(widget.patientUid),
+                  stream: userRepo.getAllPatientMedications(widget.patientUid),
                   builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -259,6 +260,7 @@ class _CaregviersVocalScreenState extends State<CaregviersVocalScreen> {
                       ),
                     ),
                               ),
+                              // icon button with copy function of medication label/name
                               IconButton(
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: snapshot.data![index].labels)).then(

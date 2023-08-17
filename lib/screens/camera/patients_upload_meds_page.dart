@@ -7,7 +7,7 @@ import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/Add_questions_modal.dart';
-import 'package:my_project/screens/camera/camera_home_patient_meds.dart';
+import 'package:my_project/screens/camera/camera_patient_meds_page.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/home.dart';
 

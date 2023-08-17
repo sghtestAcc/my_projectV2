@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/repos/authentication_repository.dart';
-import 'package:my_project/screens/camera/patients_upload_meds.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 
  var formEditDetails = GlobalKey<FormState>();
 

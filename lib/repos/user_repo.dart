@@ -247,7 +247,7 @@ Future<String> uploadImageToStorage(String childName, XFile file) async {
   }
 }
 
-// Create patient medications
+// Create a single patient medications with these information
 Future<void> createPatientMedications(
   String? labels,
   XFile? pills,
@@ -259,7 +259,6 @@ Future<void> createPatientMedications(
     final pathRoute = 'medicationPills/$fileName';
     String imageUrl = await uploadImageToStorage(pathRoute, pills!);
     String uid = FirebaseAuth.instance.currentUser!.uid;
-
     await FirebaseFirestore.instance.collection("users").doc(uid)
     .collection('medications')
     .add({
@@ -268,7 +267,6 @@ Future<void> createPatientMedications(
       "Quantity":quantity,
       "Schedule": schedule
     });
-
     Get.snackbar(
       "Congrats",
       "A new medication has been added.",
@@ -324,6 +322,7 @@ Future<void> deleteBothUserQuestions(
   }
 }
 
+//display All patient with medications only  -applies caregivers pages-  
 Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
@@ -388,7 +387,8 @@ Future<List<Medication>> displayPatientsMedications(String? uid) async {
     return patientData;
 }
 
-Stream<List<Medication>> getPatientMedications(String? uid) {
+//display all patients with medication
+Stream<List<Medication>> getAllPatientMedications(String? uid) {
   return firestore
       .collection("users")
       .doc(uid)
@@ -447,13 +447,13 @@ Stream<List<Medication>> getPatientMedications(String? uid) {
     }
   }
 
+//get a single user -applies to both patients and caregivers-  
   Future<GraceUser?> getUser(String? email) async {
   String uid = FirebaseAuth.instance.currentUser!.uid;
   final snapshot = await firestore
       .collection("users")
       .doc(uid)
       .get();
-
   if (snapshot.exists) {
     final patientData = GraceUser.fromSnapshot(snapshot);
     return patientData;
@@ -474,11 +474,11 @@ Stream<GraceUser?> getUserStream(String? uid) {
       userStreamController.add(null);  // Document doesn't exist
     }
   });
-
   return userStreamController.stream;
 }
 
 
+//get all patients -applies to patients only-  
   Future<List<GraceUser>> getAllPatients() async {
     final snapshot = await firestore
         .collection("users")
@@ -491,5 +491,4 @@ Stream<GraceUser?> getUserStream(String? uid) {
         .toList();
     return patientData;
   }
-
 }

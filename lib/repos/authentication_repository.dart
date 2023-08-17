@@ -8,7 +8,7 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/error/register_failure.dart';
 
 import 'package:my_project/repos/user_repo.dart';
-import 'package:my_project/screens/camera/patients_upload_meds.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -64,6 +64,7 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
+//forgetpassword function with backend validation -applies to both patients and caregivers-  
   Future<void> forgetpassword(email) async {
     try{
       await _auth.sendPasswordResetEmail(email: email);
@@ -110,10 +111,6 @@ Future<void> changepassword(String? email, String oldpassword, String newpasswor
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7)
       );
-    // Handle the exception here or print the error message
-    print('An error occurred: $e');
-    // You can also throw the exception again to propagate it to the calling code
-    // throw e;
   }
 }
 

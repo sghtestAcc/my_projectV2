@@ -110,7 +110,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                       ),
                                       SizedBox(height: 10,),
                                        StreamBuilder<List<Medication>>(
-                                  stream: userRepo.getPatientMedications(patientsInfo?.id),
+                                  stream: userRepo.getAllPatientMedications(patientsInfo?.id),
                                   builder: (context, snapshot) {
                                   if(snapshot.connectionState == ConnectionState.done) {
                                   if(snapshot.hasData) {
@@ -251,7 +251,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                            height: 20,
                                           ),
                                           StreamBuilder<List<Medication>>(
-                          stream: userRepo.getPatientMedications(patientsInfo?.id),
+                          stream: userRepo.getAllPatientMedications(patientsInfo?.id),
                       builder: (context, snapshot) {
                          if(snapshot.connectionState == ConnectionState.done) {
                            if(snapshot.hasData) {

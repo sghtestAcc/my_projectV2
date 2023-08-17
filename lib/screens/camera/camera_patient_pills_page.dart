@@ -5,7 +5,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:my_project/screens/camera/patients_upload_meds.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 
 import '../../components/navigation_drawer_new.dart';
 
@@ -162,6 +162,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     );
   }
 
+//crop function for label/image scanner 
   Future<void> imageCropperView(String? path, BuildContext context) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: path!,
@@ -190,27 +191,21 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
         ),
       ],
     );
-
     if (croppedFile != null) {
       log('image cropped');
       imageFilepills = XFile(croppedFile.path);
-      // });
     } else {
-      // return '';
       log('do nothing');
     }
   }
 
+//function to get scanned text after from the image
     void getRecognisedText(XFile image) async {
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-
     final inputImage = InputImage.fromFilePath(image.path);
-
     final RecognizedText recognizedText =
         await textRecognizer.processImage(inputImage);
-
     await textRecognizer.close();
-
     scannedTextpills = "";
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
@@ -222,6 +217,8 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     setState(() {});
   }
 
+
+//function to pick image by gallery and camera -patients-
   Future<String> pickImage({ImageSource? source}) async {
     final picker = ImagePicker();
     String path = '';
@@ -231,8 +228,9 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
         path = '';
         textScanning = true;
         imageFilepills = getImage;
-           final compressedFile = await FlutterImageCompress.compressAndGetFile(imageFilepills!.path,"$compressedImagePath/file1.jpg",
-          quality: 5,
+        // function to compress file size of image before adding the medication parameters
+        final compressedFile = await FlutterImageCompress.compressAndGetFile(imageFilepills!.path,"$compressedImagePath/file1.jpg",
+        quality: 5,
           );
           imageFilepills = XFile(compressedFile!.path);
           path = getImage.path;

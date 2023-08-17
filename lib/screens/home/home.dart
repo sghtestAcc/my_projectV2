@@ -16,7 +16,7 @@ import 'package:my_project/screens/communications/patient/patients_prescriptions
 import 'package:my_project/screens/communications/patient/patients_vocalization.dart';
 import 'package:my_project/screens/home/patient_card.dart';
 import '../communications/bothusers/usersCameraScreen.dart';
-import '../communications/caregiver/caregiver_prescription_patient_view.dart';
+import '../communications/caregiver/caregiver_vocalization_patient_view.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -42,6 +42,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   bool textScanning = false;
   String scannedText = "";
 
+
   Future<String> pickImage({ImageSource? source,}) async {
     final picker = ImagePicker();
     String path = '';
@@ -53,7 +54,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         imageFile = getImage;
         path = getImage.path;
         setState(() {});
-        // getRecognisedText(getImage);
       } else {
         path = '';
       }
@@ -95,26 +95,18 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         ),
       ],
     );
-
     if (croppedFile != null) {
       log('image cropped');
       imageFile = XFile(croppedFile.path);
-      // return croppedFile.path;
       // ignore: use_build_context_synchronously
       Navigator.push(
       context,
       MaterialPageRoute(
       builder: (context) =>
       RecognizePageBothUsers(path: croppedFile.path)));
-      // return XFile(croppedFile.path ?? );
-      // getRecognisedText(imageFile!);
-      // });
     } else if(scannedText == '') {
       log('do nothing');
       return;
-      // ignore: use_build_context_synchronously
-      // log('do nothing');
-          // return '';
     } else {
       log('do nothing');
     }

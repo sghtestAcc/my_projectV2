@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/repos/user_repo.dart';
-import 'package:my_project/screens/communications/communications_screen.dart';
+import 'package:my_project/screens/communications/communications_page.dart';
 
   final questionsText = TextEditingController();
   var formDataquestions = GlobalKey<FormState>();

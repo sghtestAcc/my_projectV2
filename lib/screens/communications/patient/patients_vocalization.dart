@@ -11,7 +11,7 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/models/login_type.dart';
 
-import '../communications_screen.dart';
+import '../communications_page.dart';
 
 class PatientsVocalScreen extends StatefulWidget {
   const PatientsVocalScreen({super.key});
@@ -212,7 +212,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                   ),
                       
                   StreamBuilder<List<Medication>>(
-                    stream: userRepo.getPatientMedications(currentUid!),
+                    stream: userRepo.getAllPatientMedications(currentUid!),
                     builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());

@@ -9,8 +9,8 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/screens/camera/camera_home_patient_pill.dart';
-import 'package:my_project/screens/camera/patients_upload_meds.dart';
+import 'package:my_project/screens/camera/camera_patient_pills_page.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 
 import '../../components/navigation_drawer_new.dart';
 

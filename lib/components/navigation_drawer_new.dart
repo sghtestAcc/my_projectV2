@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:my_project/screens/camera/camera_home_patient_pill.dart';
+import 'package:my_project/screens/camera/camera_patient_pills_page.dart';
 
 import '../repos/authentication_repository.dart';
-import '../screens/camera/camera_home_patient_meds.dart';
+import '../screens/camera/camera_patient_meds_page.dart';
 
 class AppDrawerNavigationNew extends StatefulWidget {
   int selectedScreen = 0;

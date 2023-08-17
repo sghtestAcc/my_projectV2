@@ -12,7 +12,7 @@ import 'package:my_project/screens/communications/patient/patients_vocalization.
 import '../repos/authentication_repository.dart';
 import '../screens/communications/bothusers/usersCameraScreen.dart';
 import '../screens/communications/caregiver/caregiver_prescription.dart';
-import '../screens/communications/caregiver/caregiver_prescription_patient_view.dart';
+import '../screens/communications/caregiver/caregiver_vocalization_patient_view.dart';
 
 class AppDrawerNavigation extends StatefulWidget {
   final LoginType loginType;

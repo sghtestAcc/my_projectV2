@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/medications.dart';
-import 'package:my_project/screens/camera/patients_upload_meds.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 
 import 'package:flutter/material.dart';
 
@@ -45,7 +45,7 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
               ),
                 if (isDropdownOpen)
                           StreamBuilder<List<Medication>>(
-                            stream: userRepo.getPatientMedications(widget.uid) ,
+                            stream: userRepo.getAllPatientMedications(widget.uid) ,
                             builder: (context, snapshot) {
                                if (snapshot.connectionState == ConnectionState.waiting) {
                               return Center(child: CircularProgressIndicator());

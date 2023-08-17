@@ -4,7 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
-import 'package:my_project/screens/camera/patients_upload_meds.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import 'package:my_project/screens/communications/caregiver/caregiver_prescription.dart';
 import 'package:my_project/screens/communications/caregiver/caregiver_vocal.dart';
 import '../../../components/navigation.tab.dart';
