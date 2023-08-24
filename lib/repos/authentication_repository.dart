@@ -67,6 +67,7 @@ class AuthenticationRepository extends GetxController {
 //forgetpassword function with backend validation -applies to both patients and caregivers-  
   Future<void> forgetpassword(email) async {
     try{
+// if function is successful, an congrat massage will be sent to user -applies to both patients and caregivers- 
       await _auth.sendPasswordResetEmail(email: email);
        Get.snackbar(
         'Congrats',
@@ -76,6 +77,7 @@ class AuthenticationRepository extends GetxController {
         colorText: Color(0xFFF6F3E7)
       );
     } catch (ex) {
+// if email is not matching firebase authemtication, error massage will be sent to user -applies to both patients and caregivers- 
       Get.snackbar(
         'Invalid',
         "This email does not exist.",
@@ -88,12 +90,13 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-
+//function to change password -applies to both Patients and Caregivers-
 Future<void> changepassword(String? email, String oldpassword, String newpassword,BuildContext context) async {
   try {
     var cred = EmailAuthProvider.credential(email: email ?? '', password: oldpassword);
     await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(cred).then
     ((value) => FirebaseAuth.instance.currentUser!.updatePassword(newpassword));
+    // if function is successful, show an change password message
      Get.snackbar(
         'Congrats',
         'Your password has been successfully changed',
@@ -103,7 +106,9 @@ Future<void> changepassword(String? email, String oldpassword, String newpasswor
       );
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
-  } catch (e) {
+  } 
+  // if function is not working, it means that password is not matching
+  catch (e) {
      Get.snackbar(
         'Invalid',
         'Your old password is not matching',
@@ -125,8 +130,6 @@ Future<void> MedicationChecksDoubleLayer(
         'Invalid',
         'You have not entered any medication yet!',
         snackPosition: SnackPosition.TOP,
-        // backgroundColor: Colors.redAccent.withOpacity(0.1),
-        // colorText: Colors.red,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7)
       );
@@ -163,18 +166,23 @@ Future<void> loginUser(
     await _auth.signInWithEmailAndPassword(email: email, password: password);
     String uid = FirebaseAuth.instance.currentUser!.uid;
     var patientMedicationExists = await userRepo.isPatientMedicationsExists(uid);
+    //check if its a patient login type with no medications (direct to add medications screen)
     if (loginType == LoginType.patient && !patientMedicationExists) {
         Get.to(
           () => const PatientUploadMedsScreen(),
         );
-    } else {
+    }
+    //check if its a patient login type with medications (direct to patient Home screen) 
+    else {
       if (loginType == LoginType.patient && patientMedicationExists) {
         Get.to(
         () => NavigatorBar(
               loginType: LoginType.patient,
             ),
       );
-      } else {
+      }
+       //else its a Caregiver Login type and (direct to Caregiver home Screen)
+      else {
         Get.to(
           () => NavigatorBar(
                 loginType: LoginType.caregiver,

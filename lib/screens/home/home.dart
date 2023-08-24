@@ -575,10 +575,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.done) {
                             if (snapshot.hasData) {
+
                               List<GraceUser> patients = snapshot.data!;
-                              // Apply search filter
-                              List<GraceUser> filteredPatients =
-                                  patients.where((patient) {
+                              // Apply search filter of patients with meds/no meds
+                              List<GraceUser> filteredPatients = patients.where((patient) {
                                 String email = patient.email ?? '';
                                 String name = patient.name ?? '';
                                 return email

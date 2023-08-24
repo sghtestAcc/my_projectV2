@@ -91,8 +91,8 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                 height: 20,
               ),
               ElevatedButton(
-                  onPressed: () {
-                    pickImage(source: ImageSource.gallery).then((value) {
+                  onPressed: () async {
+                       pickImage(source: ImageSource.gallery).then((value) {
                       if (value != '') {
                         imageCropperView(value, context);
                       }
@@ -199,24 +199,6 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     }
   }
 
-//function to get scanned text after from the image
-    void getRecognisedText(XFile image) async {
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-    final inputImage = InputImage.fromFilePath(image.path);
-    final RecognizedText recognizedText =
-        await textRecognizer.processImage(inputImage);
-    await textRecognizer.close();
-    scannedTextpills = "";
-    for (TextBlock block in recognizedText.blocks) {
-      for (TextLine line in block.lines) {
-        scannedTextpills += "${line.text} ";
-      }
-    }
-    controller.text = scannedTextpills; // Set the value of the TextEditingController to the scanned text
-    textScanning = false;
-    setState(() {});
-  }
-
 
 //function to pick image by gallery and camera -patients-
   Future<String> pickImage({ImageSource? source}) async {
@@ -229,13 +211,12 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
         textScanning = true;
         imageFilepills = getImage;
         // function to compress file size of image before adding the medication parameters
-        final compressedFile = await FlutterImageCompress.compressAndGetFile(imageFilepills!.path,"$compressedImagePath/file1.jpg",
-        quality: 5,
-          );
-          imageFilepills = XFile(compressedFile!.path);
+        // final compressedFile = await FlutterImageCompress.compressAndGetFile(imageFilepills!.path,"$compressedImagePath/file1.jpg",
+        // quality: 5,
+        //   );
+        //   imageFilepills = XFile(compressedFile!.path);
           path = getImage.path;
           setState(() {});
-          getRecognisedText(getImage);
       } else {
         path = '';
       }
@@ -244,9 +225,9 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
       imageFilepills = null;
       scannedTextpills = "Error occured while scanning";
       setState(() {});
-
       log(e.toString());
     }
     return path;
   }
+
 }

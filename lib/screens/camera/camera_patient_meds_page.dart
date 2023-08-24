@@ -248,14 +248,10 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   }
     void getRecognisedText(XFile image) async {
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-
     final inputImage = InputImage.fromFilePath(image.path);
-
     final RecognizedText recognizedText =
         await textRecognizer.processImage(inputImage);
-
     await textRecognizer.close();
-
     scannedText = "";
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
@@ -263,7 +259,6 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       }
     }
     controller.text = scannedText; // Set the value of the TextEditingController to the scanned text
-  
     textScanning = false;
     setState(() {});
   }
@@ -281,7 +276,6 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
         // Image.file(File(selectedImage!.path))
         XFile? file = XFile(imageFile!.path); 
         String fileName = file.path.split('/').last;
-        // File(imageFile!.path),
 
         print(await file.length());
         print(fileName);

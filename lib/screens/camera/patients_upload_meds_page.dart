@@ -6,7 +6,6 @@ import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/repos/user_repo.dart';
-import 'package:my_project/screens/camera/Add_questions_modal.dart';
 import 'package:my_project/screens/camera/camera_patient_meds_page.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/home.dart';
@@ -95,6 +94,7 @@ bool doesSecondWordContainTablets(String text) {
             child: Container(
               height: MediaQuery.of(context).size.height / 1.1,
               padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
+              // padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -203,8 +203,8 @@ bool doesSecondWordContainTablets(String text) {
                         ),
                       ),
                       onPressed: () async {
-                        if (medicineInput.text == null ||
-                            medicineInput.text.isEmpty) {
+                        //validation textfield of medicationQuantity if empty
+                        if (medicineInput.text == null ||medicineInput.text.isEmpty) {
                           Get.snackbar(
                             "Error",
                             "Medication Quantity is required.",
@@ -213,18 +213,17 @@ bool doesSecondWordContainTablets(String text) {
                             colorText: Color(0xFFF6F3E7),
                           );
                           return;
-                        } else if (!isMedicationQuantityValid(
-                            medicineInput.text)) {
+                        } 
+                        else if (!isMedicationQuantityValid(medicineInput.text)) {
                           Get.snackbar(
                             "Error",
-                            "Medication Quantity is invalid.The first word should contain a number between 1 and 100.",
+                            "Medication Quantity is invalid.The first word should contain a number",
                             snackPosition: SnackPosition.TOP,
                             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                             colorText: Color(0xFFF6F3E7),
                           );
                           return;
-                        } else if (!doesSecondWordContainTablets(
-                            medicineInput.text)) {
+                        } else if (!doesSecondWordContainTablets(medicineInput.text)) {
                           Get.snackbar(
                             "Error",
                             "Second word should contain 'tabs' or 'tablets'.",
@@ -233,8 +232,9 @@ bool doesSecondWordContainTablets(String text) {
                             colorText: Color(0xFFF6F3E7),
                           );
                           return;
-                        } else if (medsScheduleInput.text == null ||
-                            medsScheduleInput.text.isEmpty) {
+                        } 
+                        //validation textfield of medicationSchedule if empty
+                        else if (medsScheduleInput.text == null || medsScheduleInput.text.isEmpty) {
                           Get.snackbar(
                             "Error",
                             "Medication Schedule is required.",
@@ -243,7 +243,8 @@ bool doesSecondWordContainTablets(String text) {
                             colorText: Color(0xFFF6F3E7),
                           );
                           return;
-                        } else {
+                        } 
+                        else {
                           convertText();
                           medicineInput.clear();
                           medsScheduleInput.clear();
@@ -322,23 +323,23 @@ bool doesSecondWordContainTablets(String text) {
                             const Text(
                               'New Patients Must',
                               style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const Text(
                               'upload your medication',
                               style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
                             const Text(
                               'These information would assist caregivers',
-                              style: TextStyle(fontSize: 15),
+                              style: TextStyle(fontSize: 12),
                             ),
                             const Text(
                               'in managing your medication effectively',
-                              style: TextStyle(fontSize: 15),
+                              style: TextStyle(fontSize: 12),
                             ),
                             const SizedBox(
                               height: 20,
@@ -422,7 +423,6 @@ bool doesSecondWordContainTablets(String text) {
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          // Color(0xFF35365D).withOpacity(0.3),
                                           backgroundColor: Color(0xFF35365D),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
@@ -556,42 +556,43 @@ bool doesSecondWordContainTablets(String text) {
                                   .infinity, // Set the width to expand to the available space
                               child: ElevatedButton(
                                 onPressed: () async {
+                                  // validation field of textmedicationlabel if empty
                                   if (textController1.text == null ||
                                       textController1.text.isEmpty) {
                                     Get.snackbar(
                                       "Error",
                                       "Please fill in the Medication Label.",
                                       snackPosition: SnackPosition.TOP,
-                                      backgroundColor:
-                                          Color(0xFF35365D).withOpacity(0.5),
+                                      backgroundColor:Color(0xFF35365D).withOpacity(0.5),
                                       colorText: Color(0xFFF6F3E7),
                                     );
                                     return;
-                                  } else if (medsQuantity.text == null ||
+                                  } 
+                                  // validation field of textmedicationQuantity if empty
+                                  else if (medsQuantity.text == null ||
                                       medsQuantity.text.isEmpty) {
                                     Get.snackbar(
                                       "Error",
                                       "Please fill in the Medication Quantity.",
                                       snackPosition: SnackPosition.TOP,
-                                      backgroundColor:
-                                          Color(0xFF35365D).withOpacity(0.5),
+                                      backgroundColor:Color(0xFF35365D).withOpacity(0.5),
                                       colorText: Color(0xFFF6F3E7),
                                     );
                                     return;
-                                  } else if (medsSchedule.text == null ||
+                                  } 
+                                   // validation field of textmedicationSchedule if empty
+                                  else if (medsSchedule.text == null ||
                                       medsSchedule.text.isEmpty) {
                                     Get.snackbar(
                                       "Error",
                                       "Please fill in the Medication Schedule.",
                                       snackPosition: SnackPosition.TOP,
-                                      backgroundColor:
-                                          Color(0xFF35365D).withOpacity(0.5),
+                                      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                                       colorText: Color(0xFFF6F3E7),
                                     );
                                     return;
                                   }
-                                  if (formDataQuestions.currentState!
-                                      .validate()) {
+                                  if (formDataQuestions.currentState!.validate()) {
                                     await userRepo.createPatientMedications(
                                       textController1.text.trim(),
                                       widget.imagetakenPill,

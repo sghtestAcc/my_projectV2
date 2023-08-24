@@ -212,7 +212,7 @@ String text = 'Hello world';
             } else if (snapshot.hasData) {
               return Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      height: 175,
+                      height: 200,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: snapshot.data!.length,
@@ -222,7 +222,7 @@ String text = 'Hello world';
                         itemBuilder: (context, index) => 
                         Container(
                             padding: const EdgeInsets.all(10.0),
-                            width: 125,
+                            width: 150,
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(22)),
                               color: const Color(0xFFF6F6F6),
@@ -242,7 +242,7 @@ String text = 'Hello world';
                             child: Column(
                               // crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                     Text(snapshot.data![index].labels),
+                     Text('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}'),
                     const SizedBox(height: 10),
                      ElevatedButton(
                     onPressed: () {

@@ -90,6 +90,8 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                             ),
                           ),
                       onPressed: () async {
+                         //front end validation if fullname textfield is empty 
+                        //-applies to both Patients and Caregivers-
                           if (newFullNameText.text == null || newFullNameText.text.isEmpty) {
                           Get.snackbar(
                           "Error",
@@ -99,7 +101,10 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                           colorText: Color(0xFFF6F3E7),
                           );
                           return;
-                          } else if (!RegExp(r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
+                          } 
+                          //every first letter in the word to be full caps in the users Fullname 
+                          //-applies to Both Patients and Caregivers-
+                          else if (!RegExp(r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
                             .hasMatch(newFullNameText.text.trim())) {
                            Get.snackbar(
                           "Error",

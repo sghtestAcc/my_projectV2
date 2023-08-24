@@ -146,7 +146,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                 ),
               ),
                   StreamBuilder<List<Map<String, dynamic>>>(
-                stream:  fetchSecondListData(),
+                stream:  fetchSelectedPatients(),
                 builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -245,6 +245,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     );
   }
 
+
+//add selected Patients that has medications
 Future<void> addPatientsToCurrentUser() async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
@@ -289,7 +291,8 @@ Future<void> addPatientsToCurrentUser() async {
   }
 }
 
- Stream<List<Map<String, dynamic>>> fetchSecondListData() {
+//fetch selected patients with medications of a single caregiver user 
+ Stream<List<Map<String, dynamic>>> fetchSelectedPatients() {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {

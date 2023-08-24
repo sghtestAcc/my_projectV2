@@ -210,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Don\'t have an account? Sign up',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 15,
                           decoration: TextDecoration.underline,
                         ),
                       ),

@@ -64,6 +64,7 @@ class UserRepository extends GetxController {
     }
   }
 
+//function to change fullname -applies to both Patients and Caregivers-
   Future<void> editPatientDetails(
   String name,
   BuildContext context
@@ -97,6 +98,7 @@ class UserRepository extends GetxController {
   }
 }
 
+//adding image for profile page -applies to both patients and caregivers-
   Future<void> addImage(
   XFile? image,
   String uid,
@@ -131,6 +133,7 @@ class UserRepository extends GetxController {
   }
 }
 
+//display user profile image -applies to both patients and caregivers-
 Stream<ImagesUser?> getUserimages(String? uid) {
   return firestore
       .collection("users")
@@ -146,7 +149,7 @@ Stream<ImagesUser?> getUserimages(String? uid) {
       });
 }
 
-// //retrieve caregivers questions function(of single users)
+//retrieve caregivers questions function(of single users)
 Stream<List<String>> getQuestionsofPatient(String? email) {
   return firestore
       .collection("questions")
@@ -166,6 +169,8 @@ Stream<List<String>> getQuestionsofPatient(String? email) {
           querySnapshot.docs.map((doc) => doc.data()["Question"].toString()).toList());
 }
 
+
+//check for identical questions within the same email
 Future<bool> isQuestionsEmailExists(String email, String question) async {
   final CollectionReference usersCollection = firestore.collection('questions');
   String lowerCaseQuestion = question.toLowerCase();
@@ -186,6 +191,7 @@ Future<bool> isQuestionsEmailExists(String email, String question) async {
   final doesUserExists = await isEmailExists(email, LoginType.patient);
   final doesUserQuestionExists = await isQuestionsEmailExists(email, question);
   if (!doesUserExists) return;
+  //apply the function to check for identical questions, if it exist show the user an error message
   if (doesUserQuestionExists) {
     Get.snackbar(
       "Error",
@@ -322,7 +328,7 @@ Future<void> deleteBothUserQuestions(
   }
 }
 
-//display All patient with medications only  -applies caregivers pages-  
+//display All patient with medications only -applies caregivers pages-  
 Stream<List<GraceUser>> getAllPatientsWithMedications2() async* {
   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
   final QuerySnapshot<Map<String, dynamic>> usersSnapshot =
@@ -462,10 +468,9 @@ Stream<List<Medication>> getAllPatientMedications(String? uid) {
   }
 }
 
-Stream<GraceUser?> getUserStream(String? uid) {
-  // Create a StreamController
-  StreamController<GraceUser?> userStreamController = StreamController<GraceUser?>();
 
+Stream<GraceUser?> getUserStream(String? uid) {
+  StreamController<GraceUser?> userStreamController = StreamController<GraceUser?>();
   firestore.collection("users").doc(uid).snapshots().listen((snapshot) {
     if (snapshot.exists) {
       final patientData = GraceUser.fromSnapshot(snapshot);

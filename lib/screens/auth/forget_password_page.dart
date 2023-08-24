@@ -51,6 +51,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
                validator: (value) {
+                  // if forget email textfield is empty -applies to Both Patients and Caregivers-
                   if (value == null || value.isEmpty) {
                   scaffoldMessengerKey.currentState?.showSnackBar(
                   const SnackBar(

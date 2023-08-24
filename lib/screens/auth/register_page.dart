@@ -122,9 +122,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   content: Text('Full name is required.')),
                             );
                             return 'Full name is required.';
-                          } else if (!RegExp(
-                                  r"^[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)*$")
-                              .hasMatch(value.trim())) {
+                          }
+                          //changed to every first letter in the word to be full caps in the users Fullname 
+                          //-applies to Both Patients and Caregivers-
+                          else if (!RegExp(r"^[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)*$").hasMatch(value.trim())) {
                             scaffoldMessengerKey.currentState?.showSnackBar(
                               const SnackBar(
                                 content: Text(
@@ -237,7 +238,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Text(
                             'Already have an account? Login',
                             style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 15,
                                 decoration: TextDecoration.underline),
                           ),
                         ],

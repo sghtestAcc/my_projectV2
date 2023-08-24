@@ -121,6 +121,8 @@ import 'package:my_project/repos/authentication_repository.dart';
                               ),
                             ),
                         onPressed: () async {
+                          //front end validation if oldpassword textfield is empty 
+                          //-applies to both Patients and Caregivers-
                             if (oldpasswordText.text == null || oldpasswordText.text.isEmpty) {
                             Get.snackbar(
                             "Error",
@@ -130,7 +132,10 @@ import 'package:my_project/repos/authentication_repository.dart';
                             colorText: Color(0xFFF6F3E7),
                             );
                             return;
-                            } else if (newpasswordText.text == null || newpasswordText.text.isEmpty) {
+                            } 
+                            //front end validation if newpassword textfield is empty 
+                          //-applies to both Patients and Caregivers-
+                            else if (newpasswordText.text == null || newpasswordText.text.isEmpty) {
                              Get.snackbar(
                             "Error",
                             "Please fill up mew password.",

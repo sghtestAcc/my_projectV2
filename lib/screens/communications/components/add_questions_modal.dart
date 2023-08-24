@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/repos/user_repo.dart';
-import 'package:my_project/screens/communications/communications_page.dart';
 
   final questionsText = TextEditingController();
   var formDataquestions = GlobalKey<FormState>();
@@ -13,10 +12,6 @@ import 'package:my_project/screens/communications/communications_page.dart';
   showModalBottomSheet(
     context: context,
     builder: (context) {
-      return FutureBuilder(
-        future: controller.getPatientData(),
-        builder: (context, snapshot) {
-              var patientsInfo = snapshot.data;
               return SingleChildScrollView(
                 child: Container(
                    height: MediaQuery.of(context).size.height / 1.25,
@@ -76,7 +71,9 @@ import 'package:my_project/screens/communications/communications_page.dart';
                             child: ElevatedButton(
                               onPressed: () async {
                                 if (formDataquestions.currentState!.validate()) {
-                                } if(questionsText.text == null || questionsText.text.isEmpty) {
+                                } 
+                                //validation textfield of questions of questions if empty -applies to both Patients and Caregivers-
+                                if(questionsText.text == null || questionsText.text.isEmpty) {
                                 Get.snackbar(
                                 "Error",
                                 "Please fill in, Question is required.",
@@ -85,7 +82,8 @@ import 'package:my_project/screens/communications/communications_page.dart';
                                 colorText: Color(0xFFF6F3E7)
                                 );
                                 return;
-                                  } else {
+                                  } 
+                                  else {
                                     await UserRepository.instance.createPatientUserQuestions(
                                       context,
                                       currentEmail!,
@@ -144,8 +142,7 @@ import 'package:my_project/screens/communications/communications_page.dart';
                   ),
                 ),
               );
-        }
-      );
+       
     },
   );
 }

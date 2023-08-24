@@ -225,7 +225,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
               } else if (snapshot.hasData) {
                 return Container(
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        height: 175,
+                        height: 200,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: snapshot.data!.length,
@@ -235,7 +235,8 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                           itemBuilder: (context, index) => 
                           Container(
                               padding: const EdgeInsets.all(10.0),
-                              width: 125,
+                              width: 150,
+                              //  height: MediaQuery.of(context).size.height/ 1,
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.all(Radius.circular(22)),
                                 color: const Color(0xFFF6F6F6),
@@ -253,13 +254,13 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                                 ),
                               ),
                               child: Column(
-                                // crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                       Text(snapshot.data![index].labels),
+
+                       Text('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}'),
                       const SizedBox(height: 10),
                        ElevatedButton(
                       onPressed: () {
-                        speak(snapshot.data![index].labels);
+                        speak('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}');
                       },
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
@@ -275,7 +276,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                                 ),
                                 IconButton(
                         onPressed: () {
-                          Clipboard.setData(ClipboardData(text: snapshot.data![index].labels)).then(
+                          Clipboard.setData(ClipboardData(text: 'Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}')).then(
                             (_) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
