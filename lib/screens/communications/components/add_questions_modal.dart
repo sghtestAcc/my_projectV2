@@ -4,8 +4,11 @@ import 'package:get/get.dart';
 import 'package:my_project/repos/user_repo.dart';
 
   final questionsText = TextEditingController();
+  final questionsText2 = TextEditingController();
+
   var formDataquestions = GlobalKey<FormState>();
-  String? currentEmail = FirebaseAuth.instance.currentUser!.email;
+  final currentEmail = FirebaseAuth.instance.currentUser!.email;
+  final currentEmail2 = FirebaseAuth.instance.currentUser!.email;
 
 
   void addQuestionsModal(BuildContext context) {
@@ -192,7 +195,7 @@ import 'package:my_project/repos/user_repo.dart';
                               ),
                             ),
                             child: TextFormField(
-                            controller: questionsText,
+                            controller: questionsText2,
                             maxLines: 3,
                             keyboardType: TextInputType.multiline,
                             decoration: const InputDecoration(
@@ -209,10 +212,9 @@ import 'package:my_project/repos/user_repo.dart';
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () async {
-                                if (formDataquestions.currentState!.validate()) {
-                                } 
+                               
                                 
-                                if(questionsText.text == null || questionsText.text.isEmpty) {
+                                if(questionsText2.text == null || questionsText2.text.isEmpty) {
                                 Get.snackbar(
                                 "Error",
                                 "Please fill in, Question is required.",
@@ -224,10 +226,10 @@ import 'package:my_project/repos/user_repo.dart';
                                   } else {
                                     await UserRepository.instance.createCaregiverUserQuestions(
                                       context,
-                                      currentEmail!,
-                                      questionsText.text.trim(),
+                                      currentEmail2!,
+                                      questionsText2.text.trim(),
                                     );
-                                    questionsText.clear();
+                                    questionsText2.clear();
                                   }      
                               },
                               style: ElevatedButton.styleFrom(
