@@ -479,7 +479,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                      addQuestionsModal2(context);
             },
   style: ElevatedButton.styleFrom(
-    primary: const Color(0xDDF6F6F6),
+    backgroundColor: const Color(0xDDF6F6F6),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(22), // Rounded corner radius
       side: const BorderSide(

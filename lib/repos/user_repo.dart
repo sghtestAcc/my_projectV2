@@ -254,43 +254,93 @@ Future<String> uploadImageToStorage(String childName, XFile file) async {
 }
 
 // Create a single patient medications with these information
+// Future<void> createPatientMedications(
+//   String? labels,
+//   List<XFile> pills,
+//   String quantity,
+//   String schedule,
+// ) async {
+//   try {
+//     final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+//     final pathRoute = 'medicationPills/$fileName';
+//     String imageUrl = await uploadImageToStorage(pathRoute, pills!);
+//     String uid = FirebaseAuth.instance.currentUser!.uid;
+//     await FirebaseFirestore.instance.collection("users").doc(uid)
+//     .collection('medications')
+//     .add({
+//       "Labels":labels,
+//       "Pills":imageUrl,
+//       "Quantity":quantity,
+//       "Schedule": schedule
+//     });
+//     Get.snackbar(
+//       "Congrats",
+//       "A new medication has been added.",
+//       snackPosition: SnackPosition.TOP,
+//       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+//       colorText: Color(0xFFF6F3E7)
+//     );
+//   } catch (error) {
+//     Get.snackbar(
+//       "Error",
+//       "Failed to add a medication",
+//       snackPosition: SnackPosition.TOP,
+//       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+//       colorText: Color(0xFFF6F3E7)
+//     );
+//     print(error.toString());
+//   }
+// }
+
 Future<void> createPatientMedications(
   String? labels,
-  XFile? pills,
+  List<XFile> pills,
   String quantity,
   String schedule,
 ) async {
   try {
-    final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    final pathRoute = 'medicationPills/$fileName';
-    String imageUrl = await uploadImageToStorage(pathRoute, pills!);
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance.collection("users").doc(uid)
-    .collection('medications')
-    .add({
-      "Labels":labels,
-      "Pills":imageUrl,
-      "Quantity":quantity,
-      "Schedule": schedule
-    });
+    List<String> imageUrls = [];
+
+    // Upload each image and store URL
+    for (XFile pill in pills) {
+      final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final pathRoute = 'medicationPills/$fileName';
+      String imageUrl = await uploadImageToStorage(pathRoute, pill);
+      imageUrls.add(imageUrl);
+    }
+
+    // Store all image URLs in one document
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .collection('medications')
+        .add({
+          "Labels": labels,
+          "Pills": imageUrls, // ✅ list of URLs
+          "Quantity": quantity,
+          "Schedule": schedule,
+        });
+
     Get.snackbar(
       "Congrats",
-      "A new medication has been added.",
+      "Medication has been added with ${imageUrls.length} image(s).",
       snackPosition: SnackPosition.TOP,
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-      colorText: Color(0xFFF6F3E7)
+      colorText: Color(0xFFF6F3E7),
     );
   } catch (error) {
     Get.snackbar(
       "Error",
-      "Failed to add a medication",
+      "Failed to add medication.",
       snackPosition: SnackPosition.TOP,
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-      colorText: Color(0xFFF6F3E7)
+      colorText: Color(0xFFF6F3E7),
     );
     print(error.toString());
   }
 }
+
 
 Future<void> deleteBothUserQuestions(
   BuildContext context,

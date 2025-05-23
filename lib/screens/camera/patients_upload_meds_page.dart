@@ -13,17 +13,17 @@ import 'package:my_project/screens/home/home.dart';
 import '../../components/navigation_drawer_new.dart';
 
 class PatientUploadMedsScreen extends StatefulWidget {
-  // final XFile? image;
-  const PatientUploadMedsScreen(
-      {Key? key, this.imagetakenText, this.imagetakenPill})
-      : super(key: key);
-
   final TextEditingController? imagetakenText;
-  final XFile? imagetakenPill;
+  final List<XFile> imagetakenPills;
+  // final XFile? image;
+  const PatientUploadMedsScreen({
+    Key? key, 
+    this.imagetakenText, 
+    this.imagetakenPills = const [],
+  }): super(key: key);
 
   @override
-  State<PatientUploadMedsScreen> createState() =>
-      _PatientUploadMedsScreenState();
+  State<PatientUploadMedsScreen> createState() => _PatientUploadMedsScreenState();
 }
 
 XFile? imageFile2;
@@ -53,7 +53,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
 
 
   bool isMedicationQuantityValid(String text) {
-  if (text == null || text.isEmpty) {
+  if (text.isEmpty|| text.isEmpty) {
     return false;
   }
 
@@ -72,7 +72,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
 }
 
 bool doesSecondWordContainTablets(String text) {
-  if (text == null || text.isEmpty) {
+  if (text.isEmpty|| text.isEmpty) {
     return false;
   }
 
@@ -204,7 +204,7 @@ bool doesSecondWordContainTablets(String text) {
                       ),
                       onPressed: () async {
                         //validation textfield of medicationQuantity if empty
-                        if (medicineInput.text == null ||medicineInput.text.isEmpty) {
+                        if (medicineInput.text.isEmpty||medicineInput.text.isEmpty) {
                           Get.snackbar(
                             "Error",
                             "Medication Quantity is required.",
@@ -234,7 +234,7 @@ bool doesSecondWordContainTablets(String text) {
                           return;
                         } 
                         //validation textfield of medicationSchedule if empty
-                        else if (medsScheduleInput.text == null || medsScheduleInput.text.isEmpty) {
+                        else if (medsScheduleInput.text.isEmpty|| medsScheduleInput.text.isEmpty) {
                           Get.snackbar(
                             "Error",
                             "Medication Schedule is required.",
@@ -595,7 +595,7 @@ bool doesSecondWordContainTablets(String text) {
                                   if (formDataQuestions.currentState!.validate()) {
                                     await userRepo.createPatientMedications(
                                       textController1.text.trim(),
-                                      widget.imagetakenPill,
+                                      widget.imagetakenPills,
                                       medsQuantity.text.trim(),
                                       medsSchedule.text.trim(),
                                     );

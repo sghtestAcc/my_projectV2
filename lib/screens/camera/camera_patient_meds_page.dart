@@ -7,6 +7,7 @@ import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_image_capture/multi_image_capture.dart';
 import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/camera/camera_patient_pills_page.dart';
@@ -25,9 +26,10 @@ class CameraHomePatientScreen extends StatefulWidget {
 
 class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   bool textScanning = false;
-  XFile? imageFile;
+  List<XFile> imageFiles = [];
   String scannedText = "";
   TextEditingController controller = TextEditingController();
+  List<XFile> imageFilepills = [];
 
   @override
   void initState() {
@@ -68,25 +70,42 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
               ),
               
               ElevatedButton(
-                  onPressed: () {
-                    pickImage(source: ImageSource.camera).then((value) {
-                      if (value != '') {
-                        imageCropperView(value, context);
-                      }
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0CE25C),
-                    minimumSize: const Size(320, 50), // NEW
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12), // Rounded corner radius
+                onPressed: () async {
+                  // Open MultiImageCapture screen for multi-photo capture
+                  final List<XFile> capturedFiles = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MultiImageCapture(
+                        onAddImage: (file) async {
+                          setState(() {
+                            imageFiles.add(XFile(file.path));
+                          });
+                        },
+                        onRemoveImage: (file) async {return true;},
+                        onComplete: (files) async {},
+                      ),
                     ),
+                  );
+                  // After MultiImageCapture closes, add images to your list and refresh UI
+                  if (capturedFiles != null && capturedFiles.isNotEmpty) {
+                    setState(() {
+                      imageFiles.addAll(capturedFiles);
+                    });
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0CE25C),
+                  minimumSize: const Size(320, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Capture Photo',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                  )),
+                ),
+                child: const Text(
+                  'Capture Photo',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+              ),
+
               const SizedBox(
                 height: 20,
               ),
@@ -115,11 +134,11 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
               ),
                   ElevatedButton(
                   onPressed: () { 
-                    if (imageFile == null) {
+                    if (imageFiles.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Please select an Medication Label image')),
                     );
-                    } else if (controller.text == null || controller.text.isEmpty) {
+                    } else if (controller.text.isEmpty || controller.text.isEmpty) {
                       Get.snackbar(
                       "Error",
                       "Please select an image with medication text",
@@ -149,20 +168,32 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
               const SizedBox(
                 height: 20,
               ),
-              if (!textScanning && imageFile == null)
+              // Image Display
+              if (!textScanning && imageFiles.isEmpty)
                 Container(
                   width: 200,
                   height: 200,
                   color: Colors.grey[300]!,
                 ),
-              if (imageFile != null)
+              if (imageFiles.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                   height: 200,
-                  child: Image.file(
-                    File(imageFile!.path),
-                    fit: BoxFit.fitWidth,
-                  ),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: imageFiles.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Image.file(
+                          File(imageFiles[index].path),  // Access path of each image
+                          fit: BoxFit.cover,
+                          width: 150,
+                          height: 200,
+                        ),
+                      );
+                    },
+                  )
                 ),
             
               const SizedBox(
@@ -238,30 +269,51 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
 
     if (croppedFile != null) {
       log('image cropped');
-      imageFile = XFile(croppedFile.path);
-      getRecognisedText(imageFile!);
-      // });
+      imageFiles.add(XFile(croppedFile.path));
+      getRecognisedText(imageFiles);
     } else {
       // return '';
       log('do nothing');
     }
   }
-    void getRecognisedText(XFile image) async {
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+  //   void getRecognisedText(XFile image) async {
+  //   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+  //   final inputImage = InputImage.fromFilePath(image.path);
+  //   final RecognizedText recognizedText =
+  //       await textRecognizer.processImage(inputImage);
+  //   await textRecognizer.close();
+  //   scannedText = "";
+  //   for (TextBlock block in recognizedText.blocks) {
+  //     for (TextLine line in block.lines) {
+  //       scannedText += "${line.text} ";
+  //     }
+  //   }
+  //   controller.text = scannedText; // Set the value of the TextEditingController to the scanned text
+  //   textScanning = false;
+  //   setState(() {});
+  // }
+
+  void getRecognisedText(List<XFile> images) async {
+  final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+  scannedText = "";
+
+  for (var image in images) {
     final inputImage = InputImage.fromFilePath(image.path);
-    final RecognizedText recognizedText =
-        await textRecognizer.processImage(inputImage);
-    await textRecognizer.close();
-    scannedText = "";
+    final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
         scannedText += "${line.text} ";
       }
     }
-    controller.text = scannedText; // Set the value of the TextEditingController to the scanned text
-    textScanning = false;
-    setState(() {});
   }
+
+  await textRecognizer.close();
+
+  controller.text = scannedText.trim(); // update controller with combined text
+  textScanning = false;
+  setState(() {});
+}
 
 
   Future<String> pickImage({ImageSource? source,}) async {
@@ -272,13 +324,13 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       if (getImage != null) {
         path = '';
         textScanning = true;
-        imageFile = getImage;
+        imageFiles.add(getImage);
         // Image.file(File(selectedImage!.path))
-        XFile? file = XFile(imageFile!.path); 
-        String fileName = file.path.split('/').last;
+        String fileName = getImage.path.split('/').last;
 
-        print(await file.length());
+        print(await getImage.length());
         print(fileName);
+        
         path = getImage.path;
         setState(() {});
         // getRecognisedText(getImage);
@@ -287,7 +339,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       }
     } catch (e) {
       textScanning = false;
-      imageFile = null;
+      imageFiles.isEmpty;
       scannedText = "Error occured while scanning";
       setState(() {});
       log(e.toString());
