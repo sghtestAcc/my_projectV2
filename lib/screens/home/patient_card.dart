@@ -89,12 +89,31 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    medications[i].pills,
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: (medications[i].pills.isNotEmpty)
+                                      ? SizedBox(
+                                          height: 50,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: medications[i].pills.length,
+                                            itemBuilder: (context, imgIdx) {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(right: 4),
+                                                child: Image.network(
+                                                  medications[i].pills[imgIdx],
+                                                  height: 50,
+                                                  width: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      : Container(
+                                          height: 50,
+                                          width: 50,
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.image_not_supported),
+                                        ),
                                 ),
                               ),
                               Text(

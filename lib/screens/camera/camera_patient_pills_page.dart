@@ -13,13 +13,14 @@ import '../../components/navigation_drawer_new.dart';
 class CameraHomePatientPillScreen extends StatefulWidget {
   final String? path;
   final TextEditingController? imagetakenText;
-  final List<XFile> imagetakenPills;
+  final List<XFile> imageFiles;
 
   const CameraHomePatientPillScreen({
     Key? key, 
     this.path, 
     this.imagetakenText,
-    this.imagetakenPills = const [],
+    this.imageFiles= const [],
+
     }) : super(key: key);
   @override
   State<CameraHomePatientPillScreen> createState() =>
@@ -80,11 +81,13 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                     context,
                     MaterialPageRoute(
                       builder: (context) => MultiImageCapture(
-                        onAddImage: (file) async {},
-                        onRemoveImage: (file) async {return true;},
-                        onComplete: (files) async {
-                          Navigator.pop(context, files);  // <-- this will close camera screen
+                        onAddImage: (file) async {
+                          setState(() {
+                            imageFilepills.add(XFile(file.path));
+                          });
                         },
+                        onRemoveImage: (file) async {return true;},
+                        onComplete: (files) async {},
                       ), 
                     )
                   ); // <-- uses your new function
@@ -141,7 +144,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                     ),
                   ),
                   child: const Text(
-                    'Upload Photo',
+                    'Upload Photos',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                   )),
               const SizedBox(
@@ -149,13 +152,20 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               ),
               ElevatedButton(
                   onPressed: () {
-                    if (imageFilepills.isNotEmpty) {
+                    if (imageFilepills.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Please select an image Pill')),
                     );
                     } else {
-                    Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => PatientUploadMedsScreen(imagetakenText: widget.imagetakenText,imagetakenPills: imageFilepills)));  
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PatientUploadMedsScreen(
+                            imagetakenText: widget.imagetakenText,
+                            imageFiles: widget.imageFiles,
+                            imageFilePills: imageFilepills,
+                          )
+                        )
+                      );  
                     }
                   },
                   style: ElevatedButton.styleFrom(

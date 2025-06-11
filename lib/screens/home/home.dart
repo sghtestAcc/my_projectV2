@@ -444,22 +444,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     return Column(
                                       children: [
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "${patientsInfo?.name}",
                                               style: const TextStyle(
                                                 fontSize: 15,
                                               ),
-                                            ),
-                                            const Text(
-                                              'Quantity',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            const Text(
-                                              'Schedule',
-                                              style: TextStyle(fontSize: 15),
                                             ),
                                           ],
                                         ),
@@ -507,45 +498,76 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           i++) {
                                         children.add(
                                           Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Container(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              SizedBox(
+                                                width: 70,
+                                                height: 150,
+                                                child: Container(
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(
-                                                        12), // Adjust the value as needed for the desired roundness
+                                                    borderRadius: BorderRadius.circular(12),
                                                     border: Border.all(
-                                                        color: Colors.black,
-                                                        width:
-                                                            1), // Set the border color and width
+                                                      color: Colors.black,
+                                                      width: 1,
+                                                    ),
                                                   ),
                                                   child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(
-                                                        12), // Same value as the BoxDecoration for rounded corners
-                                                    child: Image.network(
-                                                      patientsInfoMedication[i].pills,
-                                                      height: 50,
-                                                      width: 50,
-                                                      fit: BoxFit.cover,
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    child: ListView(
+                                                      children: [
+                                                        // Show packaging images
+                                                        ...patientsInfoMedication[i].packaging.map<Widget>((url) => Padding(
+                                                          padding: const EdgeInsets.only(bottom: 4),
+                                                          child: Image.network(
+                                                            url,
+                                                            height: 50,
+                                                            width: 50,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        )),
+                                                        // Show pills images
+                                                        ...patientsInfoMedication[i].pills.map<Widget>((url) => Padding(
+                                                          padding: const EdgeInsets.only(bottom: 4),
+                                                          child: Image.network(
+                                                            url,
+                                                            height: 50,
+                                                            width: 50,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        )),
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
-                                                Text(
-                                                  patientsInfoMedication[i].labels,
-                                                  style: TextStyle(fontSize: 15),
+                                              ),
+                                              const SizedBox(width: 10), // Add space between image and text
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Medication Name: ${patientsInfoMedication[i].labels}",
+                                                      style: TextStyle(fontSize: 15),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      "Dosage:",
+                                                      style: TextStyle(fontSize: 15),
+                                                    ),
+                                                    Text(
+                                                      patientsInfoMedication[i].schedule,
+                                                      style: TextStyle(fontSize: 15),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      "Total Quantity: ${patientsInfoMedication[i].quantity}",
+                                                      style: TextStyle(fontSize: 15),
+                                                    ),
+                                                  ],
                                                 ),
-                                                Text(
-                                                  patientsInfoMedication[i].quantity,
-                                                  style: TextStyle(fontSize: 15),
-                                                ),
-                                                Text(
-                                                  patientsInfoMedication[i].schedule,
-                                                  style: TextStyle(fontSize: 15),
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                              ]),
+                                              ),
+                                            ],
+                                          )
                                         );
                                         children.add(SizedBox(
                                           height: 10,

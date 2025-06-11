@@ -29,7 +29,6 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   List<XFile> imageFiles = [];
   String scannedText = "";
   TextEditingController controller = TextEditingController();
-  List<XFile> imageFilepills = [];
 
   @override
   void initState() {
@@ -62,7 +61,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 height: 20,
               ),
               const Text(
-                ' Upload for Medication Labels',
+                ' Upload for Medication Packaging',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
                const SizedBox(
@@ -110,25 +109,43 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 height: 20,
               ),
               ElevatedButton(
-                  onPressed: () {
-                    pickImage(source: ImageSource.gallery).then((value) {
-                      if (value != '') {
-                        imageCropperView(value, context);
-                      }
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0CE25C),
-                    minimumSize: const Size(320, 50), // NEW
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12), // Rounded corner radius
-                    ),
+                // onPressed: () async {
+                // // Pick multiple images using the ImagePicker
+                //   final List<XFile>? selectedImages = await ImagePicker().pickMultiImage();
+
+                //   if (selectedImages != null && selectedImages.isNotEmpty) {
+                //     // Add the selected images to your list and update UI
+                //     setState(() {
+                //       imageFiles.addAll(selectedImages);  // Add all selected images to imageFilepills list
+                //     });
+                //   }
+                // },
+                onPressed: () {
+                  // Pick multiple images using pickMultiImage
+                  pickImages().then((selectedImages) {
+                    if (selectedImages.isNotEmpty) {
+                      setState(() {
+                        imageFiles.addAll(selectedImages); // Add selected images to the list
+                      });
+
+                      // Directly process each selected image for text recognition
+                      getRecognisedText(selectedImages);  // Recognize text for all selected images
+                    }
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0CE25C),
+                  minimumSize: const Size(320, 50), // NEW
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(12), // Rounded corner radius
                   ),
-                  child: const Text(
-                    'Photo Files',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                  )),
+                ),
+                child: const Text(
+                  'Upload Photos',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                )
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -136,7 +153,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                   onPressed: () { 
                     if (imageFiles.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please select an Medication Label image')),
+                    SnackBar(content: Text('Please select an Medication Packaging image')),
                     );
                     } else if (controller.text.isEmpty || controller.text.isEmpty) {
                       Get.snackbar(
@@ -148,8 +165,13 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                       );
                       return; 
                     } else {
-                       Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(imagetakenText: controller))); 
+                      Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(
+                          imagetakenText: controller,
+                          imageFiles: imageFiles,
+                          )
+                        )
+                      ); 
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -202,7 +224,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
               Column(
                 children: [
                   const Text(
-                    'Translated Medication Label:',
+                    'Translated Medication Packaging:',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Row(
@@ -293,6 +315,37 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   //   setState(() {});
   // }
 
+  // Function to pick multiple images
+  Future<List<XFile>> pickImages() async {
+    final ImagePicker _picker = ImagePicker();
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    
+    // Return the selected images, or an empty list if nothing is selected
+    return pickedFiles ?? [];
+  }
+
+//   void getRecognisedText(List<XFile> images) async {
+//     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+//     scannedText = "";
+
+//     for (var image in images) {
+//       final inputImage = InputImage.fromFilePath(image.path);
+//       final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+
+//       for (TextBlock block in recognizedText.blocks) {
+//         for (TextLine line in block.lines) {
+//           scannedText += "${line.text} ";
+//         }
+//       }
+//     }
+
+//     await textRecognizer.close();
+
+//     controller.text = scannedText.trim(); // update controller with combined text
+//     textScanning = false;
+//     setState(() {});
+// }
+
   void getRecognisedText(List<XFile> images) async {
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
   scannedText = "";
@@ -303,49 +356,87 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
 
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
-        scannedText += "${line.text} ";
+        scannedText += "${line.text}\n";  // newline for better splitting
       }
     }
   }
 
   await textRecognizer.close();
 
-  controller.text = scannedText.trim(); // update controller with combined text
+  final extracted = extractMedicationInfo(scannedText);
+
+  controller.text = '''
+  ${extracted["Medication Name"]}
+  ${extracted["Dosage"]}
+  ${extracted["Total Quantity"]}
+  ${extracted["Instructions"]}
+  '''.trim();
+
   textScanning = false;
   setState(() {});
 }
 
-
-  Future<String> pickImage({ImageSource? source,}) async {
+  Future<String> pickImage({ImageSource? source}) async {
     final picker = ImagePicker();
     String path = '';
     try {
-      final getImage = await picker.pickImage(source: source!,imageQuality: 50);
+      final getImage = await picker.pickImage(source: source!, imageQuality: 50);
       if (getImage != null) {
-        path = '';
         textScanning = true;
-        imageFiles.add(getImage);
-        // Image.file(File(selectedImage!.path))
-        String fileName = getImage.path.split('/').last;
 
-        print(await getImage.length());
-        print(fileName);
-        
+        // ✅ Add this image to the list instead of replacing
+        setState(() {
+          imageFiles.add(getImage);
+        });
+
         path = getImage.path;
-        setState(() {});
-        // getRecognisedText(getImage);
       } else {
         path = '';
       }
     } catch (e) {
       textScanning = false;
-      imageFiles.isEmpty;
-      scannedText = "Error occured while scanning";
+      scannedText = "Error occurred while scanning";
       setState(() {});
       log(e.toString());
     }
-
     return path;
-  }
+  } 
 
+  Map<String, String> extractMedicationInfo(String fullText) {
+    final Map<String, String> result = {
+      "Medication Name": "",
+      "Dosage": "",
+      "Total Quantity": "",
+      "Instructions": "",
+    };
+
+    final lines = fullText.split('\n');
+
+    for (final line in lines) {
+      final lower = line.toLowerCase();
+
+      if (result["Medication Name"]!.isEmpty &&
+          RegExp(r'^[a-zA-Z]+').hasMatch(line)) {
+        result["Medication Name"] = line.trim();
+      }
+
+      if (result["Dosage"]!.isEmpty &&
+          RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).hasMatch(line)) {
+        result["Dosage"] =
+            RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).firstMatch(line)?.group(0) ?? "";
+      }
+
+      if (result["Total Quantity"]!.isEmpty &&
+          line.contains(RegExp(r'qty|quantity|\d+caplets', caseSensitive: false))) {
+        result["Total Quantity"] = line.replaceAll(RegExp(r'[^0-30]'), '');
+      }
+
+      if (result["Instructions"]!.isEmpty &&
+          (lower.contains("consume") || lower.contains("after meals") || lower.contains("drowsiness"))) {
+        result["Instructions"] = line.trim();
+      }
+    }
+
+  return result;
+  }
 }

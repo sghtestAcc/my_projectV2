@@ -294,20 +294,30 @@ Future<String> uploadImageToStorage(String childName, XFile file) async {
 
 Future<void> createPatientMedications(
   String? labels,
+  List<XFile> packagingImages,
   List<XFile> pills,
   String quantity,
   String schedule,
 ) async {
   try {
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    List<String> imageUrls = [];
+    List<String> pillsUrls = [];
+    List<String> packagingUrls = [];
 
     // Upload each image and store URL
     for (XFile pill in pills) {
       final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
       final pathRoute = 'medicationPills/$fileName';
       String imageUrl = await uploadImageToStorage(pathRoute, pill);
-      imageUrls.add(imageUrl);
+      pillsUrls.add(imageUrl);
+    }
+
+    // Upload packaging images
+    for (XFile packaging in packagingImages) {
+      final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final pathRoute = 'medications/$fileName';
+      String imageUrl = await uploadImageToStorage(pathRoute, packaging);
+      packagingUrls.add(imageUrl);
     }
 
     // Store all image URLs in one document
@@ -317,14 +327,15 @@ Future<void> createPatientMedications(
         .collection('medications')
         .add({
           "Labels": labels,
-          "Pills": imageUrls, // ✅ list of URLs
+          "Pills": pillsUrls, // ✅ list of URLs
+          "Packaging": packagingUrls,
           "Quantity": quantity,
           "Schedule": schedule,
         });
 
     Get.snackbar(
       "Congrats",
-      "Medication has been added with ${imageUrls.length} image(s).",
+      "Medication has been added with ${pillsUrls.length + packagingUrls.length} image(s).",
       snackPosition: SnackPosition.TOP,
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
       colorText: Color(0xFFF6F3E7),

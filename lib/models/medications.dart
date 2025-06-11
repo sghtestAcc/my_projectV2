@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Medication {
   final String? id;
   final String labels;
-  final String pills;
+  final List<String> pills;
+  final List<String> packaging;
   final String quantity;
   final String schedule;
   final String? email;
@@ -14,6 +15,7 @@ class Medication {
     this.id,
     required this.labels,
     required this.pills,
+    required this.packaging, 
     required this.quantity,
     required this.schedule,
     this.email,
@@ -24,7 +26,7 @@ class Medication {
   Medication copy({
     String? id,
     String? labels,
-    String? pills,
+    List<String>? pills, 
     String? quantity,
     String? schedule,
     String? email,
@@ -34,6 +36,7 @@ class Medication {
         id: id ?? this.id,
         labels: labels ?? this.labels,
         pills: pills ?? this.pills,
+        packaging: packaging ?? this.packaging,
         quantity: quantity ?? this.quantity,
         schedule: schedule ?? this.schedule,
         email: email ?? this.email,
@@ -44,6 +47,7 @@ class Medication {
     return {
       'Labels': labels,
       'Pills': pills,
+      'Packaging': packaging,
       'Quantity': quantity,
       'Schedule': schedule,
       'Email': email,
@@ -59,7 +63,8 @@ class Medication {
     return Medication(
       id: document.id,
       labels: data["Labels"],
-      pills: data["Pills"],
+      pills: (data["Pills"] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      packaging: (data["Packaging"] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       quantity: data["Quantity"],
       schedule: data["Schedule"],
       email: data["Email"],

@@ -14,12 +14,14 @@ import '../../components/navigation_drawer_new.dart';
 
 class PatientUploadMedsScreen extends StatefulWidget {
   final TextEditingController? imagetakenText;
-  final List<XFile> imagetakenPills;
+  final List<XFile> imageFiles;
+  final List<XFile> imageFilePills;
   // final XFile? image;
   const PatientUploadMedsScreen({
     Key? key, 
     this.imagetakenText, 
-    this.imagetakenPills = const [],
+    this.imageFiles = const [],
+    this.imageFilePills = const [],
   }): super(key: key);
 
   @override
@@ -36,6 +38,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   final currentUid = FirebaseAuth.instance.currentUser!.uid;
   TextEditingController medsLabel = TextEditingController();
   final controller = Get.put(SelectPatientController());
+
 
   TextEditingController medsQuantity = TextEditingController();
   TextEditingController medsSchedule = TextEditingController();
@@ -289,6 +292,8 @@ bool doesSecondWordContainTablets(String text) {
   @override
   Widget build(BuildContext context) {
     final textController1 = widget.imagetakenText ?? TextEditingController();
+    final imageFiles = widget.imageFiles;
+    final imageFilePills = widget.imageFilePills;
     return WillPopScope(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -593,9 +598,13 @@ bool doesSecondWordContainTablets(String text) {
                                     return;
                                   }
                                   if (formDataQuestions.currentState!.validate()) {
+                                    print('Packaging images count: ${widget.imageFiles.length}');
+                                    print('Pills images count: ${widget.imageFilePills.length}');
+                                    
                                     await userRepo.createPatientMedications(
                                       textController1.text.trim(),
-                                      widget.imagetakenPills,
+                                      widget.imageFiles,
+                                      widget.imageFilePills,
                                       medsQuantity.text.trim(),
                                       medsSchedule.text.trim(),
                                     );

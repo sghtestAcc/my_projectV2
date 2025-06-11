@@ -269,13 +269,32 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                 ),
                                   child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
-                                  child: Image.network(
-                                  patientsInfoMedication[i].pills ,
-                                  height: 50,
-                                  width: 50,
-                                  fit: BoxFit.cover,
+                                  child: (patientsInfoMedication[i].pills.isNotEmpty)
+                                      ? SizedBox(
+                                          height: 50,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: patientsInfoMedication[i].pills.length,
+                                            itemBuilder: (context, imgIdx) {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(right: 4),
+                                                child: Image.network(
+                                                  patientsInfoMedication[i].pills[imgIdx],
+                                                  height: 50,
+                                                  width: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      : Container(
+                                          height: 50,
+                                          width: 50,
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.image_not_supported),
+                                        ),
                                 ),
-                                                 ),
                                                 ),
                                     Text(patientsInfoMedication[i].labels, 
                                     style: TextStyle(fontSize: 15),
