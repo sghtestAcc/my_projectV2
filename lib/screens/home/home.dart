@@ -17,6 +17,7 @@ import 'package:my_project/screens/communications/patient/patients_vocalization.
 import 'package:my_project/screens/home/patient_card.dart';
 import '../communications/bothusers/usersCameraScreen.dart';
 import '../communications/caregiver/caregiver_vocalization_patient_view.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -406,6 +407,33 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
                 const SizedBox(
                   height: 10,
+                ),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0CE25C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PatientUploadMedsScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Add Medications',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(10.0),
