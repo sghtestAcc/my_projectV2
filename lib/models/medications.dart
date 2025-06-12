@@ -6,8 +6,9 @@ class Medication {
   final String labels;
   final List<String> pills;
   final List<String> packaging;
-  final String quantity;
+  final String dosage;
   final String schedule;
+  final String? quantity;
   final String? email;
   final String? name;
 
@@ -16,8 +17,9 @@ class Medication {
     required this.labels,
     required this.pills,
     required this.packaging, 
-    required this.quantity,
+    required this.dosage,
     required this.schedule,
+    this.quantity,
     this.email,
     this.name
   });
@@ -37,10 +39,11 @@ class Medication {
         labels: labels ?? this.labels,
         pills: pills ?? this.pills,
         packaging: packaging ?? this.packaging,
-        quantity: quantity ?? this.quantity,
+        dosage: dosage ?? this.dosage,
         schedule: schedule ?? this.schedule,
         email: email ?? this.email,
         name: name ?? this.name,
+        quantity: quantity ?? this.quantity,
       );
 
   toJson() {
@@ -48,10 +51,11 @@ class Medication {
       'Labels': labels,
       'Pills': pills,
       'Packaging': packaging,
-      'Quantity': quantity,
+      'Dosage': dosage,
       'Schedule': schedule,
       'Email': email,
-      'Name' : name
+      'Name' : name,
+      'Quantity': quantity,
     };
   }
 
@@ -65,10 +69,11 @@ class Medication {
       labels: data["Labels"],
       pills: (data["Pills"] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       packaging: (data["Packaging"] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
-      quantity: data["Quantity"],
+      dosage: data["Dosage"] ?? '',
       schedule: data["Schedule"],
       email: data["Email"],
       name: data["Name"],
+      quantity: data["Quantity"],
     );
   }
 

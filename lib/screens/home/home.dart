@@ -42,6 +42,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   XFile? imageFile;
   bool textScanning = false;
   String scannedText = "";
+  
+  get totalQuantityController => null;
 
 
   Future<String> pickImage({ImageSource? source,}) async {
@@ -131,7 +133,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
           child: Container(
-              height: MediaQuery.of(context).size.height/ 0.8,
+            // REMOVE the height constraint!
+            padding: EdgeInsets.only(bottom: 20), // Optional: add some bottom padding
             child: Column(
               children: [
                 widget.loginType == LoginType.patient
@@ -519,13 +522,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   if (snapshot.connectionState ==
                                       ConnectionState.done) {
                                     if (snapshot.hasData) {
-                                      var patientsInfoMedication = snapshot.data;
-                                      final children = <Widget>[];
-                                      for (var i = 0;
-                                          i < patientsInfoMedication!.length;
-                                          i++) {
-                                        children.add(
-                                          Row(
+                                      var patientsInfoMedication = snapshot.data!;
+                                      return ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: patientsInfoMedication.length,
+                                        itemBuilder: (context, i) {
+                                          return Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               SizedBox(
@@ -579,7 +582,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                     ),
                                                     SizedBox(height: 4),
                                                     Text(
-                                                      "Dosage:",
+                                                      "Instructions:",
                                                       style: TextStyle(fontSize: 15),
                                                     ),
                                                     Text(
@@ -588,21 +591,21 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                     ),
                                                     SizedBox(height: 4),
                                                     Text(
-                                                      "Total Quantity: ${patientsInfoMedication[i].quantity}",
+                                                      "Quantity: ${patientsInfoMedication[i].quantity ?? ''}",
                                                       style: TextStyle(fontSize: 15),
                                                     ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      "Dosage: ${patientsInfoMedication[i].dosage}",
+                                                      style: TextStyle(fontSize: 15),
+                                                    ),
+                                                    SizedBox(height: 4),
                                                   ],
                                                 ),
                                               ),
                                             ],
-                                          )
-                                        );
-                                        children.add(SizedBox(
-                                          height: 10,
-                                        ));
-                                      }
-                                      return Column(
-                                        children: children,
+                                          );
+                                        },
                                       );
                                     } else if (snapshot.hasError) {
                                       return Center(
@@ -713,7 +716,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             return const Center(child: CircularProgressIndicator());
                           }
                         },
-                      )
+                      ),
               ],
             ),
           ),

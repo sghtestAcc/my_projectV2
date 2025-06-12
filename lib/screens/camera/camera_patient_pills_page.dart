@@ -14,12 +14,16 @@ class CameraHomePatientPillScreen extends StatefulWidget {
   final String? path;
   final TextEditingController? imagetakenText;
   final List<XFile> imageFiles;
+  final String? dosage;
+  final String? quantity;
 
   const CameraHomePatientPillScreen({
     Key? key, 
     this.path, 
     this.imagetakenText,
     this.imageFiles= const [],
+    this.dosage = '',
+    this.quantity,
 
     }) : super(key: key);
   @override
@@ -163,6 +167,8 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                             imagetakenText: widget.imagetakenText,
                             imageFiles: widget.imageFiles,
                             imageFilePills: imageFilepills,
+                            dosage: widget.dosage,
+                            quantity: widget.quantity, // <-- pass this!
                           )
                         )
                       );  

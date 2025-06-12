@@ -16,12 +16,16 @@ class PatientUploadMedsScreen extends StatefulWidget {
   final TextEditingController? imagetakenText;
   final List<XFile> imageFiles;
   final List<XFile> imageFilePills;
+  final String? dosage;
+  final String? quantity;
   // final XFile? image;
   const PatientUploadMedsScreen({
     Key? key, 
     this.imagetakenText, 
     this.imageFiles = const [],
     this.imageFilePills = const [],
+    this.dosage,
+    this.quantity,
   }): super(key: key);
 
   @override
@@ -40,16 +44,17 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   final controller = Get.put(SelectPatientController());
 
 
-  TextEditingController medsQuantity = TextEditingController();
+  TextEditingController medsDosage = TextEditingController();
   TextEditingController medsSchedule = TextEditingController();
   TextEditingController medicineInput = TextEditingController();
   TextEditingController medsScheduleInput = TextEditingController();
+  TextEditingController quantityController = TextEditingController();
 
   var formDataQuestionsInput = GlobalKey<FormState>();
   var formDataQuestions = GlobalKey<FormState>();
 
   void convertText() {
-    medsQuantity.text = medicineInput.text;
+    medsDosage.text = medicineInput.text;
     medsSchedule.text = medsScheduleInput.text;
     Navigator.pop(context);
   }
@@ -290,6 +295,12 @@ bool doesSecondWordContainTablets(String text) {
   }
 
   @override
+  void initState() {
+    super.initState();
+    quantityController.text = widget.quantity ?? '';
+  }
+
+  @override
   Widget build(BuildContext context) {
     final textController1 = widget.imagetakenText ?? TextEditingController();
     final imageFiles = widget.imageFiles;
@@ -527,7 +538,7 @@ bool doesSecondWordContainTablets(String text) {
                                   color: Colors.black,
                                 ),
                                 enabled: false,
-                                controller: medsQuantity,
+                                controller: medsDosage,
                                 decoration: const InputDecoration(
                                   hintText: "Your Medication Quantity...",
                                   border: InputBorder
@@ -574,8 +585,8 @@ bool doesSecondWordContainTablets(String text) {
                                     return;
                                   } 
                                   // validation field of textmedicationQuantity if empty
-                                  else if (medsQuantity.text == null ||
-                                      medsQuantity.text.isEmpty) {
+                                  else if (medsDosage.text == null ||
+                                      medsDosage.text.isEmpty) {
                                     Get.snackbar(
                                       "Error",
                                       "Please fill in the Medication Quantity.",
@@ -605,11 +616,12 @@ bool doesSecondWordContainTablets(String text) {
                                       textController1.text.trim(),
                                       widget.imageFiles,
                                       widget.imageFilePills,
-                                      medsQuantity.text.trim(),
+                                      quantityController.text.trim(),
                                       medsSchedule.text.trim(),
+                                      medsDosage.text.trim(),
                                     );
                                     textController1.clear();
-                                    medsQuantity.clear();
+                                    medsDosage.clear();
                                     medsSchedule.clear();
                                   }
                                 },

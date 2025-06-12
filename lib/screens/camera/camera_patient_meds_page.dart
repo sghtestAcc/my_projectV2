@@ -29,6 +29,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   List<XFile> imageFiles = [];
   String scannedText = "";
   TextEditingController controller = TextEditingController();
+  TextEditingController quantityController = TextEditingController(); // NEW
 
   @override
   void initState() {
@@ -166,12 +167,13 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                       return; 
                     } else {
                       Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => CameraHomePatientPillScreen(
+                      .push(MaterialPageRoute(
+                        builder: (_) => CameraHomePatientPillScreen(
                           imagetakenText: controller,
                           imageFiles: imageFiles,
-                          )
+                          quantity: quantityController.text, // <-- pass this!
                         )
-                      ); 
+                      ));
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -365,13 +367,9 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
 
   final extracted = extractMedicationInfo(scannedText);
 
-  controller.text = '''
-  ${extracted["Medication Name"]}
-  ${extracted["Dosage"]}
-  ${extracted["Total Quantity"]}
-  ${extracted["Instructions"]}
-  '''.trim();
-
+  controller.text = extracted["Medication Name"] ?? "";
+  // ${extracted["Dosage"]}
+  quantityController.text = extracted["Quantity"] ?? "";
   textScanning = false;
   setState(() {});
 }
@@ -405,8 +403,8 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   Map<String, String> extractMedicationInfo(String fullText) {
     final Map<String, String> result = {
       "Medication Name": "",
-      "Dosage": "",
-      "Total Quantity": "",
+      // "Dosage": "",
+      "Quantity": "",
       "Instructions": "",
     };
 
@@ -420,15 +418,22 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
         result["Medication Name"] = line.trim();
       }
 
-      if (result["Dosage"]!.isEmpty &&
-          RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).hasMatch(line)) {
-        result["Dosage"] =
-            RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).firstMatch(line)?.group(0) ?? "";
-      }
+      // if (result["Dosage"]!.isEmpty &&
+      //     RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).hasMatch(line)) {
+      //   result["Dosage"] =
+      //       RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).firstMatch(line)?.group(0) ?? "";
+      // }
 
-      if (result["Total Quantity"]!.isEmpty &&
-          line.contains(RegExp(r'qty|quantity|\d+caplets', caseSensitive: false))) {
-        result["Total Quantity"] = line.replaceAll(RegExp(r'[^0-30]'), '');
+      // Improved total quantity extraction
+      if (result["Quantity"]!.isEmpty) {
+        final quantityMatch = RegExp(
+          r'(?:(?:qty|quantity|total)[:\s]*)?(\d+)\s*(tablets?|caplets?|tabs?)',
+          caseSensitive: false,
+        ).firstMatch(line);
+
+        if (quantityMatch != null) {
+          result["Quantity"] = "${quantityMatch.group(1)} ${quantityMatch.group(2)}";
+        }
       }
 
       if (result["Instructions"]!.isEmpty &&

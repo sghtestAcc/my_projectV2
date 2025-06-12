@@ -65,17 +65,14 @@ class UserRepository extends GetxController {
   }
 
 //function to change fullname -applies to both Patients and Caregivers-
-  Future<void> editPatientDetails(
-  String name,
-  BuildContext context
-) async {
+  Future<void> editPatientDetails(String name, BuildContext context) async {
   try {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection("users")
-    .doc(uid)
-    .update({
-      "Name":name,
-    });
+      .doc(uid)
+      .update({
+        "Name": name,
+      });
 
     Get.snackbar(
       "Congrats",
@@ -84,7 +81,6 @@ class UserRepository extends GetxController {
       backgroundColor: Color(0xFF35365D).withOpacity(0.5),
       colorText: Color(0xFFF6F3E7)
     );
-  // ignore: use_build_context_synchronously
     Navigator.pop(context);
   } catch (error) {
     Get.snackbar(
@@ -96,6 +92,16 @@ class UserRepository extends GetxController {
     );
     print(error.toString());
   }
+}
+
+Future<void> deleteMedication(String uid, String? medicationId) async {
+  if (medicationId == null) return;
+  await FirebaseFirestore.instance
+      .collection("users")
+      .doc(uid)
+      .collection('medications')
+      .doc(medicationId)
+      .delete();
 }
 
 //adding image for profile page -applies to both patients and caregivers-
@@ -298,6 +304,7 @@ Future<void> createPatientMedications(
   List<XFile> pills,
   String quantity,
   String schedule,
+  String dosage,
 ) async {
   try {
     String uid = FirebaseAuth.instance.currentUser!.uid;
@@ -331,6 +338,7 @@ Future<void> createPatientMedications(
           "Packaging": packagingUrls,
           "Quantity": quantity,
           "Schedule": schedule,
+          "Dosage": dosage,
         });
 
     Get.snackbar(

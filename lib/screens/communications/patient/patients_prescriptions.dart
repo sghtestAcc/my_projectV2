@@ -299,7 +299,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                     Text(patientsInfoMedication[i].labels, 
                                     style: TextStyle(fontSize: 15),
                                     ),
-                                    Text(patientsInfoMedication[i].quantity, 
+                                    Text(patientsInfoMedication[i].dosage, 
                                     style: TextStyle(fontSize: 15),
                                     ),
                                     Text(patientsInfoMedication[i].schedule, 
