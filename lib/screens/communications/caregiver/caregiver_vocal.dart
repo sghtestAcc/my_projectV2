@@ -242,7 +242,7 @@ String text = 'Hello world';
                             child: Column(
                               // crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                     Text('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}'),
+                     Text('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].instructions}'),
                     const SizedBox(height: 10),
                      ElevatedButton(
                     onPressed: () {

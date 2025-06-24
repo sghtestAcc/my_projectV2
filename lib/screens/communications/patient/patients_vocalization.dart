@@ -256,11 +256,11 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                               child: Column(
                                 children: [
 
-                       Text('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}'),
+                       Text('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].instructions}'),
                       const SizedBox(height: 10),
                        ElevatedButton(
                       onPressed: () {
-                        speak('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}');
+                        speak('Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].instructions}');
                       },
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
@@ -276,7 +276,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                                 ),
                                 IconButton(
                         onPressed: () {
-                          Clipboard.setData(ClipboardData(text: 'Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].schedule}')).then(
+                          Clipboard.setData(ClipboardData(text: 'Take ${snapshot.data![index].labels} ${snapshot.data![index].quantity} during the ${snapshot.data![index].instructions}')).then(
                             (_) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

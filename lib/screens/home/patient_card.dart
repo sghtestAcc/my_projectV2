@@ -120,14 +120,6 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                                 medications[i].labels,
                                 style: TextStyle(fontSize: 15),
                               ),
-                              Text(
-                                medications[i].dosage,
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              Text(
-                                medications[i].schedule,
-                                style: TextStyle(fontSize: 12),
-                              ),
                             ],
                           ),
                         ),

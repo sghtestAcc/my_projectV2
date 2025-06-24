@@ -74,7 +74,7 @@ class _myCardPrescriptionState extends State<myCardPrescription> {
                                             SizedBox(height: 10,),
                                                Row(
                                               children: [
-                                                Text('Feed ${medications[i].quantity} during the ${medications[i].schedule}',
+                                                Text('Feed ${medications[i].quantity} during the ${medications[i].instructions} with the following pills: ',
                                                   style: TextStyle(fontSize: 15),
                                                 ),
                                               ],

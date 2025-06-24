@@ -30,6 +30,9 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   String scannedText = "";
   TextEditingController controller = TextEditingController();
   TextEditingController quantityController = TextEditingController(); // NEW
+  TextEditingController dosageController = TextEditingController(); // NEW
+  TextEditingController instructionsController = TextEditingController(); // NEW
+  TextEditingController detailsController = TextEditingController(); // NEW
 
   @override
   void initState() {
@@ -126,7 +129,7 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                   pickImages().then((selectedImages) {
                     if (selectedImages.isNotEmpty) {
                       setState(() {
-                        imageFiles.addAll(selectedImages); // Add selected images to the list
+                        imageFiles.addAll(selectedImages); // Add sel ected images to the list
                       });
 
                       // Directly process each selected image for text recognition
@@ -171,7 +174,10 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                         builder: (_) => CameraHomePatientPillScreen(
                           imagetakenText: controller,
                           imageFiles: imageFiles,
-                          quantity: quantityController.text, // <-- pass this!
+                          quantity: quantityController.text,
+                          dosage: dosageController.text,
+                          instructions: instructionsController.text,
+                          details: detailsController.text,
                         )
                       ));
                     }
@@ -368,8 +374,11 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   final extracted = extractMedicationInfo(scannedText);
 
   controller.text = extracted["Medication Name"] ?? "";
-  // ${extracted["Dosage"]}
+  dosageController.text = extracted["Dosage"] ?? "";
+  instructionsController.text = extracted["Instructions"] ?? "";
   quantityController.text = extracted["Quantity"] ?? "";
+  detailsController.text = extracted["Details"] ?? "";
+  dosageController.text = extracted["Dosage"] ?? "";
   textScanning = false;
   setState(() {});
 }
@@ -403,31 +412,61 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   Map<String, String> extractMedicationInfo(String fullText) {
     final Map<String, String> result = {
       "Medication Name": "",
-      // "Dosage": "",
+      "Dosage": "",
       "Quantity": "",
       "Instructions": "",
+      "Details": "",
     };
 
     final lines = fullText.split('\n');
 
+    final List<String> commonMedNames = [
+    "panadol", "paracetamol", "telfast", "ibuprofen", "amoxicillin", "cetirizine",
+    "claritin", "zrytec", "aspirin", "tylenol", "diclofenac", "omeprazole",
+    "metformin", "atorvastatin", "simvastatin", "losartan", "amlodipine",
+    "prednisolone", "orphenadrine", "anarex", "augmentin", "naproxen",
+    "gabapentin", "tramadol", "fexofenadine", "loratadine", "dextromethorphan"
+    ];
+
+    final List<String> detailKeywords = [
+      "may cause drowsiness",
+      "do not operate machinery",
+      "avoid alcohol",
+      "keep out of reach of children",
+      "for external use only",
+      "shake well before use",
+      "do not exceed stated dose",
+      "store below 25°c",
+      "keep refrigerated",
+      "for fever/pain/muscle relaxation",
+      "contains paracetamol",
+    ];
+
+    List<String> detailsList = [];
+
     for (final line in lines) {
       final lower = line.toLowerCase();
 
-      if (result["Medication Name"]!.isEmpty &&
-          RegExp(r'^[a-zA-Z]+').hasMatch(line)) {
-        result["Medication Name"] = line.trim();
+    if (result["Medication Name"]!.isEmpty) {
+      for (final med in commonMedNames) {
+        if (lower.contains(med)) {
+          result["Medication Name"] = line.trim();
+          break;
+        }
       }
+    }
 
-      // if (result["Dosage"]!.isEmpty &&
-      //     RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).hasMatch(line)) {
-      //   result["Dosage"] =
-      //       RegExp(r'(\d+mg|\d+g|\d+ml|\d+mcg)', caseSensitive: false).firstMatch(line)?.group(0) ?? "";
-      // }
+      // Improved dosage extraction: get the full phrase with name and dosage
+      if (result["Dosage"]!.isEmpty &&
+          RegExp(r'([a-zA-Z ]+\d+\s?(mg|g|ml|mcg))', caseSensitive: false).hasMatch(line)) {
+        result["Dosage"] = RegExp(r'([a-zA-Z ]+\d+\s?(mg|g|ml|mcg))', caseSensitive: false)
+          .firstMatch(line)?.group(0)?.trim() ?? "";
+      }
 
       // Improved total quantity extraction
       if (result["Quantity"]!.isEmpty) {
         final quantityMatch = RegExp(
-          r'(?:(?:qty|quantity|total)[:\s]*)?(\d+)\s*(tablets?|caplets?|tabs?)',
+          r'(?:(?:qty|quantity|total)[:\s]*)?(\d+)\s*(tablets?|caplets?|tabs?|tab/s?)',
           caseSensitive: false,
         ).firstMatch(line);
 
@@ -437,11 +476,22 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       }
 
       if (result["Instructions"]!.isEmpty &&
-          (lower.contains("consume") || lower.contains("after meals") || lower.contains("drowsiness"))) {
-        result["Instructions"] = line.trim();
-      }
-    }
+            RegExp(r'(take.*(?:tablet|tab|capsule|caplet).*)', caseSensitive: false).hasMatch(line)) {
+          result["Instructions"] = line.trim();
+        } else if (result["Instructions"]!.isEmpty &&
+            (lower.contains("take") || lower.contains("orally"))) {
+          result["Instructions"] = line.trim();
+        }
 
-  return result;
+      // Collect all matching details
+        for (final keyword in detailKeywords) {
+          if (lower.contains(keyword)) {
+            detailsList.add(line.trim());
+            break;
+          }
+        }
+      }
+      result["Details"] = detailsList.join('; ');
+      return result;
   }
 }

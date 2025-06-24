@@ -16,6 +16,8 @@ class CameraHomePatientPillScreen extends StatefulWidget {
   final List<XFile> imageFiles;
   final String? dosage;
   final String? quantity;
+  final String? instructions;
+  final String? details;
 
   const CameraHomePatientPillScreen({
     Key? key, 
@@ -24,6 +26,8 @@ class CameraHomePatientPillScreen extends StatefulWidget {
     this.imageFiles= const [],
     this.dosage = '',
     this.quantity,
+    this.instructions,
+    this.details
 
     }) : super(key: key);
   @override
@@ -81,7 +85,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final List<File> capturedFiles = await Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => MultiImageCapture(
@@ -94,12 +98,8 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                         onComplete: (files) async {},
                       ), 
                     )
-                  ); // <-- uses your new function
-                  setState(() {
-                    imageFilepills.addAll(
-                      capturedFiles.map((file) => XFile(file.path)),
-                    );
-                  }); 
+                  );
+                  // Do NOT add capturedFiles again here!
                   return;
                   // onPressed: () {
                   //   pickImage(source: ImageSource.camera).then((value) {
@@ -167,8 +167,10 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                             imagetakenText: widget.imagetakenText,
                             imageFiles: widget.imageFiles,
                             imageFilePills: imageFilepills,
+                            quantity: widget.quantity, 
                             dosage: widget.dosage,
-                            quantity: widget.quantity, // <-- pass this!
+                            instructions: widget.instructions,
+                            details: widget.details,
                           )
                         )
                       );  

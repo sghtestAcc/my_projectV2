@@ -132,11 +132,6 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                   Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                 
-                                  Text(
-                                  'Take ${patientsInfoMedication[i].quantity} during the ${patientsInfoMedication[i].schedule}',
-                                  style: TextStyle(fontSize: 15),
-                                    ),
                                   SizedBox(height: 10,),
                                    ]),
                                   );
@@ -297,12 +292,6 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                 ),
                                                 ),
                                     Text(patientsInfoMedication[i].labels, 
-                                    style: TextStyle(fontSize: 15),
-                                    ),
-                                    Text(patientsInfoMedication[i].dosage, 
-                                    style: TextStyle(fontSize: 15),
-                                    ),
-                                    Text(patientsInfoMedication[i].schedule, 
                                     style: TextStyle(fontSize: 15),
                                     ),
                                     SizedBox(height: 10,),

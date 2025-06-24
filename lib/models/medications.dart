@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Medication {
@@ -6,44 +5,49 @@ class Medication {
   final String labels;
   final List<String> pills;
   final List<String> packaging;
-  final String dosage;
-  final String schedule;
   final String? quantity;
+  final String? dosage;
   final String? email;
   final String? name;
+  final String? instructions;
+  final String? details;
 
   const Medication({
     this.id,
     required this.labels,
     required this.pills,
     required this.packaging, 
-    required this.dosage,
-    required this.schedule,
     this.quantity,
+    this.dosage,
     this.email,
-    this.name
+    this.name,
+    this.instructions,
+    this.details,
   });
 
-  
   Medication copy({
     String? id,
     String? labels,
     List<String>? pills, 
+    List<String>? packaging,
     String? quantity,
-    String? schedule,
+    String? dosage,
     String? email,
-    String? name
+    String? name,
+    String? instructions,
+    String? details,
   }) =>
       Medication(
         id: id ?? this.id,
         labels: labels ?? this.labels,
         pills: pills ?? this.pills,
         packaging: packaging ?? this.packaging,
+        quantity: quantity ?? this.quantity,
         dosage: dosage ?? this.dosage,
-        schedule: schedule ?? this.schedule,
         email: email ?? this.email,
         name: name ?? this.name,
-        quantity: quantity ?? this.quantity,
+        instructions: instructions ?? this.instructions,
+        details: details ?? this.details,
       );
 
   toJson() {
@@ -51,11 +55,12 @@ class Medication {
       'Labels': labels,
       'Pills': pills,
       'Packaging': packaging,
+      'Quantity': quantity,
       'Dosage': dosage,
-      'Schedule': schedule,
       'Email': email,
       'Name' : name,
-      'Quantity': quantity,
+      'Instructions': instructions,
+      'Details': details,
     };
   }
 
@@ -69,46 +74,12 @@ class Medication {
       labels: data["Labels"],
       pills: (data["Pills"] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       packaging: (data["Packaging"] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
-      dosage: data["Dosage"] ?? '',
-      schedule: data["Schedule"],
+      quantity: data["Quantity"],
+      dosage: data["Dosage"],
       email: data["Email"],
       name: data["Name"],
-      quantity: data["Quantity"],
+      instructions: data["Instructions"],
+      details: data["Details"],
     );
   }
-
-  // factory Medication.fromJson(
-  //   Map<String, dynamic> jsonData,
-  // ) {
-  //   return Medication(
-  //     labels: jsonData["Labels"],
-  //     pills: jsonData["Pills"],
-  //     quantity: jsonData["Quantity"],
-  //     schedule: jsonData["Schedule"],
-  //     email: jsonData["Email"],
-  //     name: jsonData["Name"],
-  //   );
-  // }
-
-  // static Map<String, dynamic> toListString(Medication medications) {
-  //   return {
-  //     'Labels': medications.labels,
-  //     'Pills': medications.pills,
-  //     'Quantity': medications.quantity,
-  //     'Schedule': medications.schedule,
-  //     'Email': medications.email,
-  //     'Name' : medications.name
-  //   };
-  // }
-
-  // // Format the list into string to store into Firebase
-  // static String encode(List<Medication> medications) {
-  //   return jsonEncode(medications.map<Map<String, dynamic>>((medications) => Medication.toListString(medications)).toList());
-  // }
-
-  // // Format the string back to list
-  // static List<Medication> decode(String medicationsString) {
-  //   return (jsonDecode(medicationsString) as List<dynamic>).map((item) => Medication.fromJson(item)).toList();
-  // }
-
 }

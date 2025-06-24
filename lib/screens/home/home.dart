@@ -582,11 +582,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                     ),
                                                     SizedBox(height: 4),
                                                     Text(
-                                                      "Instructions:",
-                                                      style: TextStyle(fontSize: 15),
-                                                    ),
-                                                    Text(
-                                                      patientsInfoMedication[i].schedule,
+                                                      "Details: ${patientsInfoMedication[i].details}",
                                                       style: TextStyle(fontSize: 15),
                                                     ),
                                                     SizedBox(height: 4),
@@ -596,7 +592,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                     ),
                                                     SizedBox(height: 4),
                                                     Text(
-                                                      "Dosage: ${patientsInfoMedication[i].dosage}",
+                                                      "Dosage: ${patientsInfoMedication[i].dosage ?? ''}",
+                                                      style: TextStyle(fontSize: 15),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      "Instructions: ${patientsInfoMedication[i].instructions ?? ''}",
                                                       style: TextStyle(fontSize: 15),
                                                     ),
                                                     SizedBox(height: 4),

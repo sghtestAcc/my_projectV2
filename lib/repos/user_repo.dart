@@ -303,8 +303,9 @@ Future<void> createPatientMedications(
   List<XFile> packagingImages,
   List<XFile> pills,
   String quantity,
-  String schedule,
   String dosage,
+  String instructions,
+  {String? details}
 ) async {
   try {
     String uid = FirebaseAuth.instance.currentUser!.uid;
@@ -337,8 +338,9 @@ Future<void> createPatientMedications(
           "Pills": pillsUrls, // ✅ list of URLs
           "Packaging": packagingUrls,
           "Quantity": quantity,
-          "Schedule": schedule,
           "Dosage": dosage,
+          "Instructions": instructions, // <-- save as one field
+          "Details": details,
         });
 
     Get.snackbar(
