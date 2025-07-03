@@ -352,28 +352,6 @@ bool doesSecondWordContainTablets(String text) {
                             SizedBox(
                               width: double
                                   .infinity, // Set the width to expand to the available space
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF0CE25C),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical:
-                                          12), // Adjust the padding as needed
-                                  child: const Text(
-                                    'Upload Schedules',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ),
                             const SizedBox(
                               height: 20,

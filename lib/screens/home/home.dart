@@ -15,6 +15,7 @@ import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
 import 'package:my_project/screens/communications/patient/patients_vocalization.dart';
 import 'package:my_project/screens/home/patient_card.dart';
+import '../../chatbot.dart';
 import '../communications/bothusers/usersCameraScreen.dart';
 import '../communications/caregiver/caregiver_vocalization_patient_view.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
@@ -723,7 +724,20 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           ),
         ),
         endDrawer: AppDrawerNavigation(loginType: widget.loginType),
+      // --- Add this floatingActionButton ---
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatbotScreen())
+          );
+        },
+        backgroundColor: const Color(0xFF0CE25C),
+        child: const Icon(Icons.chat, color: Colors.white),
+        shape: const CircleBorder(),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    ),
         onWillPop: () async {
         return false;
       },
