@@ -334,13 +334,13 @@ Future<void> createPatientMedications(
         .doc(uid)
         .collection('medications')
         .add({
-          "Labels": labels,
-          "Pills": pillsUrls, // ✅ list of URLs
+          "Labels": labels ?? '',
+          "Pills": pillsUrls, 
           "Packaging": packagingUrls,
           "Quantity": quantity,
           "Dosage": dosage,
-          "Instructions": instructions, // <-- save as one field
-          "Details": details,
+          "Instructions": instructions,
+          "Details": details ?? '',
         });
 
     Get.snackbar(

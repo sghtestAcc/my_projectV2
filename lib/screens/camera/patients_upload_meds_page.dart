@@ -472,15 +472,15 @@ bool doesSecondWordContainTablets(String text) {
                                   if (formDataQuestions.currentState!.validate()) {
                                     print('Packaging images count: ${widget.imageFiles.length}');
                                     print('Pills images count: ${widget.imageFilePills.length}');
-                                    
+
                                     await userRepo.createPatientMedications(
                                       textController1.text.trim(),
                                       widget.imageFiles,
                                       widget.imageFilePills,
                                       widget.quantity ?? '',
                                       widget.dosage ?? '',
-                                      details : widget.details,
                                       widget.instructions ?? '',
+                                      details : widget.details,
                                     );
                                   }
                                 },

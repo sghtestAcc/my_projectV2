@@ -19,6 +19,7 @@ import '../../chatbot.dart';
 import '../communications/bothusers/usersCameraScreen.dart';
 import '../communications/caregiver/caregiver_vocalization_patient_view.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
+import '../communications/patient/edit_medications.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -515,7 +516,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               },
                             ),
                             const SizedBox(
-                              height: 20,
+                              height: 10,
                             ),
                             FutureBuilder<List<Medication>>(
                                 future: userRepo.displayPatientsMedications(currentUid),
@@ -530,9 +531,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         separatorBuilder: (context, index) => SizedBox(height: 16),
                                         itemBuilder: (context, i) {
                                           final med = patientsInfoMedication[i];
-                                          // Combine both image lists
                                           final allImages = [...med.packaging, ...med.pills];
-
                                           return Container(
                                             decoration: BoxDecoration(
                                               color: Colors.white,
@@ -640,6 +639,54 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       ],
                                                     ),
                                                   ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  children: [
+                                                    IconButton(
+                                                      icon: Icon(Icons.edit, color: Colors.green),
+                                                      tooltip: 'Edit',
+                                                      onPressed: () async {
+                                                        final updated = await Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => EditMedicationsPage(
+                                                              medication: med,
+                                                              uid: currentUid,
+                                                            ),
+                                                          ),
+                                                        );
+                                                        if (updated == true) setState(() {});
+                                                      },
+                                                    ),
+                                                    IconButton(
+                                                      icon: Icon(Icons.delete, color: Colors.red),
+                                                      tooltip: 'Delete',
+                                                      onPressed: () async {
+                                                        final confirm = await showDialog<bool>(
+                                                          context: context,
+                                                          builder: (context) => AlertDialog(
+                                                            title: Text('Delete Medication'),
+                                                            content: Text('Are you sure you want to delete this medication?'),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () => Navigator.pop(context, false),
+                                                                child: Text('Cancel'),
+                                                              ),
+                                                              TextButton(
+                                                                onPressed: () => Navigator.pop(context, true),
+                                                                child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                        if (confirm == true) {
+                                                          await userRepo.deleteMedication(currentUid, med.id);
+                                                          setState(() {}); // Refresh the list
+                                                        }
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
                                               ],
                                             ),
                                           );
