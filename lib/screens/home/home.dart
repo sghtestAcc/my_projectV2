@@ -520,92 +520,128 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             FutureBuilder<List<Medication>>(
                                 future: userRepo.displayPatientsMedications(currentUid),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.done) {
+                                  if (snapshot.connectionState == ConnectionState.done) {
                                     if (snapshot.hasData) {
                                       var patientsInfoMedication = snapshot.data!;
-                                      return ListView.builder(
+                                      return ListView.separated(
                                         shrinkWrap: true,
                                         physics: NeverScrollableScrollPhysics(),
                                         itemCount: patientsInfoMedication.length,
+                                        separatorBuilder: (context, index) => SizedBox(height: 16),
                                         itemBuilder: (context, i) {
-                                          return Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              SizedBox(
-                                                width: 70,
-                                                height: 150,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(12),
-                                                    border: Border.all(
-                                                      color: Colors.black,
-                                                      width: 1,
+                                          final med = patientsInfoMedication[i];
+                                          // Combine both image lists
+                                          final allImages = [...med.packaging, ...med.pills];
+
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              border: Border.all(color: Colors.green, width: 2),
+                                              borderRadius: BorderRadius.circular(12),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black12,
+                                                  blurRadius: 4,
+                                                  offset: Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            margin: EdgeInsets.symmetric(horizontal: 8),
+                                            padding: EdgeInsets.all(16),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                if (allImages.isNotEmpty)
+                                                  SizedBox(
+                                                    height: 60,
+                                                    child: ListView.builder(
+                                                      scrollDirection: Axis.horizontal,
+                                                      itemCount: allImages.length,
+                                                      itemBuilder: (context, imgIdx) => Padding(
+                                                        padding: const EdgeInsets.only(right: 8),
+                                                        child: Image.network(
+                                                          allImages[imgIdx],
+                                                          height: 50,
+                                                          width: 50,
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder: (context, error, stackTrace) => Container(
+                                                            height: 50,
+                                                            width: 50,
+                                                            color: Colors.grey[300],
+                                                            child: Icon(Icons.image_not_supported),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                  child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(12),
-                                                    child: ListView(
+                                                SizedBox(height: 8),
+                                                Text("Medication Name: ${med.labels}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                                                if (med.details != null && med.details!.isNotEmpty)
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
                                                       children: [
-                                                        // Show packaging images
-                                                        ...patientsInfoMedication[i].packaging.map<Widget>((url) => Padding(
-                                                          padding: const EdgeInsets.only(bottom: 4),
-                                                          child: Image.network(
-                                                            url,
-                                                            height: 50,
-                                                            width: 50,
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        )),
-                                                        // Show pills images
-                                                        ...patientsInfoMedication[i].pills.map<Widget>((url) => Padding(
-                                                          padding: const EdgeInsets.only(bottom: 4),
-                                                          child: Image.network(
-                                                            url,
-                                                            height: 50,
-                                                            width: 50,
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        )),
+                                                        TextSpan(
+                                                          text: "Details: ",
+                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                        ),
+                                                        TextSpan(
+                                                          text: med.details,
+                                                          style: TextStyle(fontSize: 16),
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10), // Add space between image and text
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "Medication Name: ${patientsInfoMedication[i].labels}",
-                                                      style: TextStyle(fontSize: 15),
+                                                if (med.quantity != null && med.quantity!.isNotEmpty)
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
+                                                      children: [
+                                                        TextSpan(
+                                                          text: "Quantity: ",
+                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                        ),
+                                                        TextSpan(
+                                                          text: med.quantity,
+                                                          style: TextStyle(fontSize: 16),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      "Details: ${patientsInfoMedication[i].details}",
-                                                      style: TextStyle(fontSize: 15),
+                                                  ),
+                                                if (med.dosage != null && med.dosage!.isNotEmpty)
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
+                                                      children: [
+                                                        TextSpan(
+                                                          text: "Dosage: ",
+                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                        ),
+                                                        TextSpan(
+                                                          text: med.dosage,
+                                                          style: TextStyle(fontSize: 16),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      "Quantity: ${patientsInfoMedication[i].quantity ?? ''}",
-                                                      style: TextStyle(fontSize: 15),
+                                                  ),
+                                                if (med.instructions != null && med.instructions!.isNotEmpty)
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
+                                                      children: [
+                                                        TextSpan(
+                                                          text: "Instructions: ",
+                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                        ),
+                                                        TextSpan(
+                                                          text: med.instructions,
+                                                          style: TextStyle(fontSize: 16),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      "Dosage: ${patientsInfoMedication[i].dosage ?? ''}",
-                                                      style: TextStyle(fontSize: 15),
-                                                    ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      "Instructions: ${patientsInfoMedication[i].instructions ?? ''}",
-                                                      style: TextStyle(fontSize: 15),
-                                                    ),
-                                                    SizedBox(height: 4),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
+                                                  ),
+                                              ],
+                                            ),
                                           );
                                         },
                                       );
