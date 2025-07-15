@@ -515,9 +515,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 }
                               },
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            // const SizedBox(
+                            //   height: 10,
+                            // ),
                             FutureBuilder<List<Medication>>(
                                 future: userRepo.displayPatientsMedications(currentUid),
                                 builder: (context, snapshot) {
