@@ -568,174 +568,161 @@ class UserRepository extends GetxController {
           .toList();
       return patientData;
     }
-  //   //function to get all notification
-  //   Stream<List<Notifications>> getAllMedicationNotification(
-  //       String medicationUid) {
-  //     String uid = FirebaseAuth.instance.currentUser!.uid;
-  //     return firestore
-  //         .collection("users")
-  //         .doc(uid)
-  //         .collection('medications')
-  //         .doc(medicationUid)
-  //         .collection('notification')
-  //         .get()
-  //         .then((querySnapshot) {
-  //       final patientData =
-  //           querySnapshot.docs.map((e) => Notifications.fromSnapshot(e)).toList();
-  //       return patientData;
-  //     }).asStream(); // Convert the Future to a Stream
-  //   }
-  //   //function to create notification
-  // Future<void> createMedicationNotification(
-  //     String? medicationUid, String title, String body, String dateTime) async {
-  //   try {
-  //     // Get the current user's UID
-  //     String uid = FirebaseAuth.instance.currentUser!.uid;
+    //function to get all notification
+    Stream<List<Notifications>> getAllMedicationNotification(
+        String medicationUid) {
+      String uid = FirebaseAuth.instance.currentUser!.uid;
+      return firestore
+          .collection("users")
+          .doc(uid)
+          .collection('medications')
+          .doc(medicationUid)
+          .collection('notification')
+          .get()
+          .then((querySnapshot) {
+        final patientData =
+            querySnapshot.docs.map((e) => Notifications.fromSnapshot(e)).toList();
+        return patientData;
+      }).asStream(); // Convert the Future to a Stream
+    }
+    //function to create notification
+ // Add this method to your UserRepository class
+Future<void> createMedicationNotification(
+  String patientId,
+  String title,
+  String body,
+  String dateTime,
+) async {
+  try {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    
+    await firestore
+        .collection('users')
+        .doc(uid)
+        .collection('patient_notifications')
+        .add({
+      'patientId': patientId,
+      'title': title,
+      'body': body,
+      'dateTime': dateTime,
+      'createdAt': FieldValue.serverTimestamp(),
+      'sent': false,
+    });
+    
+    print('Notification saved to Firestore');
+  } catch (error) {
+    print('Error saving notification: $error');
+    throw error;
+  }
+}
+  //function to delete notification
+  Future<void> deleteMedicationNotification(
+      String medicationUid, String notificationUid) async {
+    try {
+      String uid = FirebaseAuth.instance.currentUser!.uid;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .collection('medications')
+          .doc(medicationUid)
+          .collection('notification')
+          .doc(notificationUid)
+          .delete();
+      Get.snackbar(
+        "Success",
+        "Notification deleted successfully",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+        colorText: const Color(0xFFF6F3E7),
+      );
+    } catch (error) {
+      Get.snackbar(
+        "Error",
+        "Failed to delete notification",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.redAccent.withOpacity(0.1),
+        colorText: Colors.red,
+      );
+      print(error.toString());
+    }
+  }
+  //function to update notification
+  Future<void> updateMedicationNotification(
+      String medicationUid, Notifications updatedNotification) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      var notificationDocRef = FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .collection('medications')
+          .doc(medicationUid)
+          .collection('notification')
+          .doc(updatedNotification.id);
+      print(medicationUid);
+      print(updatedNotification.id);
+      // Check if the medication document exists
+      var notificationDoc = await notificationDocRef.get();
 
-  //     // Add medication information to Firestore using add method
-  //     DocumentReference notificationRef = await FirebaseFirestore.instance
-  //         .collection("users")
-  //         .doc(uid)
-  //         .collection('medications')
-  //         .doc(medicationUid)
-  //         .collection('notification')
-  //         .add({
-  //       "Title": title,
-  //       "Body": body,
-  //       "DateTime": dateTime,
-  //     });
+      if (notificationDoc.exists) {
+        // Document exists, proceed with update
+        await notificationDocRef.update({
+          "Title": updatedNotification.title,
+          "Body": updatedNotification.body,
+          "DateTime": updatedNotification.dateTime,
+        });
 
-  //     // Get the document ID assigned by Firestore
-  //     String documentId = notificationRef.id;
+        Get.snackbar(
+          "Success",
+          "Medication details updated successfully",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+          colorText: const Color(0xFFF6F3E7),
+        );
+      } else {
+        // Document doesn't exist, create a new document
+        await notificationDocRef.set({
+          "Title": updatedNotification.title,
+          "Body": updatedNotification.body,
+          "DateTime": updatedNotification.dateTime,
+        });
 
-  //     // Display a success message using GetX SnackBar
-  //     Get.snackbar(
-  //       "Congrats!",
-  //       "A new notification has been added.",
-  //       snackPosition: SnackPosition.TOP,
-  //       backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-  //       colorText: const Color(0xFFF6F3E7),
-  //     );
-  //   } catch (error) {
-  //     // Display an error message using GetX SnackBar and print the error to the console
-  //     Get.snackbar(
-  //       "Error",
-  //       "Failed to add a notification.",
-  //       snackPosition: SnackPosition.TOP,
-  //       backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-  //       colorText: const Color(0xFFF6F3E7),
-  //     );
-  //     print(error.toString());
-  //   }
-  // }
-  // //function to delete notification
-  // Future<void> deleteMedicationNotification(
-  //     String medicationUid, String notificationUid) async {
-  //   try {
-  //     String uid = FirebaseAuth.instance.currentUser!.uid;
-  //     await FirebaseFirestore.instance
-  //         .collection("users")
-  //         .doc(uid)
-  //         .collection('medications')
-  //         .doc(medicationUid)
-  //         .collection('notification')
-  //         .doc(notificationUid)
-  //         .delete();
-  //     Get.snackbar(
-  //       "Success",
-  //       "Notification deleted successfully",
-  //       snackPosition: SnackPosition.TOP,
-  //       backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-  //       colorText: const Color(0xFFF6F3E7),
-  //     );
-  //   } catch (error) {
-  //     Get.snackbar(
-  //       "Error",
-  //       "Failed to delete notification",
-  //       snackPosition: SnackPosition.TOP,
-  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
-  //       colorText: Colors.red,
-  //     );
-  //     print(error.toString());
-  //   }
-  // }
-  // //function to update notification
-  // Future<void> updateMedicationNotification(
-  //     String medicationUid, Notifications updatedNotification) async {
-  //   String uid = FirebaseAuth.instance.currentUser!.uid;
-  //   try {
-  //     var notificationDocRef = FirebaseFirestore.instance
-  //         .collection("users")
-  //         .doc(uid)
-  //         .collection('medications')
-  //         .doc(medicationUid)
-  //         .collection('notification')
-  //         .doc(updatedNotification.id);
-  //     print(medicationUid);
-  //     print(updatedNotification.id);
-  //     // Check if the medication document exists
-  //     var notificationDoc = await notificationDocRef.get();
+        Get.snackbar(
+          "Success",
+          "Medication details created successfully",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+          colorText: const Color(0xFFF6F3E7),
+        );
+      }
+    } catch (error) {
+      // Handle errors and show an error message
+      Get.snackbar(
+        "Error",
+        "Failed to update medication details",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.redAccent.withOpacity(0.1),
+        colorText: Colors.red,
+      );
 
-  //     if (notificationDoc.exists) {
-  //       // Document exists, proceed with update
-  //       await notificationDocRef.update({
-  //         "Title": updatedNotification.title,
-  //         "Body": updatedNotification.body,
-  //         "DateTime": updatedNotification.dateTime,
-  //       });
-
-  //       Get.snackbar(
-  //         "Success",
-  //         "Medication details updated successfully",
-  //         snackPosition: SnackPosition.TOP,
-  //         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-  //         colorText: const Color(0xFFF6F3E7),
-  //       );
-  //     } else {
-  //       // Document doesn't exist, create a new document
-  //       await notificationDocRef.set({
-  //         "Title": updatedNotification.title,
-  //         "Body": updatedNotification.body,
-  //         "DateTime": updatedNotification.dateTime,
-  //       });
-
-  //       Get.snackbar(
-  //         "Success",
-  //         "Medication details created successfully",
-  //         snackPosition: SnackPosition.TOP,
-  //         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-  //         colorText: const Color(0xFFF6F3E7),
-  //       );
-  //     }
-  //   } catch (error) {
-  //     // Handle errors and show an error message
-  //     Get.snackbar(
-  //       "Error",
-  //       "Failed to update medication details",
-  //       snackPosition: SnackPosition.TOP,
-  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
-  //       colorText: Colors.red,
-  //     );
-
-  //     // Print the error message and the document path for debugging
-  //     print("Error updating medication: ${error.toString()}");
-  //     print(
-  //         "Document path: users/$uid/medications/$medicationUid/notification/${updatedNotification.id}");
-  //   }
-  // }
-  // Stream<Notifications> getMedicationNotificationStream(
-  //     String medicationUid, String notificationUid) {
-  //   String uid = FirebaseAuth.instance.currentUser!.uid;
-  //   return firestore
-  //       .collection("users")
-  //       .doc(uid)
-  //       .collection('medications')
-  //       .doc(medicationUid)
-  //       .collection('notification')
-  //       .doc(notificationUid)
-  //       .snapshots()
-  //       .map((documentSnapshot) {
-  //     return Notifications.fromSnapshot(documentSnapshot);
-  //   });
-  // }
+      // Print the error message and the document path for debugging
+      print("Error updating medication: ${error.toString()}");
+      print(
+          "Document path: users/$uid/medications/$medicationUid/notification/${updatedNotification.id}");
+    }
+  }
+  Stream<Notifications> getMedicationNotificationStream(
+      String medicationUid, String notificationUid) {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    return firestore
+        .collection("users")
+        .doc(uid)
+        .collection('medications')
+        .doc(medicationUid)
+        .collection('notification')
+        .doc(notificationUid)
+        .snapshots()
+        .map((documentSnapshot) {
+      return Notifications.fromSnapshot(documentSnapshot);
+    });
+  }
 }
