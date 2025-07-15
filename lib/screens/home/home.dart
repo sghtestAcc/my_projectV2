@@ -20,6 +20,9 @@ import '../communications/bothusers/usersCameraScreen.dart';
 import '../communications/caregiver/caregiver_vocalization_patient_view.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import '../communications/patient/edit_medications.dart';
+import 'translated_image_dialog.dart';
+
+
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -44,15 +47,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   XFile? imageFile;
   bool textScanning = false;
   String scannedText = "";
-  
+
   get totalQuantityController => null;
 
-
-  Future<String> pickImage({ImageSource? source,}) async {
+  Future<String> pickImage({
+    ImageSource? source,
+  }) async {
     final picker = ImagePicker();
     String path = '';
     try {
-      final getImage = await picker.pickImage(source: source!,imageQuality: 50);
+      final getImage =
+          await picker.pickImage(source: source!, imageQuality: 50);
       if (getImage != null) {
         path = '';
         textScanning = true;
@@ -72,7 +77,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     return path;
   }
 
-    Future<void> imageCropperView(String? path, BuildContext context) async {
+  Future<void> imageCropperView(String? path, BuildContext context) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: path!,
       aspectRatioPresets: [
@@ -84,7 +89,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         CropAspectRatioPreset.ratio5x4,
         CropAspectRatioPreset.ratio5x3,
         CropAspectRatioPreset.ratio16x9
-      ] ,
+      ],
       uiSettings: [
         AndroidUiSettings(
             toolbarTitle: 'photoScanner cropped images',
@@ -105,18 +110,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       imageFile = XFile(croppedFile.path);
       // ignore: use_build_context_synchronously
       Navigator.push(
-      context,
-      MaterialPageRoute(
-      builder: (context) =>
-      RecognizePageBothUsers(path: croppedFile.path)));
-    } else if(scannedText == '') {
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  RecognizePageBothUsers(path: croppedFile.path)));
+    } else if (scannedText == '') {
       log('do nothing');
       return;
     } else {
       log('do nothing');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -135,21 +139,23 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
           child: Container(
-            // REMOVE the height constraint!
-            padding: EdgeInsets.only(bottom: 20), // Optional: add some bottom padding
+            padding: EdgeInsets.only(
+                bottom: 20), 
             child: Column(
               children: [
                 widget.loginType == LoginType.patient
                     ? FutureBuilder(
                         future: controller.getPatientData(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
                             if (snapshot.hasData) {
                               var patientsInfo = snapshot.data;
                               return Stack(
                                 alignment: Alignment.topCenter,
                                 children: [
-                                  Image.asset('assets/images/new-sgh-design.png'),
+                                  Image.asset(
+                                      'assets/images/new-sgh-design.png'),
                                   Image.asset(
                                     'assets/images/final-grace-background.png',
                                     height: 125,
@@ -162,7 +168,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       child: Padding(
                                         padding: const EdgeInsets.all(20.0),
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
@@ -190,17 +197,19 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 ],
                               );
                             } else if (snapshot.hasError) {
-                              return Center(child: Text(snapshot.error.toString()));
+                              return Center(
+                                  child: Text(snapshot.error.toString()));
                             } else {
                               return const Center(
                                   child: Text('Something went wrong'));
                             }
                           } else {
-                            return const Center(child: CircularProgressIndicator());
+                            return const Center(
+                                child: CircularProgressIndicator());
                           }
                         },
                       )
-                    :  Stack(
+                    : Stack(
                         alignment: Alignment.topCenter,
                         children: [
                           Image.asset(
@@ -215,12 +224,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           Positioned.fill(
                             child: Transform.translate(
                               offset: Offset(0,
-                                  40), // Adjust the vertical offset to move the TextField downward
+                                  40), 
                               child: Padding(
                                 padding: EdgeInsets.all(20.0),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment
-                                      .end, // Align the content to the end (bottom)
+                                      .end, 
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     FutureBuilder(
@@ -294,119 +303,123 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         ],
                       ),
                 widget.loginType == LoginType.patient
-                    ?  Container(
-                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              GestureDetector(
+                    ? Container(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PatientsPrescripScreen()));
+                              },
+                              child: Image.asset(
+                                'assets/images/drugs.png',
+                                height: 75,
+                                width: 75,
+                              ),
+                            ),
+                            GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const PatientsPrescripScreen()));
+                                              const PatientsVocalScreen()));
                                 },
                                 child: Image.asset(
-                                  'assets/images/drugs.png',
+                                  'assets/images/mic.png',
                                   height: 75,
                                   width: 75,
-                                ),
-                              ),
-                              GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const PatientsVocalScreen()));
-                                  },
-                                  child: Image.asset(
-                                    'assets/images/mic.png',
-                                    height: 75,
-                                    width: 75,
-                                  )),
-                
-                              GestureDetector(
-                                onTap: () async {
-                               await pickImage(source: ImageSource.camera).then((value) {
-                                if (value != '') {
-                                imageCropperView(value, context);
-                               }
-                               });
-                               },
-                                child:  Image.asset(
+                                )),
+                            GestureDetector(
+                              onTap: () async {
+                                await pickImage(source: ImageSource.camera)
+                                    .then((value) {
+                                  if (value != '') {
+                                    imageCropperView(value, context);
+                                  }
+                                });
+                              },
+                              child: Image.asset(
                                 'assets/images/photo-camera.png',
                                 height: 75,
                                 width: 75,
                               ),
-                              )
-                            ],
-                          ),
-                        )
-                      : Container(
-                          padding: const EdgeInsets.fromLTRB(0, 35, 0, 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const CaregiverPrescription()));
-                                },
-                                child: Image.asset(
-                                  'assets/images/drugs.png',
-                                  height: 75,
-                                  width: 75,
-                                ),
-                              ),
-                              GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const CaregiverPrescriptionViewPatient()));
-                                  },
-                                  child: Image.asset(
-                                    'assets/images/mic.png',
-                                    height: 75,
-                                    width: 75,
-                                  )),
-                              GestureDetector(
-                                onTap: () async {
-                               await pickImage(source: ImageSource.camera).then((value) {
-                                if (value != '') {
-                                imageCropperView(value, context);
-                               }
-                               });
-                               } ,
-                                child:  Image.asset(
-                                'assets/images/photo-camera.png',
-                                height: 75,
-                                width: 75,
-                              ),
-                              )
-                            ],
-                          ),
+                            )
+                          ],
                         ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.fromLTRB(0, 35, 0, 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CaregiverPrescription()));
+                              },
+                              child: Image.asset(
+                                'assets/images/drugs.png',
+                                height: 75,
+                                width: 75,
+                              ),
+                            ),
+                            GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const CaregiverPrescriptionViewPatient()));
+                                },
+                                child: Image.asset(
+                                  'assets/images/mic.png',
+                                  height: 75,
+                                  width: 75,
+                                )),
+                            GestureDetector(
+                              onTap: () async {
+                                await pickImage(source: ImageSource.camera)
+                                    .then((value) {
+                                  if (value != '') {
+                                    imageCropperView(value, context);
+                                  }
+                                });
+                              },
+                              child: Image.asset(
+                                'assets/images/photo-camera.png',
+                                height: 75,
+                                width: 75,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
                       'Prescriptions',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Vocalization',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'PhotoScanner',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -420,7 +433,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 12),
                     ),
                     onPressed: () {
                       Navigator.push(
@@ -447,20 +461,20 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       children: [
                         Text(
                           'Medication Status',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ]),
                 ),
                 widget.loginType == LoginType.patient
-                    ?
-                    Container(
+                    ? Container(
                         padding: const EdgeInsets.all(20.0),
                         child: Container(
                           padding: const EdgeInsets.all(20.0),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF6F6F6), // Background color
+                            color: const Color(0xFFF6F6F6), 
                             borderRadius:
-                                BorderRadius.circular(10.0), // Rounded border
+                                BorderRadius.circular(10.0), 
                             border: Border.all(
                               color: Colors.black,
                               width: 1.0,
@@ -477,7 +491,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     return Column(
                                       children: [
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "${patientsInfo?.name}",
@@ -519,24 +534,35 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             //   height: 10,
                             // ),
                             FutureBuilder<List<Medication>>(
-                                future: userRepo.displayPatientsMedications(currentUid),
+                                future: userRepo
+                                    .displayPatientsMedications(currentUid),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.done) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.done) {
                                     if (snapshot.hasData) {
-                                      var patientsInfoMedication = snapshot.data!;
+                                      var patientsInfoMedication =
+                                          snapshot.data!;
                                       return ListView.separated(
                                         shrinkWrap: true,
                                         physics: NeverScrollableScrollPhysics(),
-                                        itemCount: patientsInfoMedication.length,
-                                        separatorBuilder: (context, index) => SizedBox(height: 16),
+                                        itemCount:
+                                            patientsInfoMedication.length,
+                                        separatorBuilder: (context, index) =>
+                                            SizedBox(height: 16),
                                         itemBuilder: (context, i) {
                                           final med = patientsInfoMedication[i];
-                                          final allImages = [...med.packaging, ...med.pills];
+                                          final allImages = [
+                                            ...med.packaging,
+                                            ...med.pills
+                                          ];
                                           return Container(
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              border: Border.all(color: Colors.green, width: 2),
-                                              borderRadius: BorderRadius.circular(12),
+                                              border: Border.all(
+                                                  color: Colors.green,
+                                                  width: 2),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.black12,
@@ -545,143 +571,247 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                 ),
                                               ],
                                             ),
-                                            margin: EdgeInsets.symmetric(horizontal: 8),
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 8),
                                             padding: EdgeInsets.all(16),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 if (allImages.isNotEmpty)
                                                   SizedBox(
                                                     height: 60,
                                                     child: ListView.builder(
-                                                      scrollDirection: Axis.horizontal,
-                                                      itemCount: allImages.length,
-                                                      itemBuilder: (context, imgIdx) => Padding(
-                                                        padding: const EdgeInsets.only(right: 8),
-                                                        child: Image.network(
-                                                          allImages[imgIdx],
-                                                          height: 50,
-                                                          width: 50,
-                                                          fit: BoxFit.cover,
-                                                          errorBuilder: (context, error, stackTrace) => Container(
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      itemCount:
+                                                          allImages.length,
+                                                      itemBuilder:
+                                                          (context, imgIdx) =>
+                                                              Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(right: 8),
+                                                        child: GestureDetector(
+                                                          onTap: () {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (_) =>
+                                                                  TranslatedImageDialog(
+                                                                      imageUrl:
+                                                                          allImages[
+                                                                              imgIdx]),
+                                                            );
+                                                          },
+                                                          child: Image.network(
+                                                            allImages[imgIdx],
                                                             height: 50,
                                                             width: 50,
-                                                            color: Colors.grey[300],
-                                                            child: Icon(Icons.image_not_supported),
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context,
+                                                                    error,
+                                                                    stackTrace) =>
+                                                                Container(
+                                                              height: 50,
+                                                              width: 50,
+                                                              color: Colors
+                                                                  .grey[300],
+                                                              child: Icon(Icons
+                                                                  .image_not_supported),
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
                                                 SizedBox(height: 8),
-                                                Text("Medication Name: ${med.labels}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                                                if (med.details != null && med.details!.isNotEmpty)
+                                                Text(
+                                                    "Medication Name: ${med.labels}",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 18)),
+                                                if (med.details != null &&
+                                                    med.details!.isNotEmpty)
                                                   RichText(
                                                     text: TextSpan(
-                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
+                                                      style:
+                                                          DefaultTextStyle.of(
+                                                                  context)
+                                                              .style
+                                                              .copyWith(
+                                                                  fontSize: 16),
                                                       children: [
                                                         TextSpan(
                                                           text: "Details: ",
-                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16),
                                                         ),
                                                         TextSpan(
                                                           text: med.details,
-                                                          style: TextStyle(fontSize: 16),
+                                                          style: TextStyle(
+                                                              fontSize: 16),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
-                                                if (med.quantity != null && med.quantity!.isNotEmpty)
+                                                if (med.quantity != null &&
+                                                    med.quantity!.isNotEmpty)
                                                   RichText(
                                                     text: TextSpan(
-                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
+                                                      style:
+                                                          DefaultTextStyle.of(
+                                                                  context)
+                                                              .style
+                                                              .copyWith(
+                                                                  fontSize: 16),
                                                       children: [
                                                         TextSpan(
                                                           text: "Quantity: ",
-                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16),
                                                         ),
                                                         TextSpan(
                                                           text: med.quantity,
-                                                          style: TextStyle(fontSize: 16),
+                                                          style: TextStyle(
+                                                              fontSize: 16),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
-                                                if (med.dosage != null && med.dosage!.isNotEmpty)
+                                                if (med.dosage != null &&
+                                                    med.dosage!.isNotEmpty)
                                                   RichText(
                                                     text: TextSpan(
-                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
+                                                      style:
+                                                          DefaultTextStyle.of(
+                                                                  context)
+                                                              .style
+                                                              .copyWith(
+                                                                  fontSize: 16),
                                                       children: [
                                                         TextSpan(
                                                           text: "Dosage: ",
-                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16),
                                                         ),
                                                         TextSpan(
                                                           text: med.dosage,
-                                                          style: TextStyle(fontSize: 16),
+                                                          style: TextStyle(
+                                                              fontSize: 16),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
-                                                if (med.instructions != null && med.instructions!.isNotEmpty)
+                                                if (med.instructions != null &&
+                                                    med.instructions!
+                                                        .isNotEmpty)
                                                   RichText(
                                                     text: TextSpan(
-                                                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16),
+                                                      style:
+                                                          DefaultTextStyle.of(
+                                                                  context)
+                                                              .style
+                                                              .copyWith(
+                                                                  fontSize: 16),
                                                       children: [
                                                         TextSpan(
-                                                          text: "Instructions: ",
-                                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                          text:
+                                                              "Instructions: ",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16),
                                                         ),
                                                         TextSpan(
-                                                          text: med.instructions,
-                                                          style: TextStyle(fontSize: 16),
+                                                          text:
+                                                              med.instructions,
+                                                          style: TextStyle(
+                                                              fontSize: 16),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
                                                   children: [
                                                     IconButton(
-                                                      icon: Icon(Icons.edit, color: Colors.green),
+                                                      icon: Icon(Icons.edit,
+                                                          color: Colors.green),
                                                       tooltip: 'Edit',
                                                       onPressed: () async {
-                                                        final updated = await Navigator.push(
+                                                        final updated =
+                                                            await Navigator
+                                                                .push(
                                                           context,
                                                           MaterialPageRoute(
-                                                            builder: (context) => EditMedicationsPage(
+                                                            builder: (context) =>
+                                                                EditMedicationsPage(
                                                               medication: med,
                                                               uid: currentUid,
                                                             ),
                                                           ),
                                                         );
-                                                        if (updated == true) setState(() {});
+                                                        if (updated == true)
+                                                          setState(() {});
                                                       },
                                                     ),
                                                     IconButton(
-                                                      icon: Icon(Icons.delete, color: Colors.red),
+                                                      icon: Icon(Icons.delete,
+                                                          color: Colors.red),
                                                       tooltip: 'Delete',
                                                       onPressed: () async {
-                                                        final confirm = await showDialog<bool>(
+                                                        final confirm =
+                                                            await showDialog<
+                                                                bool>(
                                                           context: context,
-                                                          builder: (context) => AlertDialog(
-                                                            title: Text('Delete Medication'),
-                                                            content: Text('Are you sure you want to delete this medication?'),
+                                                          builder: (context) =>
+                                                              AlertDialog(
+                                                            title: Text(
+                                                                'Delete Medication'),
+                                                            content: Text(
+                                                                'Are you sure you want to delete this medication?'),
                                                             actions: [
                                                               TextButton(
-                                                                onPressed: () => Navigator.pop(context, false),
-                                                                child: Text('Cancel'),
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context,
+                                                                        false),
+                                                                child: Text(
+                                                                    'Cancel'),
                                                               ),
                                                               TextButton(
-                                                                onPressed: () => Navigator.pop(context, true),
-                                                                child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context,
+                                                                        true),
+                                                                child: Text(
+                                                                    'Delete',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .red)),
                                                               ),
                                                             ],
                                                           ),
                                                         );
                                                         if (confirm == true) {
-                                                          await userRepo.deleteMedication(currentUid, med.id);
-                                                          setState(() {}); // Refresh the list
+                                                          await userRepo
+                                                              .deleteMedication(
+                                                                  currentUid,
+                                                                  med.id);
+                                                          setState(
+                                                              () {}); // Refresh the list
                                                         }
                                                       },
                                                     ),
@@ -694,7 +824,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       );
                                     } else if (snapshot.hasError) {
                                       return Center(
-                                          child: Text(snapshot.error.toString()));
+                                          child:
+                                              Text(snapshot.error.toString()));
                                     } else {
                                       return const Center(
                                           child: Text('Something went wrong'));
@@ -707,22 +838,22 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ]),
                         ),
                       )
-                    :
-                    FutureBuilder<List<GraceUser>>(
+                    : FutureBuilder<List<GraceUser>>(
                         future: controller.getPatients(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
                             if (snapshot.hasData) {
-
                               List<GraceUser> patients = snapshot.data!;
                               // Apply search filter of patients with meds/no meds
-                              List<GraceUser> filteredPatients = patients.where((patient) {
+                              List<GraceUser> filteredPatients =
+                                  patients.where((patient) {
                                 String email = patient.email ?? '';
                                 String name = patient.name ?? '';
-                                return email
-                                        .toLowerCase()
-                                        .contains(specificPatients.toLowerCase()) ||
-                                    name.toLowerCase().contains(specificPatients.toLowerCase());
+                                return email.toLowerCase().contains(
+                                        specificPatients.toLowerCase()) ||
+                                    name.toLowerCase().contains(
+                                        specificPatients.toLowerCase());
                               }).toList();
                               return Expanded(
                                   child: ListView.separated(
@@ -735,21 +866,22 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         );
                                       },
                                       itemBuilder: (context, index) {
-                                        GraceUser patient = filteredPatients[index];
+                                        GraceUser patient =
+                                            filteredPatients[index];
                                         String uid = patient.id ?? '';
                                         String email = patient.email ?? '';
                                         String name = patient.name ?? '';
-                                        return 
-                                        Container(
+                                        return Container(
                                           padding: const EdgeInsets.fromLTRB(
                                               10, 10, 10, 0),
                                           decoration: const BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.all(Radius.circular(22)),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(22)),
                                             color: Color(0xDDF6F6F6),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Color.fromRGBO(0, 0, 0, 0.5),
+                                                color: Color.fromRGBO(
+                                                    0, 0, 0, 0.5),
                                                 offset: Offset(0, 1),
                                                 blurRadius: 4,
                                                 spreadRadius: 0,
@@ -765,40 +897,44 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                 style: TextStyle(fontSize: 15),
                                               ),
                                               Text(name),
-                                               if(isDropdownOpen)
-                                              Row(
-                                                children: [
-                                                  const Text(
-                                                    'View more for medication info',
-                                                    style: TextStyle(fontSize: 10),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        isDropdownOpen =
-                                                            !isDropdownOpen;
-                                                      });
-                                                    },
-                                                    icon: Icon(isDropdownOpen
-                                                        ? Icons.expand_less
-                                                        : Icons.expand_more),
-                                                  ),
-                                                ],
-                                              ),
-                                               caregiverPatientCardView(index,uid),
+                                              if (isDropdownOpen)
+                                                Row(
+                                                  children: [
+                                                    const Text(
+                                                      'View more for medication info',
+                                                      style: TextStyle(
+                                                          fontSize: 10),
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          isDropdownOpen =
+                                                              !isDropdownOpen;
+                                                        });
+                                                      },
+                                                      icon: Icon(isDropdownOpen
+                                                          ? Icons.expand_less
+                                                          : Icons.expand_more),
+                                                    ),
+                                                  ],
+                                                ),
+                                              caregiverPatientCardView(
+                                                  index, uid),
                                             ],
                                           ),
                                         );
                                       }));
                             } else if (snapshot.hasError) {
-                              return Center(child: Text(snapshot.error.toString()));
+                              return Center(
+                                  child: Text(snapshot.error.toString()));
                             } else {
                               return const Center(
                                   child: Text('Something went wrong'));
                             }
                           } else {
                             // return const Center(child: Text(''));
-                            return const Center(child: CircularProgressIndicator());
+                            return const Center(
+                                child: CircularProgressIndicator());
                           }
                         },
                       ),
@@ -807,21 +943,19 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           ),
         ),
         endDrawer: AppDrawerNavigation(loginType: widget.loginType),
-      // --- Add this floatingActionButton ---
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ChatbotScreen())
-          );
-        },
-        backgroundColor: const Color(0xFF0CE25C),
-        child: const Icon(Icons.chat, color: Colors.white),
-        shape: const CircleBorder(),
+        // --- Add this floatingActionButton ---
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ChatbotScreen()));
+          },
+          backgroundColor: const Color(0xFF0CE25C),
+          child: const Icon(Icons.chat, color: Colors.white),
+          shape: const CircleBorder(),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    ),
-        onWillPop: () async {
+      onWillPop: () async {
         return false;
       },
     );

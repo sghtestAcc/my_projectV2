@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
@@ -7,7 +8,6 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:my_project/models/medications.dart';
 
 import '../home/patient_card.dart';
 
@@ -222,37 +222,6 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                 ],
                               ),
                                caregiverPatientCardView(i, patientid),
-                               StreamBuilder<List<Medication>>(
-                                stream: userRepo.getAllPatientMedications(patientid),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return Center(child: CircularProgressIndicator());
-                                  } else if (snapshot.hasError) {
-                                    return Center(child: Text(snapshot.error.toString()));
-                                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                                    final meds = snapshot.data!;
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: meds.map((med) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 4),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Medication Name: ${med.labels}', style: TextStyle(fontWeight: FontWeight.bold)),
-                                            Text('Details: ${med.details ?? ""}'),
-                                            Text('Quantity: ${med.quantity ?? ""}'),
-                                            Text('Dosage: ${med.dosage ?? ""}'),
-                                            Text('Instructions: ${med.instructions ?? ""}'),
-                                            const Divider(),
-                                          ],
-                                        ),
-                                      )).toList(),
-                                    );
-                                  } else {
-                                    return Text('No medications found for this patient.');
-                                  }
-                                },
-                              ),
                             ],
                           ),
                         );
