@@ -288,7 +288,8 @@ String text = 'Hello world';
               ],
             )
           ]),
-          endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
+          endDrawer: const AppDrawerNavigation(),
+
         );
   }
 }

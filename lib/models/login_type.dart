@@ -1,4 +1,5 @@
 enum LoginType {
   patient,
-  caregiver
+  caregiver,
+  dualAccount,
 }

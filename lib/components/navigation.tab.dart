@@ -6,94 +6,113 @@ import 'package:my_project/screens/patients/select_patients.dart';
 import 'package:my_project/screens/profile/profile_page.dart';
 
 class NavigatorBar extends StatefulWidget {
+  final LoginType loginType; // Selected by user on login (e.g., caregiver)
+  final LoginType actualAccountType; // From Firestore (can be dualAccount)
+  int selectedIndex;
 
-  final LoginType loginType;
-  int selectedIndex = 0;
-  NavigatorBar({Key? key, required this.loginType,  this.selectedIndex = 0}) : super(key: key);
+  NavigatorBar({
+    Key? key,
+    required this.loginType,
+    required this.actualAccountType,
+    this.selectedIndex = 0,
+  }) : super(key: key);
+
   @override
   State<NavigatorBar> createState() => _NavigatorBarState();
 }
 
 class _NavigatorBarState extends State<NavigatorBar> {
-  // int selectedIndex = 0;
-  final screens = [
-     const PatientHomeScreen(
-      loginType: LoginType.patient),
-     const CommunicationsScreen(
-      loginType: LoginType.patient,
-    ),
-   const MyProfile(loginType: LoginType.patient)
-  ];
+  late LoginType _currentLoginType;
 
-  final screens2 = [
-     PatientHomeScreen(
-      loginType: LoginType.caregiver),
-   CommunicationsScreen(
-      loginType: LoginType.caregiver,
-    ),
-    SelectPatientScreen(),
-    const MyProfile(loginType: LoginType.caregiver)
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _currentLoginType = widget.loginType; // Start with user's selected role
+  }
+
+  List<BottomNavigationBarItem> get bottomNavItems {
+    if (_currentLoginType == LoginType.caregiver) {
+      return const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.comment),
+          label: 'Communications',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.list_alt),
+          label: 'Patients',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ];
+    } else {
+      return const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.comment),
+          label: 'Communications',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return widget.loginType == LoginType.patient
-        ? Scaffold(
-            body: screens[widget.selectedIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              backgroundColor:Color(0xff0CE25C),
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.white,
-              currentIndex: widget.selectedIndex,
-              onTap: (index) {
-                setState(() {
-                  widget.selectedIndex = index;
-                });
-              },
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home', ),
-                BottomNavigationBarItem(
-                icon: Icon(Icons.comment), label: 'Communications'),
-                BottomNavigationBarItem(icon: Icon(Icons.person_2_sharp), label: 'Profile', ),
-              ],
-            ),
-          )
-        : Scaffold(
-            body: screens2[widget.selectedIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              backgroundColor:const Color(0xff1CA77A),
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.white,
-              currentIndex: widget.selectedIndex,
-              onTap: (index) {
-                setState(() {
-                  widget.selectedIndex = index;
-                });
-              },
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                  backgroundColor:Color(0xff1CA77A),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.comment),
-                  // assets/images/chat-box.png
-                  label: 'Communications',
-                   backgroundColor:Color(0xff1CA77A),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.list_outlined),
-                  label: 'Patients',
-                   backgroundColor:Color(0xff1CA77A),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Profile',
-                   backgroundColor:Color(0xff1CA77A),
-                ),
-              ],
-            ),
-          );
+    final List<Widget> screens = _currentLoginType == LoginType.caregiver
+        ? [
+            PatientHomeScreen(
+  loginType: _currentLoginType,
+  actualAccountType: widget.actualAccountType,
+),
+
+            CommunicationsScreen(loginType: _currentLoginType),
+            SelectPatientScreen(),
+            MyProfile(loginType: _currentLoginType),
+          ]
+        : [
+            PatientHomeScreen(
+  loginType: _currentLoginType,
+  actualAccountType: widget.actualAccountType,
+),
+
+            CommunicationsScreen(loginType: _currentLoginType),
+            MyProfile(loginType: _currentLoginType),
+          ];
+
+    return Scaffold(
+      appBar: null, // ❌ removed "View: ..." text
+      body: screens[widget.selectedIndex],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: _currentLoginType == LoginType.caregiver
+              ? const Color(0xff1CA77A)
+              : const Color(0xff0CE25C),
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white,
+          currentIndex: widget.selectedIndex,
+          onTap: (index) {
+            setState(() {
+              widget.selectedIndex = index;
+            });
+          },
+          items: bottomNavItems,
+        ),
+      ),
+    );
   }
 }

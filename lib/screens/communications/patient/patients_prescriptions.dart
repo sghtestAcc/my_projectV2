@@ -17,8 +17,8 @@ class PatientsPrescripScreen extends StatefulWidget {
   State<PatientsPrescripScreen> createState() => _PatientsPrescripScreenState();
 }
 
-  final userRepo = Get.put(UserRepository());
-  final _authRepo = Get.put(AuthenticationRepository());
+final userRepo = Get.put(UserRepository());
+final _authRepo = Get.put(AuthenticationRepository());
 
 class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
   final currentEmail = _authRepo.firebaseUser.value?.email;
@@ -27,23 +27,23 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  const Text(
+        title: const Text(
           'Prescriptions',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme:  IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: Colors.black),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-          Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-          builder: (context) => 
-          NavigatorBar(
-          loginType: LoginType.patient),
-          ));
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => NavigatorBar(
+                loginType: LoginType.caregiver,
+                actualAccountType: LoginType.caregiver,
+              ),
+            ));
           },
         ),
       ),
@@ -58,135 +58,175 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                 decoration: const BoxDecoration(
                   color: Color(0xFF9EE8BF), // Background color/ Rounded border
                 ),
-                child:
-                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                   const Text(
-                    'Patient',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                   const SizedBox(
-                    height: 10,
-                  ),
-                   const Text(
-                    'Medications',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                   const SizedBox(
-                    height: 10,
-                  ),
-                  Column(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(20.0),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF6F6F6), // Background color
-                          borderRadius: BorderRadius.circular(10.0), // Rounded border
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.0,
-                          ),
-                        ),
-                        child: FutureBuilder(
-                          future: controller.getPatientData(),
-                          builder: (context, snapshot) {
-                           if (snapshot.connectionState == ConnectionState.done) {
-                              if(snapshot.hasData) {
-                                 var patientsInfo = snapshot.data;
-                                 return  Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                       Text(
+                      const Text(
+                        'Patient',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Text(
+                        'Medications',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20.0),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Color(0xFFF6F6F6), // Background color
+                              borderRadius:
+                                  BorderRadius.circular(10.0), // Rounded border
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 1.0,
+                              ),
+                            ),
+                            child: FutureBuilder(
+                                future: controller.getPatientData(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    if (snapshot.hasData) {
+                                      var patientsInfo = snapshot.data;
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
                                             "${patientsInfo?.name}",
                                             style: const TextStyle(
-                                            fontSize: 15,
+                                              fontSize: 15,
                                             ),
-                                            ),
-                                       Text(
+                                          ),
+                                          Text(
                                             "${patientsInfo?.email}",
-                                              style: const TextStyle(
-                                               fontSize: 15,
-                                              ),
-                                      ),
-                                      SizedBox(height: 10,),
-                                       StreamBuilder<List<Medication>>(
-                                  stream: userRepo.getAllPatientMedications(patientsInfo?.id),
-                                  builder: (context, snapshot) {
-                                  if(snapshot.connectionState == ConnectionState.done) {
-                                  if(snapshot.hasData) {
-                                  var patientsInfoMedication = snapshot.data;
-                                  final children = <Widget>[];
-                                  for (var i = 0; i < patientsInfoMedication!.length; i++) {
-                                     children.add(
-                                  Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                  Text(
-                                  '${patientsInfoMedication[i].labels}',
-                                  style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
-                                    ),
-                                   ]),
-                                  );
-                                  children.add(SizedBox(height: 10,));
-                                  children.add(
-                                  Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                  SizedBox(height: 10,),
-                                   ]),
-                                  );
-                                  children.add(SizedBox(height: 10,));
-                                  }
-                                  return Column(
-                                  children: children,);
-                                  } else if (snapshot.hasError) {
-                                  return Center(child: Text(snapshot.error.toString()));
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          StreamBuilder<List<Medication>>(
+                                              stream: userRepo
+                                                  .getAllPatientMedications(
+                                                      patientsInfo?.id),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.done) {
+                                                  if (snapshot.hasData) {
+                                                    var patientsInfoMedication =
+                                                        snapshot.data;
+                                                    final children = <Widget>[];
+                                                    for (var i = 0;
+                                                        i <
+                                                            patientsInfoMedication!
+                                                                .length;
+                                                        i++) {
+                                                      children.add(
+                                                        Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                '${patientsInfoMedication[i].labels}',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ]),
+                                                      );
+                                                      children.add(SizedBox(
+                                                        height: 10,
+                                                      ));
+                                                      children.add(
+                                                        Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                            ]),
+                                                      );
+                                                      children.add(SizedBox(
+                                                        height: 10,
+                                                      ));
+                                                    }
+                                                    return Column(
+                                                      children: children,
+                                                    );
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Center(
+                                                        child: Text(snapshot
+                                                            .error
+                                                            .toString()));
+                                                  } else {
+                                                    return const Center(
+                                                        child: Text(
+                                                            'Something went wrong'));
+                                                  }
+                                                } else {
+                                                  return const Center(
+                                                      child:
+                                                          CircularProgressIndicator());
+                                                }
+                                              })
+                                        ],
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child:
+                                              Text(snapshot.error.toString()));
+                                    } else {
+                                      return const Center(
+                                          child: Text('Something went wrong'));
+                                    }
                                   } else {
-                                  return const Center(
-                                  child: Text('Something went wrong'));
+                                    return const Center(
+                                        child: CircularProgressIndicator());
                                   }
-                                  }  else {
-                                  return const Center(child: CircularProgressIndicator());
-                                  }
-                                  })
-               
-                                  ],
-                                 );
-                              } else if (snapshot.hasError) {
-                                        return Center(child: Text(snapshot.error.toString()));
-                              } else {
-                                        return const Center(
-                                            child: Text('Something went wrong'));
-                                      }
-                           }else  {
-                                      return const Center(child: CircularProgressIndicator());
-                            }
-                          }
-                        ),
-                      ),
-                    ],
-                  )
-                ]),
+                                }),
+                          ),
+                        ],
+                      )
+                    ]),
               ),
               Container(
                 width: double.infinity,
                 // padding: EdgeInsets.all(10.0),
                 decoration: BoxDecoration(
                   color:
-                       Color(0xFFF6F6F6), // Background color // Rounded border
+                      Color(0xFFF6F6F6), // Background color // Rounded border
                   border: Border.all(
                     color: Colors.black,
                     width: 1.0,
                   ),
                 ),
                 child: Container(
-                    padding:  EdgeInsets.all(10.0),
-                    child:  const Text(
+                    padding: EdgeInsets.all(10.0),
+                    child: const Text(
                       'Patient info Medication List',
                       style: TextStyle(fontSize: 20),
                     )),
               ),
-               const SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Container(
@@ -194,140 +234,192 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
-                    color:const Color(0xFFF6F6F6), // Background color
+                    color: const Color(0xFFF6F6F6), // Background color
                     borderRadius: BorderRadius.circular(10.0), // Rounded border
                     border: Border.all(
                       color: Colors.black,
                       width: 1.0,
                     ),
                   ),
-                  child:  
-                  Column(
-                    children: [
-                       FutureBuilder(
-                              future: controller.getPatientData(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.done) {
-                                   if (snapshot.hasData) {
-                                    var patientsInfo = snapshot.data;
-                                    return Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                           children: [
-                                             Text(
-                                            "${patientsInfo?.name}",
-                                            style: const TextStyle(
-                                            fontSize: 15,
-                                            ),
-                                            ),
-                                            const Text(
-                                           'Quantity',
-                                            style: TextStyle(fontSize: 15),
-                                            ),   
-                                                  const Text(
-                                              'Schedule',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                           ],
-                                        ),
-                                        SizedBox(height: 10,),
-                                        Row(
-                                          children: [
-                                             Text(
-                                            "${patientsInfo?.email}",
-                                            style: const TextStyle(
-                                            fontSize: 15,
-                                            ),
-                                            ),
-                                          ],
-                                        ),
-                                          const SizedBox(
-                                           height: 20,
-                                          ),
-                                          StreamBuilder<List<Medication>>(
-                          stream: userRepo.getAllPatientMedications(patientsInfo?.id),
+                  child: Column(children: [
+                    FutureBuilder(
+                      future: controller.getPatientData(),
                       builder: (context, snapshot) {
-                         if(snapshot.connectionState == ConnectionState.done) {
-                           if(snapshot.hasData) {
-                              var patientsInfoMedication = snapshot.data;
-                              final children = <Widget>[];
-                              for (var i = 0; i < patientsInfoMedication!.length; i++) {
-                                 children.add(
-                                  Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasData) {
+                            var patientsInfo = snapshot.data;
+                            return Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                  Container(
-                                  decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12), // Adjust the value as needed for the desired roundness
-                                  border: Border.all(color: Colors.black, width: 1), // Set the border color and width
-                                ),
-                                  child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12), // Same value as the BoxDecoration for rounded corners
-                                  child: (patientsInfoMedication[i].pills.isNotEmpty)
-                                      ? SizedBox(
-                                          height: 50,
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: patientsInfoMedication[i].pills.length,
-                                            itemBuilder: (context, imgIdx) {
-                                              return Padding(
-                                                padding: const EdgeInsets.only(right: 4),
-                                                child: Image.network(
-                                                  patientsInfoMedication[i].pills[imgIdx],
-                                                  height: 50,
-                                                  width: 50,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        )
-                                      : Container(
-                                          height: 50,
-                                          width: 50,
-                                          color: Colors.grey[300],
-                                          child: Icon(Icons.image_not_supported),
-                                        ),
-                                ),
-                                                ),
-                                    Text(patientsInfoMedication[i].labels, 
-                                    style: TextStyle(fontSize: 15),
+                                    Text(
+                                      "${patientsInfo?.name}",
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                      ),
                                     ),
-                                    SizedBox(height: 10,),
-                                 ]),
-                                //  SizedBox(height: 10,),
-                                 );
-                                 children.add(SizedBox(height: 10,));
-                              }
-                                   return Column(
-                                    children: children,);
-                           } else if (snapshot.hasError) {
-                            return Center(child: Text(snapshot.error.toString()));
-                  } else {
-                     return const Center(
+                                    const Text(
+                                      'Quantity',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                    const Text(
+                                      'Schedule',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "${patientsInfo?.email}",
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                StreamBuilder<List<Medication>>(
+                                    stream: userRepo.getAllPatientMedications(
+                                        patientsInfo?.id),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        if (snapshot.hasData) {
+                                          var patientsInfoMedication =
+                                              snapshot.data;
+                                          final children = <Widget>[];
+                                          for (var i = 0;
+                                              i <
+                                                  patientsInfoMedication!
+                                                      .length;
+                                              i++) {
+                                            children.add(
+                                              Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                12), // Adjust the value as needed for the desired roundness
+                                                        border: Border.all(
+                                                            color: Colors.black,
+                                                            width:
+                                                                1), // Set the border color and width
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                12), // Same value as the BoxDecoration for rounded corners
+                                                        child:
+                                                            (patientsInfoMedication[
+                                                                        i]
+                                                                    .pills
+                                                                    .isNotEmpty)
+                                                                ? SizedBox(
+                                                                    height: 50,
+                                                                    child: ListView
+                                                                        .builder(
+                                                                      scrollDirection:
+                                                                          Axis.horizontal,
+                                                                      itemCount: patientsInfoMedication[
+                                                                              i]
+                                                                          .pills
+                                                                          .length,
+                                                                      itemBuilder:
+                                                                          (context,
+                                                                              imgIdx) {
+                                                                        return Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              right: 4),
+                                                                          child:
+                                                                              Image.network(
+                                                                            patientsInfoMedication[i].pills[imgIdx],
+                                                                            height:
+                                                                                50,
+                                                                            width:
+                                                                                50,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    ),
+                                                                  )
+                                                                : Container(
+                                                                    height: 50,
+                                                                    width: 50,
+                                                                    color: Colors
+                                                                            .grey[
+                                                                        300],
+                                                                    child: Icon(
+                                                                        Icons
+                                                                            .image_not_supported),
+                                                                  ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      patientsInfoMedication[i]
+                                                          .labels,
+                                                      style: TextStyle(
+                                                          fontSize: 15),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                  ]),
+                                              //  SizedBox(height: 10,),
+                                            );
+                                            children.add(SizedBox(
+                                              height: 10,
+                                            ));
+                                          }
+                                          return Column(
+                                            children: children,
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                              child: Text(
+                                                  snapshot.error.toString()));
+                                        } else {
+                                          return const Center(
+                                              child:
+                                                  Text('Something went wrong'));
+                                        }
+                                      } else {
+                                        return const Center(
+                                            child: CircularProgressIndicator());
+                                      }
+                                    }),
+                              ],
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text(snapshot.error.toString()));
+                          } else {
+                            return const Center(
                                 child: Text('Something went wrong'));
-                  }
-                         }  else {
-                          return const Center(child: CircularProgressIndicator());
+                          }
+                        } else {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
-                      }),
-                                      ],
-                                    );
-                                   } else if (snapshot.hasError) {
-                                    return Center(child: Text(snapshot.error.toString()));
-                                  } else {
-                                    return const Center(
-                                        child: Text('Something went wrong'));
-                                  }
-                                } else {
-                                  return const Center(child: CircularProgressIndicator());
-                                }
-                              },),
+                      },
+                    ),
                     const SizedBox(
                       height: 20,
                     ),
-              
                   ]),
                 ),
               ),
@@ -336,7 +428,8 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
         ),
       ),
       //  endDrawer: AppDrawerNavigation(loginType: widget.loginType),
-      endDrawer: const AppDrawerNavigation(loginType: LoginType.patient),
+endDrawer: const AppDrawerNavigation(),
+
     );
   }
 }

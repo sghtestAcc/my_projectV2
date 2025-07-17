@@ -45,7 +45,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         ),
         body: SingleChildScrollView(
           child: Container(
-             height: MediaQuery.of(context).size.height/ 1,
+            height: MediaQuery.of(context).size.height / 1,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -141,11 +141,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                         40), // Adjust the width by modifying the minimumSize property
                   ),
                   child: const Text(
-                    'Add Patients',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'Select Patient',
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -378,79 +375,78 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             ),
           ),
         ),
-        endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
+        endDrawer: const AppDrawerNavigation(),
       ),
-        onWillPop: () async {
+      onWillPop: () async {
         return false;
       },
     );
   }
 
-
 //add selected Patients that has medications
-Future<void> addPatientsToCurrentUser() async {
-  try {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String currentUserId = user.uid;
-      CollectionReference<Map<String, dynamic>> userCollection =
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(currentUserId)
-              .collection('patients');
+  Future<void> addPatientsToCurrentUser() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String currentUserId = user.uid;
+        CollectionReference<Map<String, dynamic>> userCollection =
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUserId)
+                .collection('patients');
 
-      List<GraceUser> patients = await userRepo.getAllPatientsWithMedications();
+        List<GraceUser> patients =
+            await userRepo.getAllPatientsWithMedications();
 
-      for (String uid in _isCheckedMap.keys) {
-        if (_isCheckedMap[uid] == true) {
-          // Find the selected patient from the list of filtered patients
-          GraceUser selectedPatient = patients.firstWhere((patient) => patient.id == uid);
+        for (String uid in _isCheckedMap.keys) {
+          if (_isCheckedMap[uid] == true) {
+            // Find the selected patient from the list of filtered patients
+            GraceUser selectedPatient =
+                patients.firstWhere((patient) => patient.id == uid);
 
-          // Create a map representation of the patient to be added to the user's collection
-          Map<String, dynamic> patientData = {
-            'id': selectedPatient.id,
-            'email': selectedPatient.email,
-            'name': selectedPatient.name,
-          };
-          await userCollection.add(patientData);
-          _isCheckedMap[uid] = false; // Set to false after adding the patient
+            // Create a map representation of the patient to be added to the user's collection
+            Map<String, dynamic> patientData = {
+              'id': selectedPatient.id,
+              'email': selectedPatient.email,
+              'name': selectedPatient.name,
+            };
+            await userCollection.add(patientData);
+            _isCheckedMap[uid] = false; // Set to false after adding the patient
+          }
         }
+        Get.snackbar("Congrats", "A new user has been added to your list.",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+            colorText: Color(0xFFF6F3E7));
+        setState(() {
+          // No need to modify _allPatients, as we only modify _selectedPatients now
+        });
       }
-          Get.snackbar(
-          "Congrats",
-          "A new user has been added to your list.",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-          colorText: Color(0xFFF6F3E7)
-          );
-      setState(() {
-        // No need to modify _allPatients, as we only modify _selectedPatients now
-      });
+    } catch (e) {
+      print('Error adding patients: $e');
     }
-  } catch (e) {
-    print('Error adding patients: $e');
   }
-}
 
-//fetch selected patients with medications of a single caregiver user 
- Stream<List<Map<String, dynamic>>> fetchSelectedPatients() {
-  try {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String currentUserId = user.uid;
-      CollectionReference<Map<String, dynamic>> collectionRef =
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(currentUserId)
-              .collection('patients');
-      return collectionRef.snapshots().map((snapshot) {
-        return snapshot.docs.map((doc) => doc.data()).toList();
-      });
+//fetch selected patients with medications of a single caregiver user
+  Stream<List<Map<String, dynamic>>> fetchSelectedPatients() {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String currentUserId = user.uid;
+        CollectionReference<Map<String, dynamic>> collectionRef =
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUserId)
+                .collection('patients');
+        return collectionRef.snapshots().map((snapshot) {
+          return snapshot.docs.map((doc) => doc.data()).toList();
+        });
+      }
+    } catch (e) {
+      print('Error fetching second list data: $e');
     }
-  } catch (e) {
-    print('Error fetching second list data: $e');
+    return Stream.value([]); // Return an empty stream if there's an error
   }
-  return Stream.value([]); // Return an empty stream if there's an error
 }
 
   // Method to schedule notification

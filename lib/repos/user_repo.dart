@@ -29,6 +29,38 @@ class UserRepository extends GetxController {
     return isEmailExists; // If the snapshot has documents, email exists
   }
 
+Future<bool> isEmailExistsWithValidLoginType(String email, LoginType attemptedLoginType) async {
+  final user = await getUserByEmail(email);
+  if (user == null) return false;
+
+  return user.loginType == attemptedLoginType || user.loginType == LoginType.dualAccount;
+}
+
+Future<GraceUser?> getUserByEmail(String email) async {
+  try {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('Email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return GraceUser.fromSnapshot(snapshot.docs.first);
+    } else {
+      return null;
+    }
+  } catch (e) {
+    print('Error fetching user by email: $e');
+    return null;
+  }
+}
+
+Future<GraceUser> getUserById(String uid) async {
+  final snapshot = await firestore.collection('users').doc(uid).get();
+  return GraceUser.fromSnapshot(snapshot);
+}
+
+
   Future<bool> createUser(GraceUser user, String uid) async {
     final String email = user.email!;
     final bool emailExists = await isEmailExists(email, user.loginType);
