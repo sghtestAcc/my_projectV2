@@ -22,15 +22,18 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import '../communications/patient/edit_medications.dart';
 import 'translated_image_dialog.dart';
 
-
-
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
-  const PatientHomeScreen({Key? key, required this.loginType})
-      : super(key: key);
+  final LoginType actualAccountType; // ✅ Add this field
+  const PatientHomeScreen({
+    Key? key,
+    required this.loginType,
+    required this.actualAccountType, // ✅ Add this param
+  }) : super(key: key);
 
   @override
-  State<PatientHomeScreen> createState() => _PatientHomeScreenState();
+  State<PatientHomeScreen> createState() =>
+      _PatientHomeScreenState(); // ✅ KEEP THIS
 }
 
 final _authRepo = Get.put(AuthenticationRepository());
@@ -42,11 +45,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   String specificPatients = '';
   TextEditingController searchController = TextEditingController();
   final controller = Get.put(SelectPatientController());
-
+  late LoginType _currentView;
   bool isDropdownOpen = false;
   XFile? imageFile;
   bool textScanning = false;
   String scannedText = "";
+  @override
+  void initState() {
+    super.initState();
+    _currentView = widget.loginType;
+  }
 
   get totalQuantityController => null;
 
@@ -123,6 +131,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   }
 
   @override
+  void didUpdateWidget(PatientHomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update the view when loginType changes from parent
+    if (oldWidget.loginType != widget.loginType) {
+      setState(() {
+        _currentView = widget.loginType;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
@@ -139,11 +158,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.only(
-                bottom: 20), 
+            padding: EdgeInsets.only(bottom: 20),
             child: Column(
               children: [
-                widget.loginType == LoginType.patient
+                _currentView == LoginType.patient
                     ? FutureBuilder(
                         future: controller.getPatientData(),
                         builder: (context, snapshot) {
@@ -223,13 +241,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ),
                           Positioned.fill(
                             child: Transform.translate(
-                              offset: Offset(0,
-                                  40), 
+                              offset: Offset(0, 40),
                               child: Padding(
                                 padding: EdgeInsets.all(20.0),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .end, 
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     FutureBuilder(
@@ -302,7 +318,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ),
                         ],
                       ),
-                widget.loginType == LoginType.patient
+                _currentView == LoginType.patient
                     ? Container(
                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                         child: Row(
@@ -466,15 +482,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         ),
                       ]),
                 ),
-                widget.loginType == LoginType.patient
+                _currentView == LoginType.patient
                     ? Container(
                         padding: const EdgeInsets.all(20.0),
                         child: Container(
                           padding: const EdgeInsets.all(20.0),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF6F6F6), 
-                            borderRadius:
-                                BorderRadius.circular(10.0), 
+                            color: const Color(0xFFF6F6F6),
+                            borderRadius: BorderRadius.circular(10.0),
                             border: Border.all(
                               color: Colors.black,
                               width: 1.0,
@@ -942,7 +957,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ),
           ),
         ),
-        endDrawer: AppDrawerNavigation(loginType: widget.loginType),
+        endDrawer: const AppDrawerNavigation(),
+
+
         // --- Add this floatingActionButton ---
         floatingActionButton: FloatingActionButton(
           onPressed: () {

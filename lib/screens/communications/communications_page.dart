@@ -186,7 +186,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  widget.loginType == LoginType.patient
+                  widget.loginType == LoginType.patient || widget.loginType == LoginType.dualAccount
                       ? Container(
                           decoration: BoxDecoration(
                               border: Border.all(
@@ -212,7 +212,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                           ),
                         ),
                         //patients view questions
-                    widget.loginType == LoginType.patient ?  
+                    widget.loginType == LoginType.patient || widget.loginType == LoginType.dualAccount ?  
                   Expanded(
                     child: StreamBuilder<List<String>>(
                 stream: userRepo.getQuestionsofPatient(currentEmail),
@@ -440,7 +440,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                 },
               )
                   ),
-                  widget.loginType == LoginType.patient ?
+                  widget.loginType == LoginType.patient || widget.loginType == LoginType.dualAccount ?
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(10.0),
@@ -505,9 +505,8 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
           ),
         ),
         
-        endDrawer: widget.loginType == LoginType.patient ? 
-        const AppDrawerNavigation(loginType: LoginType.patient) :
-        const AppDrawerNavigation(loginType: LoginType.caregiver) ,
+        endDrawer: AppDrawerNavigation(),
+
       ),
        onWillPop: () async {
         return false;

@@ -378,9 +378,8 @@ Future<String> pickImage({ImageSource? source,}) async {
           ),
         ),
       ),
-        endDrawer: widget.loginType == LoginType.patient ? 
-        const AppDrawerNavigation(loginType: LoginType.patient) :
-        const AppDrawerNavigation(loginType: LoginType.caregiver) ,
+        endDrawer: const AppDrawerNavigation(),
+
     );
   }
 }
