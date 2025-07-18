@@ -139,10 +139,8 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       ),
       onTap: () {
-        // 🧠 Update global controller
         accountController.loginType = newLoginType;
 
-        // 🔁 Rebuild with new view
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

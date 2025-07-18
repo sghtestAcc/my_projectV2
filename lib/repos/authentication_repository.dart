@@ -107,10 +107,8 @@ class AuthenticationRepository extends GetxController {
 
   Future<void> MedicationChecksDoubleLayer(
       String uid, BuildContext context) async {
-    // ✅ Get the user's full info from Firestore
     final user = await userRepo.getUserById(uid);
 
-    // ✅ Check if medication exists
     var patientMedicationExists =
         await userRepo.isPatientMedicationsExists(uid);
 
@@ -127,7 +125,6 @@ class AuthenticationRepository extends GetxController {
       return;
     }
 
-    // ✅ Navigate to the main view (as patient)
     Get.to(() => NavigatorBar(
           loginType: LoginType.patient,
           actualAccountType: user.loginType, // ← this is now required
@@ -155,7 +152,6 @@ class AuthenticationRepository extends GetxController {
         return;
       }
 
-      // ✅ Check if selected loginType is valid for this user
       if (user.loginType != loginType &&
           user.loginType != LoginType.dualAccount) {
         Get.snackbar(
@@ -167,17 +163,13 @@ class AuthenticationRepository extends GetxController {
         );
         return;
       }
-
-      // ✅ Proceed with login
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       String uid = FirebaseAuth.instance.currentUser!.uid;
 
-      // ✅ Save selected and actual account types globally
       final accountController = Get.find<AccountController>();
       accountController.loginType = loginType; // selected by user
       accountController.actualAccountType = user.loginType; // from DB
 
-      // ✅ Navigate
       final hasMedications = await userRepo.isPatientMedicationsExists(uid);
 
       if (loginType == LoginType.patient && !hasMedications) {
