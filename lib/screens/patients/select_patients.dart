@@ -280,7 +280,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             GraceUser selectedPatient =
                 patients.firstWhere((patient) => patient.id == uid);
 
-            // Create a map representation of the patient to be added to the user's collection
+           
             Map<String, dynamic> patientData = {
               'id': selectedPatient.id,
               'email': selectedPatient.email,
@@ -295,7 +295,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
             colorText: Color(0xFFF6F3E7));
         setState(() {
-          // No need to modify _allPatients, as we only modify _selectedPatients now
+          
         });
       }
     } catch (e) {

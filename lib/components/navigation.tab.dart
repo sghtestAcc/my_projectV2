@@ -92,7 +92,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
           ];
 
     return Scaffold(
-      appBar: null, // ❌ removed "View: ..." text
+      appBar: null, 
       body: screens[widget.selectedIndex],
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
