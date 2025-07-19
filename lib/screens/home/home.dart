@@ -45,6 +45,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   String specificPatients = '';
   TextEditingController searchController = TextEditingController();
   final controller = Get.put(SelectPatientController());
+  Map<String, bool> isExpandedMap = {};
   late LoginType _currentView;
   bool isDropdownOpen = false;
   XFile? imageFile;
@@ -854,13 +855,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         ),
                       )
                     : FutureBuilder<List<GraceUser>>(
-                        future: controller.getPatients(),
+                        future: controller.getPatientsOfCurrentCaregiver(
+                          controller.currentUser!.uid,
+                        ),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
                             if (snapshot.hasData) {
                               List<GraceUser> patients = snapshot.data!;
-                              // Apply search filter of patients with meds/no meds
+                              debugPrint(
+                                  "✅ Fetched ${patients.length} patients under caregiver");
+
                               List<GraceUser> filteredPatients =
                                   patients.where((patient) {
                                 String email = patient.email ?? '';
@@ -870,95 +875,255 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     name.toLowerCase().contains(
                                         specificPatients.toLowerCase());
                               }).toList();
-                              return Expanded(
-                                  child: ListView.separated(
-                                      padding: const EdgeInsets.all(10.0),
-                                      shrinkWrap: true,
-                                      itemCount: filteredPatients.length,
-                                      separatorBuilder: (context, index) {
-                                        return const SizedBox(
-                                          height: 10,
-                                        );
-                                      },
-                                      itemBuilder: (context, index) {
-                                        GraceUser patient =
-                                            filteredPatients[index];
-                                        String uid = patient.id ?? '';
-                                        String email = patient.email ?? '';
-                                        String name = patient.name ?? '';
-                                        return Container(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              10, 10, 10, 0),
-                                          decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(22)),
-                                            color: Color(0xDDF6F6F6),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Color.fromRGBO(
-                                                    0, 0, 0, 0.5),
-                                                offset: Offset(0, 1),
-                                                blurRadius: 4,
-                                                spreadRadius: 0,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                email,
-                                                style: TextStyle(fontSize: 15),
-                                              ),
-                                              Text(name),
-                                              if (isDropdownOpen)
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      'View more for medication info',
-                                                      style: TextStyle(
-                                                          fontSize: 10),
+
+                              if (filteredPatients.isEmpty) {
+                                return const Center(
+                                    child: Text("No matching patients found."));
+                              }
+
+                              return ListView.separated(
+                                padding: const EdgeInsets.all(10.0),
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: filteredPatients.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 10),
+                                itemBuilder: (context, index) {
+                                  final patient = filteredPatients[index];
+                                  final uid = patient.id ?? '';
+                                  final email = patient.email ?? '';
+                                  final name = patient.name ?? '';
+
+                                  debugPrint("👤 Showing: $name <$email>");
+
+                                  final isExpanded =
+                                      isExpandedMap[uid] ?? false;
+
+                                  return Container(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        10, 10, 10, 0),
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(22)),
+                                      color: const Color(0xDDF6F6F6),
+                                      border: Border.all(
+                                          color: Colors.green,
+                                          width: 2), // ✅ Green border
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Color.fromRGBO(0, 0, 0, 0.5),
+                                          offset: Offset(0, 1),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(email,
+                                            style:
+                                                const TextStyle(fontSize: 15)),
+                                        Text(name),
+                                        Row(
+                                          children: [
+                                            const Text('View medications',
+                                                style: TextStyle(fontSize: 10)),
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isExpandedMap[uid] =
+                                                      !isExpanded;
+                                                });
+                                              },
+                                              icon: Icon(isExpanded
+                                                  ? Icons.expand_less
+                                                  : Icons.expand_more),
+                                            ),
+                                          ],
+                                        ),
+                                        if (isExpanded)
+                                          FutureBuilder<List<Medication>>(
+                                            future: userRepo
+                                                .displayPatientsMedications(
+                                                    uid),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Padding(
+                                                  padding: EdgeInsets.all(8.0),
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                );
+                                              } else if (snapshot.hasError) {
+                                                return Text(
+                                                    'Error: ${snapshot.error}');
+                                              } else if (!snapshot.hasData ||
+                                                  snapshot.data!.isEmpty) {
+                                                return const Text(
+                                                    'No medications found.');
+                                              }
+
+                                              final meds = snapshot.data!;
+                                              return ListView.builder(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: meds.length,
+                                                itemBuilder: (context, i) {
+                                                  final med = meds[i];
+                                                  final allImages = [
+                                                    ...med.packaging,
+                                                    ...med.pills
+                                                  ];
+                                                  return Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      border: Border.all(
+                                                          color: Colors.green,
+                                                          width: 2),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black12,
+                                                          blurRadius: 4,
+                                                          offset: Offset(0, 2),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          isDropdownOpen =
-                                                              !isDropdownOpen;
-                                                        });
-                                                      },
-                                                      icon: Icon(isDropdownOpen
-                                                          ? Icons.expand_less
-                                                          : Icons.expand_more),
+                                                    margin: const EdgeInsets
+                                                        .symmetric(vertical: 8),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        if (allImages
+                                                            .isNotEmpty)
+                                                          SizedBox(
+                                                            height: 60,
+                                                            child: ListView
+                                                                .builder(
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              itemCount:
+                                                                  allImages
+                                                                      .length,
+                                                              itemBuilder: (context,
+                                                                      imgIdx) =>
+                                                                  Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            8),
+                                                                child:
+                                                                    GestureDetector(
+                                                                  onTap: () {
+                                                                    showDialog(
+                                                                      context:
+                                                                          context,
+                                                                      builder: (_) =>
+                                                                          TranslatedImageDialog(
+                                                                              imageUrl: allImages[imgIdx]),
+                                                                    );
+                                                                  },
+                                                                  child: Image
+                                                                      .network(
+                                                                    allImages[
+                                                                        imgIdx],
+                                                                    height: 50,
+                                                                    width: 50,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    errorBuilder: (context,
+                                                                            error,
+                                                                            stackTrace) =>
+                                                                        Container(
+                                                                      height:
+                                                                          50,
+                                                                      width: 50,
+                                                                      color: Colors
+                                                                              .grey[
+                                                                          300],
+                                                                      child: const Icon(
+                                                                          Icons
+                                                                              .image_not_supported),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        const SizedBox(
+                                                            height: 8),
+                                                        Text(
+                                                            "Medication Name: ${med.labels}",
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 16)),
+                                                        if (med.details !=
+                                                                null &&
+                                                            med.details!
+                                                                .isNotEmpty)
+                                                          Text(
+                                                              "Details: ${med.details!}"),
+                                                        if (med.quantity !=
+                                                                null &&
+                                                            med.quantity!
+                                                                .isNotEmpty)
+                                                          Text(
+                                                              "Quantity: ${med.quantity!}"),
+                                                        if (med.dosage !=
+                                                                null &&
+                                                            med.dosage!
+                                                                .isNotEmpty)
+                                                          Text(
+                                                              "Dosage: ${med.dosage!}"),
+                                                        if (med.instructions !=
+                                                                null &&
+                                                            med.instructions!
+                                                                .isNotEmpty)
+                                                          Text(
+                                                              "Instructions: ${med.instructions!}"),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
-                                              caregiverPatientCardView(
-                                                  index, uid),
-                                            ],
+                                                  );
+                                                },
+                                              );
+                                            },
                                           ),
-                                        );
-                                      }));
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
                             } else if (snapshot.hasError) {
+                              debugPrint("❌ Error: ${snapshot.error}");
                               return Center(
-                                  child: Text(snapshot.error.toString()));
+                                  child: Text('Error: ${snapshot.error}'));
                             } else {
                               return const Center(
-                                  child: Text('Something went wrong'));
+                                  child: Text("Something went wrong."));
                             }
                           } else {
-                            // return const Center(child: Text(''));
                             return const Center(
                                 child: CircularProgressIndicator());
                           }
                         },
-                      ),
+                      )
               ],
             ),
           ),
         ),
         endDrawer: const AppDrawerNavigation(),
-
 
         // --- Add this floatingActionButton ---
         floatingActionButton: FloatingActionButton(
