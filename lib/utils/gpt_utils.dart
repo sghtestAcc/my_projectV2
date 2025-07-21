@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_project/models/medications.dart';
 
 /// Utility function to translate text using GPT API.
 Future<String> translateWithGPT(String text,
@@ -42,3 +43,23 @@ Future<String> translateWithGPT(String text,
     return text; // Fallback to original
   }
 }
+
+String generateMedicationSummary(String patientName, List<Medication> meds) {
+  final buffer = StringBuffer();
+  buffer.writeln('$patientName has ${meds.length} medication${meds.length > 1 ? 's' : ''}.');
+
+  for (int i = 0; i < meds.length; i++) {
+    final med = meds[i];
+    final label = med.labels?.trim().isNotEmpty == true ? med.labels!.trim() : 'Unnamed medication';
+    final dosage = med.dosage?.trim();
+
+    if (dosage != null && dosage.isNotEmpty) {
+      buffer.writeln('Medication ${i + 1} is $label, where they will take $dosage.');
+    } else {
+      buffer.writeln('Medication ${i + 1} is $label.');
+    }
+  }
+
+  return buffer.toString();
+}
+

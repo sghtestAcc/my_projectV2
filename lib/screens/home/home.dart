@@ -21,6 +21,7 @@ import '../communications/caregiver/caregiver_vocalization_patient_view.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import '../communications/patient/edit_medications.dart';
 import 'translated_image_dialog.dart';
+import 'package:my_project/utils/gpt_utils.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -893,11 +894,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   final uid = patient.id ?? '';
                                   final email = patient.email ?? '';
                                   final name = patient.name ?? '';
-
-                                  debugPrint("👤 Showing: $name <$email>");
-
                                   final isExpanded =
                                       isExpandedMap[uid] ?? false;
+
+                                  debugPrint("👤 Showing: $name <$email>");
 
                                   return Container(
                                     padding: const EdgeInsets.fromLTRB(
@@ -921,185 +921,214 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(email,
-                                            style:
-                                                const TextStyle(fontSize: 15)),
-                                        Text(name),
-                                        Row(
-                                          children: [
-                                            const Text('View medications',
-                                                style: TextStyle(fontSize: 10)),
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  isExpandedMap[uid] =
-                                                      !isExpanded;
-                                                });
-                                              },
-                                              icon: Icon(isExpanded
-                                                  ? Icons.expand_less
-                                                  : Icons.expand_more),
-                                            ),
-                                          ],
+                                        Text(
+                                          email,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                        if (isExpanded)
-                                          FutureBuilder<List<Medication>>(
-                                            future: userRepo
-                                                .displayPatientsMedications(
-                                                    uid),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return const Padding(
-                                                  padding: EdgeInsets.all(8.0),
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                );
-                                              } else if (snapshot.hasError) {
-                                                return Text(
-                                                    'Error: ${snapshot.error}');
-                                              } else if (!snapshot.hasData ||
-                                                  snapshot.data!.isEmpty) {
-                                                return const Text(
-                                                    'No medications found.');
-                                              }
+                                        Text(
+                                          name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        FutureBuilder<List<Medication>>(
+                                          future: userRepo
+                                              .displayPatientsMedications(uid),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            } else if (snapshot.hasError) {
+                                              return Text(
+                                                  'Error: ${snapshot.error}');
+                                            } else if (!snapshot.hasData ||
+                                                snapshot.data!.isEmpty) {
+                                              return const Text(
+                                                  'No medications found.');
+                                            }
 
-                                              final meds = snapshot.data!;
-                                              return ListView.builder(
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: meds.length,
-                                                itemBuilder: (context, i) {
-                                                  final med = meds[i];
-                                                  final allImages = [
-                                                    ...med.packaging,
-                                                    ...med.pills
-                                                  ];
-                                                  return Container(
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      border: Border.all(
-                                                          color: Colors.green,
-                                                          width: 2),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black12,
-                                                          blurRadius: 4,
-                                                          offset: Offset(0, 2),
-                                                        ),
-                                                      ],
+                                            final meds = snapshot.data!;
+                                            final summaryText =
+                                                generateMedicationSummary(
+                                                    name, meds);
+
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  summaryText,
+                                                  style: const TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    const Text(
+                                                        'View medications',
+                                                        style: TextStyle(
+                                                            fontSize: 10)),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          isExpandedMap[uid] =
+                                                              !isExpanded;
+                                                        });
+                                                      },
+                                                      icon: Icon(isExpanded
+                                                          ? Icons.expand_less
+                                                          : Icons.expand_more),
                                                     ),
-                                                    margin: const EdgeInsets
-                                                        .symmetric(vertical: 8),
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            12),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        if (allImages
-                                                            .isNotEmpty)
-                                                          SizedBox(
-                                                            height: 60,
-                                                            child: ListView
-                                                                .builder(
-                                                              scrollDirection:
-                                                                  Axis.horizontal,
-                                                              itemCount:
-                                                                  allImages
-                                                                      .length,
-                                                              itemBuilder: (context,
-                                                                      imgIdx) =>
-                                                                  Padding(
-                                                                padding:
-                                                                    const EdgeInsets
+                                                  ],
+                                                ),
+                                                if (isExpanded)
+                                                  Column(
+                                                    children: meds.map((med) {
+                                                      final allImages = [
+                                                        ...med.packaging,
+                                                        ...med.pills
+                                                      ];
+                                                      return Container(
+                                                        margin: const EdgeInsets
+                                                            .symmetric(
+                                                            vertical: 8),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(12),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.green,
+                                                              width: 2),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          boxShadow: const [
+                                                            BoxShadow(
+                                                              color: Colors
+                                                                  .black12,
+                                                              blurRadius: 4,
+                                                              offset:
+                                                                  Offset(0, 2),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            if (allImages
+                                                                .isNotEmpty)
+                                                              SizedBox(
+                                                                height: 60,
+                                                                child: ListView
+                                                                    .builder(
+                                                                  scrollDirection:
+                                                                      Axis.horizontal,
+                                                                  itemCount:
+                                                                      allImages
+                                                                          .length,
+                                                                  itemBuilder:
+                                                                      (context,
+                                                                              imgIdx) =>
+                                                                          Padding(
+                                                                    padding: const EdgeInsets
                                                                         .only(
                                                                         right:
                                                                             8),
-                                                                child:
-                                                                    GestureDetector(
-                                                                  onTap: () {
-                                                                    showDialog(
-                                                                      context:
-                                                                          context,
-                                                                      builder: (_) =>
-                                                                          TranslatedImageDialog(
-                                                                              imageUrl: allImages[imgIdx]),
-                                                                    );
-                                                                  },
-                                                                  child: Image
-                                                                      .network(
-                                                                    allImages[
-                                                                        imgIdx],
-                                                                    height: 50,
-                                                                    width: 50,
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                    errorBuilder: (context,
-                                                                            error,
-                                                                            stackTrace) =>
-                                                                        Container(
-                                                                      height:
-                                                                          50,
-                                                                      width: 50,
-                                                                      color: Colors
-                                                                              .grey[
-                                                                          300],
-                                                                      child: const Icon(
-                                                                          Icons
-                                                                              .image_not_supported),
+                                                                    child:
+                                                                        GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        showDialog(
+                                                                          context:
+                                                                              context,
+                                                                          builder: (_) =>
+                                                                              TranslatedImageDialog(
+                                                                            imageUrl:
+                                                                                allImages[imgIdx],
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                      child: Image
+                                                                          .network(
+                                                                        allImages[
+                                                                            imgIdx],
+                                                                        height:
+                                                                            50,
+                                                                        width:
+                                                                            50,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        errorBuilder: (context,
+                                                                                error,
+                                                                                stackTrace) =>
+                                                                            Container(
+                                                                          height:
+                                                                              50,
+                                                                          width:
+                                                                              50,
+                                                                          color:
+                                                                              Colors.grey[300],
+                                                                          child:
+                                                                              const Icon(Icons.image_not_supported),
+                                                                        ),
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ),
                                                               ),
+                                                            const SizedBox(
+                                                                height: 8),
+                                                            Text(
+                                                              "Medication Name: ${med.labels}",
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 16),
                                                             ),
-                                                          ),
-                                                        const SizedBox(
-                                                            height: 8),
-                                                        Text(
-                                                            "Medication Name: ${med.labels}",
-                                                            style: const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 16)),
-                                                        if (med.details !=
-                                                                null &&
-                                                            med.details!
-                                                                .isNotEmpty)
-                                                          Text(
-                                                              "Details: ${med.details!}"),
-                                                        if (med.quantity !=
-                                                                null &&
-                                                            med.quantity!
-                                                                .isNotEmpty)
-                                                          Text(
-                                                              "Quantity: ${med.quantity!}"),
-                                                        if (med.dosage !=
-                                                                null &&
-                                                            med.dosage!
-                                                                .isNotEmpty)
-                                                          Text(
-                                                              "Dosage: ${med.dosage!}"),
-                                                        if (med.instructions !=
-                                                                null &&
-                                                            med.instructions!
-                                                                .isNotEmpty)
-                                                          Text(
-                                                              "Instructions: ${med.instructions!}"),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ),
+                                                            if (med.details
+                                                                    ?.isNotEmpty ==
+                                                                true)
+                                                              Text(
+                                                                  "Details: ${med.details!}"),
+                                                            if (med.quantity
+                                                                    ?.isNotEmpty ==
+                                                                true)
+                                                              Text(
+                                                                  "Quantity: ${med.quantity!}"),
+                                                            if (med.dosage
+                                                                    ?.isNotEmpty ==
+                                                                true)
+                                                              Text(
+                                                                  "Dosage: ${med.dosage!}"),
+                                                            if (med.instructions
+                                                                    ?.isNotEmpty ==
+                                                                true)
+                                                              Text(
+                                                                  "Instructions: ${med.instructions!}"),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                              ],
+                                            );
+                                          },
+                                        ),
                                       ],
                                     ),
                                   );
