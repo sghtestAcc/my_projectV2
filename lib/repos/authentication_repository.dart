@@ -6,7 +6,7 @@ import 'package:my_project/main.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/error/register_failure.dart';
-
+import 'package:my_project/notification_service.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 
@@ -44,6 +44,7 @@ class AuthenticationRepository extends GetxController {
       );
       String uid = FirebaseAuth.instance.currentUser!.uid;
       UserRepository.instance.createUser(user, uid);
+
       Get.offAll(() => const HomeScreen());
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
@@ -164,8 +165,10 @@ Future<void> loginUser(
       return;
     }
     await _auth.signInWithEmailAndPassword(email: email, password: password);
+    
     String uid = FirebaseAuth.instance.currentUser!.uid;
     var patientMedicationExists = await userRepo.isPatientMedicationsExists(uid);
+
     //check if its a patient login type with no medications (direct to add medications screen)
     if (loginType == LoginType.patient && !patientMedicationExists) {
         Get.to(

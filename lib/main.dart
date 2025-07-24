@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:my_project/screens/auth/login_page.dart';
+import 'package:my_project/notification_service.dart'; // Add this import
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'firebase_options.dart';
@@ -14,6 +15,8 @@ Future<void> main() async {
   await dotenv.load();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
       .then((value) => Get.put(AuthenticationRepository()));
+
+  await NotificationService.initialize(); // Initialize notification service
 
   runApp(
     const GetMaterialApp(

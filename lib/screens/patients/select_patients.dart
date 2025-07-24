@@ -149,6 +149,47 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                   ),
                 ),
               ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(50, 10, 50, 10),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    // Test immediate notification
+                    await NotificationService.showTestNotification();
+                    
+                    // Test scheduled notification (5 seconds from now)
+                    await NotificationService.scheduleNotification(
+                      id: 998,
+                      title: '⏰ Test Scheduled Notification',
+                      body: 'This notification was scheduled 5 seconds ago!',
+                      scheduledTime: DateTime.now().add(Duration(seconds: 5)),
+                      data: {'type': 'test_scheduled'},
+                    );
+                    
+                    Get.snackbar(
+                      "Test Notifications Sent",
+                      "Check for immediate notification and scheduled notification in 5 seconds",
+                      snackPosition: SnackPosition.TOP,
+                      backgroundColor: Colors.blue.withOpacity(0.7),
+                      colorText: Colors.white,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    minimumSize: const Size(double.infinity, 40),
+                  ),
+                  child: const Text(
+                    '🧪 Test Notifications',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
                   StreamBuilder<List<Map<String, dynamic>>>(
                 stream:  fetchSelectedPatients(),
                 builder: (context, snapshot) {
@@ -292,10 +333,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                     ),
                                   ],
                                 ),
-                                
                                 SizedBox(height: 10),
-                                
-                                // Save and Cancel buttons
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -318,7 +356,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                       ),
                                       onPressed: selectedTime != null
                                           ? () async {
-                                              await _scheduleNotification(
+                                              await _scheduleNotificationForPatient(
                                                 patientid,
                                                 patientName,
                                                 selectedTime!,
@@ -432,76 +470,73 @@ Future<void> addPatientsToCurrentUser() async {
   }
 }
 
-//fetch selected patients with medications of a single caregiver user 
- Stream<List<Map<String, dynamic>>> fetchSelectedPatients() {
-  try {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String currentUserId = user.uid;
-      CollectionReference<Map<String, dynamic>> collectionRef =
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(currentUserId)
-              .collection('patients');
-      return collectionRef.snapshots().map((snapshot) {
-        return snapshot.docs.map((doc) => doc.data()).toList();
-      });
+  //fetch selected patients with medications of a single caregiver user 
+  Stream<List<Map<String, dynamic>>> fetchSelectedPatients() {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String currentUserId = user.uid;
+        CollectionReference<Map<String, dynamic>> collectionRef =
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUserId)
+                .collection('patients');
+        return collectionRef.snapshots().map((snapshot) {
+          return snapshot.docs.map((doc) => doc.data()).toList();
+        });
+      }
+    } catch (e) {
+      print('Error fetching second list data: $e');
     }
-  } catch (e) {
-    print('Error fetching second list data: $e');
+    return Stream.value([]); // Return an empty stream if there's an error
   }
-  return Stream.value([]); // Return an empty stream if there's an error
-}
-
-  // Method to schedule notification
-  Future<void> _scheduleNotification(
+  
+  // Add this method to your _SelectPatientScreenState class
+  Future<void> _scheduleNotificationForPatient(
     String patientId,
     String patientName,
     TimeOfDay selectedTime,
   ) async {
     try {
-      // Create notification time for today at selected time
-      final now = DateTime.now();
-      final scheduledDateTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        selectedTime.hour,
-        selectedTime.minute,
-      );
+      print('🔔 Scheduling notification for patient: $patientName');
       
-      // If time has already passed today, schedule for tomorrow
-      final finalScheduledTime = scheduledDateTime.isBefore(now)
-          ? scheduledDateTime.add(Duration(days: 1))
-          : scheduledDateTime;
-
-      // Schedule local notification
-      await NotificationService.scheduleNotification(
-        DateTime.now().millisecondsSinceEpoch, // unique notification ID
-        "Medication Reminder",
-        "It's time for $patientName to take their medication!",
-        finalScheduledTime,
+      // Generate unique notification ID
+      final notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      
+      // Schedule the notification
+      await NotificationService.scheduleDailyNotification(
+        id: notificationId,
+        title: 'Medication Reminder for $patientName',
+        body: 'Time to remind $patientName to take their medication!',
+        time: selectedTime,
+        data: {
+          'type': 'medication_reminder',
+          'patientId': patientId,
+          'patientName': patientName,
+          'notificationId': notificationId,
+        },
       );
 
-      // Optionally save to Firestore for tracking
+      // Save notification info to Firestore for tracking
       await userRepo.createMedicationNotification(
         patientId,
-        "Medication Reminder",
-        "It's time for $patientName to take their medication!",
-        finalScheduledTime.toIso8601String(),
+        'Medication Reminder',
+        'Daily reminder for $patientName at ${selectedTime.format(context)}',
+        DateTime.now().toIso8601String(),
       );
 
       Get.snackbar(
-        "Success",
-        "Medication reminder set for ${selectedTime.format(context)}",
+        "Success ✅",
+        "Daily medication reminder set for $patientName at ${selectedTime.format(context)}",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7),
       );
     } catch (e) {
+      print('❌ Error scheduling notification: $e');
       Get.snackbar(
         "Error",
-        "Failed to schedule notification: $e",
+        "Failed to schedule notification: ${e.toString()}",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.redAccent.withOpacity(0.1),
         colorText: Colors.red,
