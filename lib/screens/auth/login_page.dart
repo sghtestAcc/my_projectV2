@@ -6,14 +6,14 @@ import 'package:my_project/screens/auth/register_page.dart';
 import '../../models/login_type.dart';
 
 class LoginScreen extends StatefulWidget {
-  final LoginType loginType;
-  const LoginScreen({Key? key, required this.loginType}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  LoginType? selectedLoginType;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
   // String? email;
@@ -59,14 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
-                    widget.loginType == LoginType.patient
-                        ? 'Patient Login'
-                        : 'Caregiver Login',
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  const Text(
+                    'Login',
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -81,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 10,
                     ),
+                    const SizedBox(height: 10),
                     TextFormField(
                       controller: email,
                       obscureText: false,
@@ -145,33 +141,76 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => ResetPasswordScreen()
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child:
+                          Text('Account Type', style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(height: 10),
+                    DropdownButtonFormField<LoginType>(
+                      value: selectedLoginType,
+                      onChanged: (LoginType? newValue) {
+                        setState(() {
+                          selectedLoginType = newValue!;
+                        });
+                      },
+                      validator: (value) => value == null
+                          ? 'Please select an account type.'
+                          : null,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
                       ),
-                  );
-                    },
-                  child: Align(
-                  alignment: Alignment.centerRight, // Align the text to the right
-                  child: Text(
-                  'Forget Password?',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-              ),
-            ),
+                      items: [LoginType.patient, LoginType.caregiver]
+                          .map((LoginType type) {
+                        return DropdownMenuItem<LoginType>(
+                          value: type,
+                          child: Text(type.name[0].toUpperCase() +
+                              type.name.substring(1)),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ResetPasswordScreen()),
+                        );
+                      },
+                      child: Align(
+                        alignment: Alignment
+                            .centerRight, // Align the text to the right
+                        child: Text(
+                          'Forget Password?',
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
                     SizedBox(
                       width: double.infinity,
                       // height: 50,
                       child: ElevatedButton(
                         onPressed: () {
+                          if (selectedLoginType == null) {
+                            scaffoldMessengerKey.currentState?.showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select an account type.'),
+                              ),
+                            );
+                            return;
+                          }
+
                           if (formData.currentState!.validate()) {
                             AuthenticationRepository.instance.loginUser(
                               email.text.trim(),
                               password.text.trim(),
-                              widget.loginType,
+                              selectedLoginType!,
                             );
                             formData.currentState?.reset();
                           }
@@ -201,9 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RegisterScreen(
-                              registerType: widget.loginType,
-                            ),
+                            builder: (context) => const RegisterScreen(),
                           ),
                         );
                       },
@@ -214,22 +251,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: TextDecoration.underline,
                         ),
                       ),
-                    ),                
+                    ),
                   ],
                 ),
               ),
-              SizedBox(height: 30,),
-              Container(
-                child:   widget.loginType == LoginType.patient
-                ?
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Image.asset('assets/images/sghDesign.png'),
-            ):  Align(
-              alignment: Alignment.bottomCenter,
-              child: Image.asset('assets/images/sgh-design-caregiver.png'),
-            ),
-              )
+              SizedBox(
+                height: 30,
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Image.asset(
+                  selectedLoginType == LoginType.caregiver
+                      ? 'assets/images/sgh-design-caregiver.png'
+                      : 'assets/images/sghDesign.png',
+                ),
+              ),
             ],
           ),
         ),

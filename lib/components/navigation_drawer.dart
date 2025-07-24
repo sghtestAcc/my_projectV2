@@ -13,28 +13,46 @@ import '../repos/authentication_repository.dart';
 import '../screens/communications/bothusers/usersCameraScreen.dart';
 import '../screens/communications/caregiver/caregiver_prescription.dart';
 import '../screens/communications/caregiver/caregiver_vocalization_patient_view.dart';
+import 'package:my_project/controllers/account_controller.dart';
 
 class AppDrawerNavigation extends StatefulWidget {
-  final LoginType loginType;
+  const AppDrawerNavigation({Key? key}) : super(key: key);
 
-  // const AppDrawerNavigation({super.key});
-
-  const AppDrawerNavigation({Key? key, required this.loginType}): super(key: key);
   @override
   State<AppDrawerNavigation> createState() => _AppDrawerNavigationState();
 }
 
 class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
-  
+  late LoginType _currentLoginType;
+  final accountController = Get.find<AccountController>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final accountController = Get.find<AccountController>();
+    debugPrint(
+        '🔥 Current loginType from controller: ${accountController.loginType}');
+
+    _currentLoginType = accountController.loginType == LoginType.dualAccount
+        ? LoginType.patient
+        : accountController.loginType;
+
+    debugPrint('🟢 Initial view mode: $_currentLoginType');
+  }
+
   XFile? imageFile;
   bool textScanning = false;
   String scannedText = "";
 
-    Future<String> pickImage({ImageSource? source,}) async {
+  Future<String> pickImage({
+    ImageSource? source,
+  }) async {
     final picker = ImagePicker();
     String path = '';
     try {
-      final getImage = await picker.pickImage(source: source!,imageQuality: 50);
+      final getImage =
+          await picker.pickImage(source: source!, imageQuality: 50);
       if (getImage != null) {
         path = '';
         textScanning = true;
@@ -55,7 +73,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
     return path;
   }
 
-    Future<void> imageCropperView(String? path, BuildContext context) async {
+  Future<void> imageCropperView(String? path, BuildContext context) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: path!,
       aspectRatioPresets: [
@@ -67,7 +85,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
         CropAspectRatioPreset.ratio5x4,
         CropAspectRatioPreset.ratio5x3,
         CropAspectRatioPreset.ratio16x9
-      ] ,
+      ],
       uiSettings: [
         AndroidUiSettings(
             toolbarTitle: 'photoScanner cropped images',
@@ -90,35 +108,64 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
       // return croppedFile.path;
       // ignore: use_build_context_synchronously
       Navigator.push(
-      context,
-      MaterialPageRoute(
-      builder: (context) =>
-      RecognizePageBothUsers(path: croppedFile.path)));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  RecognizePageBothUsers(path: croppedFile.path)));
       // return XFile(croppedFile.path ?? );
       // getRecognisedText(imageFile!);
       // });
-    } else if(scannedText == '') {
+    } else if (scannedText == '') {
       log('do nothing');
       return;
       // ignore: use_build_context_synchronously
       // log('do nothing');
-          // return '';
+      // return '';
     } else {
       log('do nothing');
     }
   }
 
+  ListTile buildSwitchViewTile() {
+    final newLoginType = accountController.loginType == LoginType.patient
+        ? LoginType.caregiver
+        : LoginType.patient;
+
+    return ListTile(
+      leading: const Icon(Icons.swap_horiz),
+      iconColor: Colors.black,
+      title: Text(
+        'Switch to ${newLoginType == LoginType.patient ? 'Patient' : 'Caregiver'} View',
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      onTap: () {
+        accountController.loginType = newLoginType;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NavigatorBar(
+              loginType: newLoginType,
+              actualAccountType: accountController.actualAccountType,
+              selectedIndex: 0,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   String sourceLang = 'English';
 
-   final languagePicker = TranslateLanguage.values
-  .map(
-  (e) => e.name.capitalize!,
-  )
-  .toList(); 
+  final languagePicker = TranslateLanguage.values
+      .map(
+        (e) => e.name.capitalize!,
+      )
+      .toList();
 
-  @override  
+  @override
   Widget build(BuildContext context) {
-    return widget.loginType == LoginType.patient
+    return _currentLoginType == LoginType.patient
         ? Drawer(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -128,6 +175,8 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   color: Colors.black, // Set the desired color here
                 ),
               ),
+              if (accountController.actualAccountType == LoginType.dualAccount)
+                buildSwitchViewTile(),
               ListTile(
                   leading: Image.asset(
                     'assets/images/logout.png',
@@ -152,34 +201,34 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   onTap: () {
-                        showDialog(
+                    showDialog(
                       context: context,
-                  builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Select Language'),
-          content: Container(
-            padding: const EdgeInsets.all(10.0),
-            child: DropdownButton(
-              hint: Text('English'),
-              value: sourceLang,
-              onChanged: (newValue) {
-                setState(() {
-                  sourceLang = newValue ?? '';
-                  // translateTextFunction(typedText);
-                });
-                 Navigator.pop(context); // Close the dialog
-              },
-              items: languagePicker.map((valueItem) {
-                return DropdownMenuItem(
-                  value: valueItem,
-                  child: Text(valueItem),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Select Language'),
+                          content: Container(
+                            padding: const EdgeInsets.all(10.0),
+                            child: DropdownButton(
+                              hint: Text('English'),
+                              value: sourceLang,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  sourceLang = newValue ?? '';
+                                  // translateTextFunction(typedText);
+                                });
+                                Navigator.pop(context); // Close the dialog
+                              },
+                              items: languagePicker.map((valueItem) {
+                                return DropdownMenuItem(
+                                  value: valueItem,
+                                  child: Text(valueItem),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        );
+                      },
+                    );
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
@@ -191,12 +240,11 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   title: const Text('Prescriptions'),
                   onTap: () {
                     Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                    builder: (context) => const PatientsPrescripScreen(),
-                    ),
+                      MaterialPageRoute(
+                        builder: (context) => const PatientsPrescripScreen(),
+                      ),
                     );
-                  }
-                  ),
+                  }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
@@ -205,15 +253,13 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     width: 28,
                   ),
                   title: const Text('Vocalizations'),
-                  onTap:
-                      () {
+                  onTap: () {
                     Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                    builder: (context) => const PatientsVocalScreen(),
-                    ),
+                      MaterialPageRoute(
+                        builder: (context) => const PatientsVocalScreen(),
+                      ),
                     );
-                      } 
-                  ),
+                  }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
@@ -223,57 +269,65 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   ),
                   title: const Text('PhotoScanner'),
                   onTap: () async {
-                  await pickImage(source: ImageSource.gallery).then((value) {
-                  if (value != '') {
-                  imageCropperView(value, context);
-                  }
-                  });
-                  }
-                  ),
+                    await pickImage(source: ImageSource.gallery).then((value) {
+                      if (value != '') {
+                        imageCropperView(value, context);
+                      }
+                    });
+                  }),
               const Divider(height: 3, color: Colors.blueGrey),
-               ListTile(
+              ListTile(
                   leading: const Icon(Icons.home),
                   title: const Text('Home'),
                   iconColor: Colors.black,
-                  onTap:
-                      () {
-                        Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: LoginType.patient, selectedIndex: 0,),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavigatorBar(
+                          loginType: _currentLoginType,
+                          actualAccountType:
+                              LoginType.dualAccount, // or widget.loginType
+                          selectedIndex: 0,
+                        ),
                       ),
-                  );
-                      }
-                  ),
+                    );
+                  }),
               ListTile(
                   leading: const Icon(Icons.comment),
                   iconColor: Colors.black,
                   title: const Text('Communications'),
-                  onTap:
-                      () {
-                        Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: LoginType.patient, selectedIndex: 1,),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavigatorBar(
+                          loginType: _currentLoginType,
+                          actualAccountType:
+                              LoginType.dualAccount, // or widget.loginType
+                          selectedIndex: 1,
+                        ),
                       ),
-                  );
-                      }
-                  ),
-                const Divider(height: 3, color: Colors.blueGrey),
-               ListTile(
-                leading: const Icon(Icons.person),
-                iconColor: Colors.black,
-                title: const Text('Profile'),
-                onTap: () {
-                   Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: LoginType.patient, selectedIndex: 2,),
+                    );
+                  }),
+              const Divider(height: 3, color: Colors.blueGrey),
+              ListTile(
+                  leading: const Icon(Icons.person),
+                  iconColor: Colors.black,
+                  title: const Text('Profile'),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavigatorBar(
+                          loginType: _currentLoginType,
+                          actualAccountType:
+                              LoginType.dualAccount, // or widget.loginType
+                          selectedIndex: 2,
+                        ),
                       ),
-                  );
-
-                } 
-              ),
+                    );
+                  }),
               //  Divider(height: 3, color: Colors.blueGrey),
               //  ListTile(
               //   leading: Icon(Icons.logout),
@@ -293,6 +347,8 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   color: Colors.black, // Set the desired color here
                 ),
               ),
+              if (accountController.actualAccountType == LoginType.dualAccount)
+                buildSwitchViewTile(),
               ListTile(
                   leading: Image.asset(
                     'assets/images/logout.png',
@@ -329,11 +385,10 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   title: const Text('Prescriptions'),
                   onTap: () {
                     Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => const CaregiverPrescription()
-                      ),
-                  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CaregiverPrescription()),
+                    );
                   }
                   // Navigator.of(context).pushReplacementNamed(GalleryScreen.routeName),
                   ),
@@ -345,17 +400,14 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     width: 28,
                   ),
                   title: const Text('Vocalizations'),
-                  onTap:
-                      () {
-                         Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => const CaregiverPrescriptionViewPatient()
-                      ),
-                  );
-                            
-                      } 
-                  ),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const CaregiverPrescriptionViewPatient()),
+                    );
+                  }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
@@ -365,73 +417,84 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   ),
                   title: const Text('PhotoScanner'),
                   onTap: () async {
-                  await pickImage(source: ImageSource.gallery).then((value) {
-                  if (value != '') {
-                  imageCropperView(value, context);
-                  }
-                  });
-                  }
-                  ),
+                    await pickImage(source: ImageSource.gallery).then((value) {
+                      if (value != '') {
+                        imageCropperView(value, context);
+                      }
+                    });
+                  }),
               ListTile(
                   leading: const Icon(Icons.home),
                   iconColor: Colors.black,
                   title: const Text('Home'),
-                  onTap:
-                      () {
-                        Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 0,),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavigatorBar(
+                          loginType: _currentLoginType,
+                          actualAccountType:
+                              LoginType.dualAccount, // or widget.loginType
+                          selectedIndex: 0,
+                        ),
                       ),
-                  );
-                      }
-                  ),
+                    );
+                  }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: const Icon(Icons.comment),
                   iconColor: Colors.black,
                   title: const Text('Communications'),
-                  onTap:
-                      () {
-                        Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 1,),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavigatorBar(
+                          loginType: _currentLoginType,
+                          actualAccountType:
+                              LoginType.dualAccount, // or widget.loginType
+                          selectedIndex: 1,
+                        ),
                       ),
-                  );
-                      } // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
+                    );
+                  } // Navigator.of(context).pushReplacementNamed(HelpScreen.routeName),
                   ),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: const Icon(Icons.list),
                   iconColor: Colors.black,
                   title: const Text('Patients'),
-                  onTap:
-                      () {
-                        Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 2,),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavigatorBar(
+                          loginType: _currentLoginType,
+                          actualAccountType:
+                              LoginType.dualAccount, // or widget.loginType
+                          selectedIndex: 2,
+                        ),
                       ),
-                  );
-                      } 
-                  ),
-               const Divider(height: 3, color: Colors.blueGrey),
-                ListTile(
+                    );
+                  }),
+              const Divider(height: 3, color: Colors.blueGrey),
+              ListTile(
                   leading: const Icon(Icons.person),
                   iconColor: Colors.black,
                   title: const Text('Profile'),
-                  onTap:
-                      () {
-                        Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => NavigatorBar(loginType: LoginType.caregiver, selectedIndex: 3,),
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavigatorBar(
+                          loginType: _currentLoginType,
+                          actualAccountType:
+                              LoginType.dualAccount, // or widget.loginType
+                          selectedIndex: 3,
+                        ),
                       ),
-                  );
-                      } 
-                  ),
-
+                    );
+                  }),
             ]),
           );
   }

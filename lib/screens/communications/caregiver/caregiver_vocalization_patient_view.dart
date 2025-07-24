@@ -41,7 +41,10 @@ class _CaregiverPrescriptionViewPatientState extends State<CaregiverPrescription
           MaterialPageRoute(
           builder: (context) => 
           NavigatorBar(
-          loginType: LoginType.caregiver),
+  loginType: LoginType.caregiver,
+  actualAccountType: LoginType.caregiver,
+),
+
           ));
           },
         ),
@@ -159,7 +162,8 @@ StreamBuilder<List<GraceUser>>(
         SizedBox(height: 20,),
       ],
     ),
-    endDrawer: const AppDrawerNavigation(loginType: LoginType.caregiver),
+    endDrawer: const AppDrawerNavigation(),
+
   );
 }
 }
