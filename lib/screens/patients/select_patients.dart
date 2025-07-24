@@ -7,7 +7,7 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/medications.dart';
 import '../../notification_service.dart';
 import '../home/patient_card.dart';
@@ -35,8 +35,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     return WillPopScope(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Patients',
+          title: Text(
+            AppLocalizations.of(context)!.patients,
             style: TextStyle(color: Colors.black),
           ),
           automaticallyImplyLeading: false,
@@ -55,8 +55,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                   color: const Color(0xFF9EE8BF),
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
-                  child: const Text(
-                    'Select Patient',
+                  child: Text(
+                    AppLocalizations.of(context)!.selectPatient,
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -84,7 +84,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Text('No questions added yet'),
+                                  Text(AppLocalizations.of(context)!.noqnyet),
                                 ],
                               ),
                             );
@@ -131,8 +131,9 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                               },
                             );
                           } else {
-                            return const Center(
-                                child: Text('Something went wrong'));
+                            return Center(
+                                child: Text(AppLocalizations.of(context)!
+                                    .smtwentwrong));
                           }
                         })),
                 Container(
@@ -177,7 +178,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                             const SizedBox(
                               height: 10,
                             ),
-                            Text('No patients added yet'),
+                            Text(AppLocalizations.of(context)!.noPatientYet),
                           ],
                         ),
                       );
@@ -248,8 +249,10 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                     },
                                     child: Text(
                                       isTimeDropdownOpen
-                                          ? 'Cancel Alert'
-                                          : 'Add Alert',
+                                          ? AppLocalizations.of(context)!
+                                              .cancelAlert
+                                          : AppLocalizations.of(context)!
+                                              .addAlert,
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -273,7 +276,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Set Notification Time:',
+                                            AppLocalizations.of(context)!
+                                                .setNotiTime,
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
@@ -300,7 +304,9 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                                     selectedTime != null
                                                         ? selectedTime!
                                                             .format(context)
-                                                        : 'Select time',
+                                                        : AppLocalizations.of(
+                                                                context)!
+                                                            .selectTime,
                                                     style:
                                                         TextStyle(fontSize: 16),
                                                   ),
@@ -343,7 +349,9 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                                         null;
                                                   });
                                                 },
-                                                child: Text('Cancel'),
+                                                child: Text(AppLocalizations.of(
+                                                        context)!
+                                                    .cancel),
                                               ),
                                               SizedBox(width: 8),
                                               ElevatedButton(
@@ -415,7 +423,9 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                         ),
                       );
                     } else {
-                      return const Center(child: Text('Something went wrong'));
+                      return Center(
+                          child:
+                              Text(AppLocalizations.of(context)!.smtwentwrong));
                     }
                   },
                 ),
@@ -461,7 +471,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             _isCheckedMap[uid] = false; // Set to false after adding the patient
           }
         }
-        Get.snackbar("Congrats", "A new user has been added to your list.",
+        Get.snackbar(AppLocalizations.of(context)!.snackbarCongrats,
+            AppLocalizations.of(context)!.newUserList,
             snackPosition: SnackPosition.TOP,
             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
             colorText: Color(0xFFF6F3E7));
@@ -534,16 +545,17 @@ Future<void> _scheduleNotification(
     );
 
     Get.snackbar(
-      "Success",
-      "Medication reminder set for ${selectedTime.format(context)}",
+      AppLocalizations.of(context)!.snackbarCongrats,
+      AppLocalizations.of(context)!
+          .snackbarReminderSet(selectedTime.format(context)),
       snackPosition: SnackPosition.TOP,
-      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-      colorText: Color(0xFFF6F3E7),
+      backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+      colorText: const Color(0xFFF6F3E7),
     );
   } catch (e) {
     Get.snackbar(
-      "Error",
-      "Failed to schedule notification: $e",
+      AppLocalizations.of(context)!.snackbarInvalid,
+      AppLocalizations.of(context)!.snackbarReminderFailed(e.toString()),
       snackPosition: SnackPosition.TOP,
       backgroundColor: Colors.redAccent.withOpacity(0.1),
       colorText: Colors.red,

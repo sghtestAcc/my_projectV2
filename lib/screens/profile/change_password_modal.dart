@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/repos/authentication_repository.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
  var formChangepassword = GlobalKey<FormState>();
 
@@ -40,18 +41,18 @@ import 'package:my_project/repos/authentication_repository.dart';
                         ),
                       ],
                     ),
-                    const Text(
-                      'Change Password',
+                    Text(
+                      AppLocalizations.of(context)!.changePassword,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
-                    const Align(
+                    Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Old password',
+                            AppLocalizations.of(context)!.oldPassword,
                             style:
                               TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
@@ -79,10 +80,10 @@ import 'package:my_project/repos/authentication_repository.dart';
                         const SizedBox(
                           height: 10,
                         ),
-                    const Align(
+                    Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'New Password',
+                            AppLocalizations.of(context)!.newPassword,
                             style:
                               TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
@@ -125,8 +126,8 @@ import 'package:my_project/repos/authentication_repository.dart';
                           //-applies to both Patients and Caregivers-
                             if (oldpasswordText.text == null || oldpasswordText.text.isEmpty) {
                             Get.snackbar(
-                            "Error",
-                            "Please fill up old password.",
+                            AppLocalizations.of(context)!.snackbarInvalid,
+                            AppLocalizations.of(context)!.errNoOldPW,
                             snackPosition: SnackPosition.TOP,
                             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                             colorText: Color(0xFFF6F3E7),
@@ -137,8 +138,8 @@ import 'package:my_project/repos/authentication_repository.dart';
                           //-applies to both Patients and Caregivers-
                             else if (newpasswordText.text == null || newpasswordText.text.isEmpty) {
                              Get.snackbar(
-                            "Error",
-                            "Please fill up mew password.",
+                            AppLocalizations.of(context)!.snackbarInvalid,
+                            AppLocalizations.of(context)!.errNoNewPW,
                             snackPosition: SnackPosition.TOP,
                             backgroundColor: Color(0xFF35365D).withOpacity(0.3),
                             colorText: Color(0xFFF6F3E7),
@@ -150,8 +151,8 @@ import 'package:my_project/repos/authentication_repository.dart';
                             newpasswordText.clear();
                             }
                         },
-                        child: const Text(
-                          'Change Password',
+                        child: Text(
+                          AppLocalizations.of(context)!.changePassword,
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -170,8 +171,8 @@ import 'package:my_project/repos/authentication_repository.dart';
                         onPressed: () {
                            Navigator.pop(context);
                         },
-                        child: const Text(
-                          'Close',
+                        child: Text(
+                          AppLocalizations.of(context)!.close,
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),

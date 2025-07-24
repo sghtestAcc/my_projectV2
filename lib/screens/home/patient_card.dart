@@ -6,6 +6,7 @@ import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import 'package:my_project/repos/user_repo.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 final userRepo = Get.put(UserRepository());
 
@@ -13,25 +14,26 @@ class caregiverPatientCardView extends StatefulWidget {
   int index;
   final String uid;
   caregiverPatientCardView(this.index, this.uid, {Key? key}) : super(key: key);
-  
+
   @override
-  State<caregiverPatientCardView> createState() => _caregiverPatientCardViewState();
+  State<caregiverPatientCardView> createState() =>
+      _caregiverPatientCardViewState();
 }
 
 class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
   bool isDropdownOpen = false;
-  
+
   @override
   Widget build(BuildContext context) {
-    return Container(      
+    return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [  
+        children: [
           Row(
             children: [
-              const Text(
-                'View more for medication info',
-                style: TextStyle(fontSize: 10),
+              Text(
+                AppLocalizations.of(context)!.viewmore,
+                style: const TextStyle(fontSize: 10),
               ),
               IconButton(
                 onPressed: () {
@@ -60,8 +62,9 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                         Container(
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
                           child: Text(
-                            'No medications has been added yet.', 
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            AppLocalizations.of(context)!.nomedyet,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                         ),
                       ],
@@ -69,9 +72,10 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                   );
                 } else if (snapshot.hasData) {
                   final medications = snapshot.data!;
-                  List<bool> isItemExpanded = List.filled(snapshot.data!.length, false);
+                  List<bool> isItemExpanded =
+                      List.filled(snapshot.data!.length, false);
                   final children = <Widget>[];
-                  
+
                   for (int i = 0; i < medications.length; i++) {
                     children.add(
                       GestureDetector(
@@ -110,21 +114,30 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                                           ? SizedBox(
                                               height: 50,
                                               child: ListView.builder(
-                                                scrollDirection: Axis.horizontal,
-                                                itemCount: medications[i].pills.length,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount:
+                                                    medications[i].pills.length,
                                                 itemBuilder: (context, imgIdx) {
                                                   return Padding(
-                                                    padding: const EdgeInsets.only(right: 4),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 4),
                                                     child: Image.network(
-                                                      medications[i].pills[imgIdx],
+                                                      medications[i]
+                                                          .pills[imgIdx],
                                                       height: 50,
                                                       width: 50,
                                                       fit: BoxFit.cover,
-                                                      errorBuilder: (context, error, stackTrace) => Container(
+                                                      errorBuilder: (context,
+                                                              error,
+                                                              stackTrace) =>
+                                                          Container(
                                                         height: 50,
                                                         width: 50,
                                                         color: Colors.grey[300],
-                                                        child: Icon(Icons.image_not_supported),
+                                                        child: Icon(Icons
+                                                            .image_not_supported),
                                                       ),
                                                     ),
                                                   );
@@ -135,14 +148,16 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                                               height: 50,
                                               width: 50,
                                               color: Colors.grey[300],
-                                              child: Icon(Icons.image_not_supported),
+                                              child: Icon(
+                                                  Icons.image_not_supported),
                                             ),
                                     ),
                                   ),
                                   SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           medications[i].labels,
@@ -152,37 +167,51 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                                             color: Colors.green[700],
                                           ),
                                         ),
-                                        if (medications[i].quantity != null && medications[i].quantity!.isNotEmpty)
+                                        if (medications[i].quantity != null &&
+                                            medications[i].quantity!.isNotEmpty)
                                           Text(
-                                            "Quantity: ${medications[i].quantity}",
-                                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                                            AppLocalizations.of(context)!
+                                                .medicationQuantityLabel(
+                                                    medications[i].quantity!),
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black87),
                                           ),
-                                        if (medications[i].dosage != null && medications[i].dosage!.isNotEmpty)
+                                        if (medications[i].dosage != null &&
+                                            medications[i].dosage!.isNotEmpty)
                                           Text(
-                                            "Dosage: ${medications[i].dosage}",
-                                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                                            AppLocalizations.of(context)!
+                                                .medicationDosageLabel(
+                                                    medications[i].dosage!),
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black87),
                                           ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                              
+
                               // Additional Details (Instructions and Details)
                               SizedBox(height: 8),
-                              if (medications[i].instructions != null && medications[i].instructions!.isNotEmpty)
+                              if (medications[i].instructions != null &&
+                                  medications[i].instructions!.isNotEmpty)
                                 Container(
                                   padding: EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     color: Colors.blue[50],
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.blue[200]!),
+                                    border:
+                                        Border.all(color: Colors.blue[200]!),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Instructions:",
+                                        AppLocalizations.of(context)!
+                                            .instructions1,
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
@@ -192,26 +221,31 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                                       SizedBox(height: 4),
                                       Text(
                                         medications[i].instructions!,
-                                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black87),
                                       ),
                                     ],
                                   ),
                                 ),
-                              
-                              if (medications[i].details != null && medications[i].details!.isNotEmpty)
+
+                              if (medications[i].details != null &&
+                                  medications[i].details!.isNotEmpty)
                                 Container(
                                   margin: EdgeInsets.only(top: 8),
                                   padding: EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     color: Colors.orange[50],
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.orange[200]!),
+                                    border:
+                                        Border.all(color: Colors.orange[200]!),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Details:",
+                                        AppLocalizations.of(context)!.details1,
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
@@ -221,7 +255,9 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                                       SizedBox(height: 4),
                                       Text(
                                         medications[i].details!,
-                                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black87),
                                       ),
                                     ],
                                   ),
@@ -233,14 +269,15 @@ class _caregiverPatientCardViewState extends State<caregiverPatientCardView> {
                     );
                     children.add(SizedBox(height: 10));
                   }
-                  
+
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: children,
                   );
                 } else {
-                  return const Center(child: Text('Something went wrong'));
+                  return Center(
+                      child: Text(AppLocalizations.of(context)!.smtwentwrong));
                 }
               },
             ),

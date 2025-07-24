@@ -8,6 +8,7 @@ import 'package:my_project/utils/gpt_utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:my_project/utils/translation_config.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TranslatedTextLine {
   final String translated;
@@ -164,7 +165,7 @@ class _FullScreenTranslatedImageState extends State<FullScreenTranslatedImage> {
   @override
   void initState() {
     super.initState();
-    _translateText(); 
+    _translateText();
   }
 
   Future<void> _translateText() async {
@@ -172,7 +173,7 @@ class _FullScreenTranslatedImageState extends State<FullScreenTranslatedImage> {
 
     if (selectedTranslationLanguage.isEmpty) {
       setState(() {
-        lines = []; 
+        lines = [];
         isLoading = false;
       });
       return;
@@ -212,7 +213,7 @@ class _FullScreenTranslatedImageState extends State<FullScreenTranslatedImage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: const Text('Translated Image'),
+        title: Text(AppLocalizations.of(context)!.translatedImg),
       ),
       body: Container(
         color: Colors.white,
@@ -225,10 +226,10 @@ class _FullScreenTranslatedImageState extends State<FullScreenTranslatedImage> {
               child: DropdownButtonFormField<String>(
                 value: selectedLanguage,
                 dropdownColor: Colors.grey[900],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
-                  labelText: 'Translate to',
+                  labelText: AppLocalizations.of(context)!.translatedTo,
                   labelStyle: TextStyle(color: Color(0xFF00E676)),
                   border: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xFF00E676)),
@@ -239,51 +240,53 @@ class _FullScreenTranslatedImageState extends State<FullScreenTranslatedImage> {
                 ),
                 iconEnabledColor: Color(0xFF00E676),
                 style: const TextStyle(color: Colors.black),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: '',
-                    child: Text('Default / No language selected',
+                    child: Text(
+                        AppLocalizations.of(context)!.defaultNoLangSelected,
                         style: TextStyle(color: Colors.white)),
                   ),
                   DropdownMenuItem(
                     value: 'English',
-                    child:
-                        Text('English', style: TextStyle(color: Colors.white)),
+                    child: Text(AppLocalizations.of(context)!.english,
+                        style: TextStyle(color: Colors.white)),
                   ),
                   DropdownMenuItem(
                     value: 'Chinese',
-                    child:
-                        Text('Chinese', style: TextStyle(color: Colors.white)),
+                    child: Text(AppLocalizations.of(context)!.chinese,
+                        style: TextStyle(color: Colors.white)),
                   ),
                   DropdownMenuItem(
                     value: 'Tagalog',
-                    child:
-                        Text('Tagalog', style: TextStyle(color: Colors.white)),
+                    child: Text(AppLocalizations.of(context)!.tagalog,
+                        style: TextStyle(color: Colors.white)),
                   ),
                   DropdownMenuItem(
                     value: 'Indonesian',
-                    child: Text('Indonesian',
+                    child: Text(AppLocalizations.of(context)!.indonesian,
                         style: TextStyle(color: Colors.white)),
                   ),
                   DropdownMenuItem(
                     value: 'Burmese',
-                    child:
-                        Text('Burmese', style: TextStyle(color: Colors.white)),
+                    child: Text(AppLocalizations.of(context)!.burmese,
+                        style: TextStyle(color: Colors.white)),
                   ),
                   DropdownMenuItem(
                     value: 'Tamil',
-                    child: Text('Tamil', style: TextStyle(color: Colors.white)),
+                    child: Text(AppLocalizations.of(context)!.tamil,
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
                 selectedItemBuilder: (BuildContext context) {
                   return [
-                    'Default / No language selected',
-                    'English',
-                    'Chinese',
-                    'Tagalog',
-                    'Indonesian',
-                    'Burmese',
-                    'Tamil',
+                    AppLocalizations.of(context)!.defaultNoLangSelected,
+                    AppLocalizations.of(context)!.english,
+                    AppLocalizations.of(context)!.chinese,
+                    AppLocalizations.of(context)!.tagalog,
+                    AppLocalizations.of(context)!.indonesian,
+                    AppLocalizations.of(context)!.burmese,
+                    AppLocalizations.of(context)!.tamil,
                   ].map((value) {
                     return Text(
                       value,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({Key? key}) : super(key: key);
@@ -47,7 +48,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chatbot'),
+        title: Text(AppLocalizations.of(context)!.chatBot),
         backgroundColor: Color(0xFF0CE25C),
         foregroundColor: Colors.black,
         ),
@@ -84,8 +85,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: const InputDecoration(
-                      labelText: 'Type your message...',
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.typeYourMsg,
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) => _sendMessage(),

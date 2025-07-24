@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/repos/user_repo.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditMedicationsPage extends StatefulWidget {
   final Medication medication;
@@ -59,8 +60,8 @@ class _EditMedicationsPageState extends State<EditMedicationsPage> {
       });
 
       Get.snackbar(
-        "Success",
-        "Medication updated successfully.",
+        AppLocalizations.of(context)!.snackbarCongrats,
+        AppLocalizations.of(context)!.medicationUpdateSuccess,
         snackPosition: SnackPosition.TOP,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
         colorText: Color(0xFFF6F3E7),
@@ -68,8 +69,8 @@ class _EditMedicationsPageState extends State<EditMedicationsPage> {
       Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {
       Get.snackbar(
-        "Error",
-        "Failed to update medication.",
+        AppLocalizations.of(context)!.snackbarInvalid,
+        AppLocalizations.of(context)!.medicationUpdateFailed,
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.redAccent.withOpacity(0.1),
         colorText: Colors.red,
@@ -81,7 +82,7 @@ class _EditMedicationsPageState extends State<EditMedicationsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Medication'),
+        title: Text(AppLocalizations.of(context)!.editMeds),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -91,28 +92,28 @@ class _EditMedicationsPageState extends State<EditMedicationsPage> {
             children: [
               TextFormField(
                 controller: labelController,
-                decoration: InputDecoration(labelText: 'Medication Label'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.medicationLabel),
                 validator: (value) => value == null || value.isEmpty ? 'Required' : null,
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: quantityController,
-                decoration: InputDecoration(labelText: 'Quantity'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.quantity),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: dosageController,
-                decoration: InputDecoration(labelText: 'Dosage'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.dosage),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: instructionsController,
-                decoration: InputDecoration(labelText: 'Instructions'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.instructions),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: detailsController,
-                decoration: InputDecoration(labelText: 'Details'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.details),
               ),
               SizedBox(height: 32),
               ElevatedButton(
@@ -123,7 +124,7 @@ class _EditMedicationsPageState extends State<EditMedicationsPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text('Save Changes', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                child: Text(AppLocalizations.of(context)!.svChanges, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               ),
             ],
           ),

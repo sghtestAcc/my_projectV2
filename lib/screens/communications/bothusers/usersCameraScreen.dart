@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../components/navigation.tab.dart';
 import '../../../models/login_type.dart';
 
@@ -80,9 +80,9 @@ class _RecognizePageBothUsersState extends State<RecognizePageBothUsers> {
       //   centerTitle: true,
       // ),
       AppBar(
-        title:  const Text(
-          'PhotoScanner',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          AppLocalizations.of(context)!.photoScanner,
+          style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -155,7 +155,7 @@ class _RecognizePageBothUsersState extends State<RecognizePageBothUsers> {
               maxLines: 3,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
-                hintText: 'Enter text',
+                hintText: AppLocalizations.of(context)!.enterText,
                 contentPadding: const EdgeInsets.all(10.0),
               ),
             ),
@@ -170,7 +170,7 @@ class _RecognizePageBothUsersState extends State<RecognizePageBothUsers> {
               child: Text(
                 _isLoading
                     ? 'Loading...'
-                    : _translatedText ?? 'Enter text to be translated',
+                    : _translatedText ?? AppLocalizations.of(context)!.texttobetranslated,
                 style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
             ),

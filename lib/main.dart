@@ -9,6 +9,7 @@ import 'firebase_options.dart';
 import 'repos/authentication_repository.dart';
 import 'models/login_type.dart';
 import 'package:my_project/screens/auth/register_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,24 +61,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 200,
                 fit: BoxFit.cover,
               ),
-              const Text(
-                'Guided Resources, Assistance',
+              Text(
+                AppLocalizations.of(context)!.titlepage1stMsg,
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
-              const Text(
-                'and Communication for Empowered Care',
+              Text(
+                AppLocalizations.of(context)!.titlepage2ndMsg,
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
               Image.asset(
                 'assets/images/sgh.png',
                 fit: BoxFit.contain,
               ),
-              const Text(
-                'Welcome to SGH`s Medication',
+              Text(
+                AppLocalizations.of(context)!.titlepage3rdMsg,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
-              const Text(
-                'Tracker Application',
+              Text(
+                AppLocalizations.of(context)!.titlepage4thMsg,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               const SizedBox(
@@ -101,8 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Login',
+                child: Text(
+                  AppLocalizations.of(context)!.login,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -125,8 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Sign Up',
+                child: Text(
+                  AppLocalizations.of(context)!.signUp,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),

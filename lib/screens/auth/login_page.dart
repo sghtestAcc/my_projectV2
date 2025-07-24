@@ -256,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           AppLocalizations.of(context)!.login,
                           style: const TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold),
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),

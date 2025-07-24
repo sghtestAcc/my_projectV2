@@ -26,16 +26,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
-  final LoginType actualAccountType; // ✅ Add this field
+  final LoginType actualAccountType;
   const PatientHomeScreen({
     Key? key,
     required this.loginType,
-    required this.actualAccountType, // ✅ Add this param
+    required this.actualAccountType,
   }) : super(key: key);
 
   @override
-  State<PatientHomeScreen> createState() =>
-      _PatientHomeScreenState(); // ✅ KEEP THIS
+  State<PatientHomeScreen> createState() => _PatientHomeScreenState();
 }
 
 final _authRepo = Get.put(AuthenticationRepository());
@@ -178,8 +177,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               Widget greetingSection;
 
                               if (localizations == null) {
-                                greetingSection = const Center(
-                                  child: Text("Loading translations..."),
+                                greetingSection = Center(
+                                  child: Text(AppLocalizations.of(context)!
+                                      .loadingTranslation),
                                 );
                               } else {
                                 greetingSection = Column(
@@ -233,8 +233,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               return Center(
                                   child: Text(snapshot.error.toString()));
                             } else {
-                              return const Center(
-                                  child: Text('Something went wrong'));
+                              return Center(
+                                  child: Text(AppLocalizations.of(context)!
+                                      .smtwentwrong));
                             }
                           } else {
                             return const Center(
@@ -270,8 +271,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               ConnectionState.done) {
                                             if (snapshot.hasData) {
                                               return Text(
-                                                "Hi Welcome ${snapshot.data?.name}",
-                                                style: TextStyle(
+                                                AppLocalizations.of(context)!
+                                                    .hiWelcomeUser(
+                                                        snapshot.data?.name ??
+                                                            ''),
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
@@ -283,9 +287,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                   child: Text(snapshot.error
                                                       .toString()));
                                             } else {
-                                              return const Center(
+                                              return Center(
                                                   child: Text(
-                                                      'Something went wrong'));
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .smtwentwrong));
                                             }
                                           } else {
                                             return const Center(
@@ -294,8 +300,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           }
                                         }),
                                     Text(
-                                      'How can I help you today?',
-                                      style: TextStyle(
+                                      AppLocalizations.of(context)!.helpPrompt,
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
@@ -317,7 +323,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           border: InputBorder.none,
                                           prefixIcon: Icon(Icons.search),
                                           hintText:
-                                              'Quick search a patient here',
+                                              AppLocalizations.of(context)!
+                                                  .searchPatient,
                                         ),
                                         onChanged: (val) {
                                           setState(() {
@@ -434,23 +441,23 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ],
                         ),
                       ),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      'Prescriptions',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      AppLocalizations.of(context)!.prescriptions,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Vocalization',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      AppLocalizations.of(context)!.vocalization,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'PhotoScanner',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      AppLocalizations.of(context)!.photoScanner,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -475,9 +482,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         ),
                       );
                     },
-                    child: const Text(
-                      'Add Medications',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context)!.addMedications,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -487,12 +494,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
                 Container(
                   padding: const EdgeInsets.all(10.0),
-                  child: const Row(
+                  child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          'Medication Status',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.medicationStatus,
+                          style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ]),
@@ -551,8 +558,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     return Center(
                                         child: Text(snapshot.error.toString()));
                                   } else {
-                                    return const Center(
-                                        child: Text('Something went wrong'));
+                                    return Center(
+                                        child: Text(
+                                            AppLocalizations.of(context)!
+                                                .smtwentwrong));
                                   }
                                 } else {
                                   return const Center(
@@ -656,11 +665,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                   ),
                                                 SizedBox(height: 8),
                                                 Text(
-                                                    "Medication Name: ${med.labels}",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18)),
+                                                  AppLocalizations.of(context)!
+                                                      .medicationNameLabel(
+                                                          med.labels),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
                                                 if (med.details != null &&
                                                     med.details!.isNotEmpty)
                                                   RichText(
@@ -673,7 +685,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                                   fontSize: 16),
                                                       children: [
                                                         TextSpan(
-                                                          text: "Details: ",
+                                                          text: AppLocalizations
+                                                                  .of(context)!
+                                                              .details,
                                                           style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -700,7 +714,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                                   fontSize: 16),
                                                       children: [
                                                         TextSpan(
-                                                          text: "Quantity: ",
+                                                          text: AppLocalizations
+                                                                  .of(context)!
+                                                              .quantity,
                                                           style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -727,7 +743,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                                   fontSize: 16),
                                                       children: [
                                                         TextSpan(
-                                                          text: "Dosage: ",
+                                                          text: AppLocalizations
+                                                                  .of(context)!
+                                                              .dosage,
                                                           style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -755,8 +773,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                                   fontSize: 16),
                                                       children: [
                                                         TextSpan(
-                                                          text:
-                                                              "Instructions: ",
+                                                          text: AppLocalizations
+                                                                  .of(context)!
+                                                              .instructions,
                                                           style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -779,7 +798,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                     IconButton(
                                                       icon: Icon(Icons.edit,
                                                           color: Colors.green),
-                                                      tooltip: 'Edit',
+                                                      tooltip:
+                                                          AppLocalizations.of(
+                                                                  context)!
+                                                              .edit,
                                                       onPressed: () async {
                                                         final updated =
                                                             await Navigator
@@ -800,7 +822,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                     IconButton(
                                                       icon: Icon(Icons.delete,
                                                           color: Colors.red),
-                                                      tooltip: 'Delete',
+                                                      tooltip:
+                                                          AppLocalizations.of(
+                                                                  context)!
+                                                              .delete,
                                                       onPressed: () async {
                                                         final confirm =
                                                             await showDialog<
@@ -809,9 +834,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                           builder: (context) =>
                                                               AlertDialog(
                                                             title: Text(
-                                                                'Delete Medication'),
+                                                                AppLocalizations.of(
+                                                                        context)!
+                                                                    .deleteMedication),
                                                             content: Text(
-                                                                'Are you sure you want to delete this medication?'),
+                                                                AppLocalizations.of(
+                                                                        context)!
+                                                                    .cmndeleteMed),
                                                             actions: [
                                                               TextButton(
                                                                 onPressed: () =>
@@ -819,7 +848,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                                         context,
                                                                         false),
                                                                 child: Text(
-                                                                    'Cancel'),
+                                                                    AppLocalizations.of(
+                                                                            context)!
+                                                                        .cancel),
                                                               ),
                                                               TextButton(
                                                                 onPressed: () =>
@@ -827,7 +858,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                                         context,
                                                                         true),
                                                                 child: Text(
-                                                                    'Delete',
+                                                                    AppLocalizations.of(
+                                                                            context)!
+                                                                        .delete,
                                                                     style: TextStyle(
                                                                         color: Colors
                                                                             .red)),
@@ -857,8 +890,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           child:
                                               Text(snapshot.error.toString()));
                                     } else {
-                                      return const Center(
-                                          child: Text('Something went wrong'));
+                                      return Center(
+                                          child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .smtwentwrong));
                                     }
                                   } else {
                                     return const Center(
@@ -891,8 +926,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               }).toList();
 
                               if (filteredPatients.isEmpty) {
-                                return const Center(
-                                    child: Text("No matching patients found."));
+                                return Center(
+                                    child: Text(AppLocalizations.of(context)!
+                                        .noMatchingPatient));
                               }
 
                               return ListView.separated(
@@ -964,8 +1000,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                   'Error: ${snapshot.error}');
                                             } else if (!snapshot.hasData ||
                                                 snapshot.data!.isEmpty) {
-                                              return const Text(
-                                                  'No medications found.');
+                                              return Text(
+                                                  AppLocalizations.of(context)!
+                                                      .noMedFound);
                                             }
 
                                             final meds = snapshot.data!;
@@ -986,9 +1023,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                 ),
                                                 Row(
                                                   children: [
-                                                    const Text(
-                                                        'View medications',
-                                                        style: TextStyle(
+                                                    Text(
+                                                        AppLocalizations.of(
+                                                                context)!
+                                                            .viewMeds,
+                                                        style: const TextStyle(
                                                             fontSize: 10)),
                                                     IconButton(
                                                       onPressed: () {
@@ -1106,33 +1145,50 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                             const SizedBox(
                                                                 height: 8),
                                                             Text(
-                                                              "Medication Name: ${med.labels}",
-                                                              style: const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 16),
+                                                              AppLocalizations.of(
+                                                                      context)!
+                                                                  .medicationNameLabel(
+                                                                      med.labels),
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 16,
+                                                              ),
                                                             ),
                                                             if (med.details
                                                                     ?.isNotEmpty ==
                                                                 true)
-                                                              Text(
-                                                                  "Details: ${med.details!}"),
+                                                              Text(AppLocalizations
+                                                                      .of(
+                                                                          context)!
+                                                                  .medicationDetailsLabel(
+                                                                      med.details!)),
                                                             if (med.quantity
                                                                     ?.isNotEmpty ==
                                                                 true)
-                                                              Text(
-                                                                  "Quantity: ${med.quantity!}"),
+                                                              Text(AppLocalizations
+                                                                      .of(
+                                                                          context)!
+                                                                  .medicationQuantityLabel(
+                                                                      med.quantity!)),
                                                             if (med.dosage
                                                                     ?.isNotEmpty ==
                                                                 true)
-                                                              Text(
-                                                                  "Dosage: ${med.dosage!}"),
+                                                              Text(AppLocalizations
+                                                                      .of(
+                                                                          context)!
+                                                                  .medicationDosageLabel(
+                                                                      med.dosage!)),
                                                             if (med.instructions
                                                                     ?.isNotEmpty ==
                                                                 true)
-                                                              Text(
-                                                                  "Instructions: ${med.instructions!}"),
+                                                              Text(AppLocalizations
+                                                                      .of(
+                                                                          context)!
+                                                                  .medicationInstructionsLabel(
+                                                                      med.instructions!)),
                                                           ],
                                                         ),
                                                       );
@@ -1150,10 +1206,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             } else if (snapshot.hasError) {
                               debugPrint("❌ Error: ${snapshot.error}");
                               return Center(
-                                  child: Text('Error: ${snapshot.error}'));
+                                child: Text(
+                                  AppLocalizations.of(context)!
+                                      .errorMessage(snapshot.error.toString()),
+                                ),
+                              );
                             } else {
-                              return const Center(
-                                  child: Text("Something went wrong."));
+                              return Center(
+                                child: Text(AppLocalizations.of(context)!
+                                    .somethingWentWrong),
+                              );
                             }
                           } else {
                             return const Center(
