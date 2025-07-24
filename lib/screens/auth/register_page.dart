@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../repos/authentication_repository.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -21,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final email = TextEditingController();
   final fullName = TextEditingController();
   final password = TextEditingController();
+  bool showAccountTypeError = false;
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +54,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Text(
-                      'Register',
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    Text(
+                      AppLocalizations.of(context)!.register,
+                      style: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -66,9 +67,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Email', style: TextStyle(fontSize: 20)),
+                      child: Text(
+                        AppLocalizations.of(context)!.email,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
@@ -79,15 +83,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(content: Text('Email is required.')),
+                            SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .emailRequiredError)),
                           );
-                          return 'Email is required.';
+                          return AppLocalizations.of(context)!
+                              .emailRequiredError;
                         } else if (!value.contains('@')) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                                content: Text('Invalid email format.')),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .errorInvalidEmail),
+                            ),
                           );
-                          return 'Invalid email format.';
+                          return AppLocalizations.of(context)!
+                              .errorInvalidEmail;
                         }
                         return null;
                       },
@@ -100,41 +110,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child:
-                          Text('Account Type', style: TextStyle(fontSize: 20)),
+                      child: Text(AppLocalizations.of(context)!.accountType,
+                          style: const TextStyle(fontSize: 20)),
                     ),
                     const SizedBox(height: 10),
-                    Column(
-                      children: LoginType.values
-                          .where((type) =>
-                              type !=
-                              LoginType.dualAccount) // 👈 Exclude dualAccount
-                          .map((type) {
-                        return CheckboxListTile(
-                          title: Text(type.name[0].toUpperCase() +
-                              type.name.substring(1)),
-                          value: selectedLoginTypes.contains(type),
-                          onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                selectedLoginTypes.add(type);
-                              } else {
-                                selectedLoginTypes.remove(type);
-                              }
-                            });
-                          },
-                          controlAffinity: ListTileControlAffinity.leading,
-                        );
-                      }).toList(),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: showAccountTypeError
+                              ? Colors.red
+                              : Colors.transparent,
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      child: Column(
+                        children: LoginType.values
+                            .where((type) => type != LoginType.dualAccount)
+                            .map((type) {
+                          return CheckboxListTile(
+                            title: Text(
+                              type == LoginType.patient
+                                  ? AppLocalizations.of(context)!
+                                      .accountTypePatient
+                                  : AppLocalizations.of(context)!
+                                      .accountTypeCaregiver,
+                            ),
+                            value: selectedLoginTypes.contains(type),
+                            onChanged: (bool? value) {
+                              setState(() {
+                                if (value == true) {
+                                  selectedLoginTypes.add(type);
+                                } else {
+                                  selectedLoginTypes.remove(type);
+                                }
+                                showAccountTypeError =
+                                    false; // clear error on change
+                              });
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                          );
+                        }).toList(),
+                      ),
                     ),
+                    if (showAccountTypeError)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            AppLocalizations.of(context)!
+                                .selectAccountTypeError,
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 12),
+                          ),
+                        ),
+                      ),
                     const SizedBox(
                       height: 10,
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Full name', style: TextStyle(fontSize: 20)),
+                      child: Text(AppLocalizations.of(context)!.fullname,
+                          style: const TextStyle(fontSize: 20)),
                     ),
                     const SizedBox(
                       height: 10,
@@ -145,10 +187,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                                content: Text('Full name is required.')),
+                            SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .fullnamerequired)),
                           );
-                          return 'Full name is required.';
+                          return AppLocalizations.of(context)!.fullnamerequired;
                         }
                         //changed to every first letter in the word to be full caps in the users Fullname
                         //-applies to Both Patients and Caregivers-
@@ -156,12 +199,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 r"^[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)*$")
                             .hasMatch(value.trim())) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Full name should start with capital letters.'),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .fullnamecapitalerror),
                             ),
                           );
-                          return 'Full name should start with capital letters.';
+                          return AppLocalizations.of(context)!
+                              .fullnamecapitalerror;
                         }
                         return null;
                       },
@@ -174,9 +218,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Password', style: TextStyle(fontSize: 20)),
+                      child: Text(AppLocalizations.of(context)!.password,
+                          style: const TextStyle(fontSize: 20)),
                     ),
                     TextFormField(
                       controller: password,
@@ -184,17 +229,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                                content: Text('Password is required.')),
+                            SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .errorPasswordRequired)),
                           );
-                          return 'Password is required.';
+                          return AppLocalizations.of(context)!
+                              .errorPasswordRequired;
                         } else if (value.length < 6) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Password must be at least 6 characters long.')),
+                            SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .errorPasswordTooShort)),
                           );
-                          return 'Password must be at least 6 characters long.';
+                          return AppLocalizations.of(context)!
+                              .errorPasswordTooShort;
                         }
                         return null;
                       },
@@ -223,41 +271,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (selectedLoginTypes.isEmpty) {
-                          scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Please select at least one account type.'),
-                            ),
-                          );
-                          return;
+                        bool isValid = formData.currentState!.validate();
+
+                        setState(() {
+                          showAccountTypeError = selectedLoginTypes.isEmpty;
+                        });
+
+                        if (!isValid || selectedLoginTypes.isEmpty) return;
+
+                        // Determine login type
+                        LoginType loginType;
+                        if (selectedLoginTypes.contains(LoginType.patient) &&
+                            selectedLoginTypes.contains(LoginType.caregiver)) {
+                          loginType = LoginType.dualAccount;
+                        } else {
+                          loginType = selectedLoginTypes.first;
                         }
 
-                        if (formData.currentState!.validate()) {
-// Determine the proper login type
-                          LoginType loginType;
-                          if (selectedLoginTypes.contains(LoginType.patient) &&
-                              selectedLoginTypes
-                                  .contains(LoginType.caregiver)) {
-                            loginType = LoginType.dualAccount;
-                          } else {
-                            loginType = selectedLoginTypes.first;
-                          }
+                        final user = GraceUser(
+                          email: email.text.trim(),
+                          name: fullName.text.trim(),
+                          loginType: loginType,
+                        );
 
-// Register user
-                          final user = GraceUser(
-                            email: email.text.trim(),
-                            name: fullName.text.trim(),
-                            loginType: loginType,
-                          );
-
-                          await AuthenticationRepository.instance.registerUser(
-                            email.text.trim(),
-                            password.text.trim(),
-                            loginType,
-                            user,
-                          );
-                        }
+                        await AuthenticationRepository.instance.registerUser(
+                          email.text.trim(),
+                          password.text.trim(),
+                          loginType,
+                          user,
+                          context,
+                        );
 
                         email.clear();
                         password.clear();
@@ -270,9 +313,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               12), // Rounded corner radius
                         ),
                       ),
-                      child: const Text(
-                        'Register',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.register,
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -282,8 +325,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Already have an account? Login',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.haveaccountlogin,
+                          style: const TextStyle(
                               fontSize: 15,
                               decoration: TextDecoration.underline),
                         ),

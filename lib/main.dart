@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:my_project/screens/auth/login_page.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:my_project/controllers/account_controller.dart';
 import 'firebase_options.dart';
 import 'repos/authentication_repository.dart';
@@ -14,39 +14,23 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
 
-  // ✅ Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // ✅ Register controllers and repositories globally BEFORE runApp
-  Get.put(AccountController()); // <<== 🔑 Register it here
+  Get.put(AccountController());
   Get.put(AuthenticationRepository());
 
-  // ✅ Run app
-  runApp(const GetMaterialApp(
-    title: "App",
-    home: HomeScreen(),
-  ));
+  runApp(MyApp()); // ✅ Removed 'const' if MyApp constructor is not const
 }
-
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: "App",
-      // localizationsDelegates: [
-      //   GlobalMaterialLocalizations.delegate,
-      //   GlobalWidgetsLocalizations.delegate,
-      //   GlobalCupertinoLocalizations.delegate,
-      // ],
-      // supportedLocales: [
-      //   Locale('en', ''), // English
-      //   Locale('hi', ''), // Spanish
-      //   Locale('ar', ''),
-      //   Locale('fr', ''),
-      // ],
-      // locale: Locale('fr', ''),
-      home: HomeScreen(),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'), // or use Get.deviceLocale for dynamic support
+      home: const HomeScreen(),
     );
   }
 }

@@ -22,6 +22,7 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import '../communications/patient/edit_medications.dart';
 import 'translated_image_dialog.dart';
 import 'package:my_project/utils/gpt_utils.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final LoginType loginType;
@@ -171,6 +172,41 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               ConnectionState.done) {
                             if (snapshot.hasData) {
                               var patientsInfo = snapshot.data;
+                              final localizations =
+                                  AppLocalizations.of(context);
+
+                              Widget greetingSection;
+
+                              if (localizations == null) {
+                                greetingSection = const Center(
+                                  child: Text("Loading translations..."),
+                                );
+                              } else {
+                                greetingSection = Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      localizations.welcomeMessage(
+                                          patientsInfo?.name ?? ''),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      localizations.helpPrompt,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+
                               return Stack(
                                 alignment: Alignment.topCenter,
                                 children: [
@@ -187,30 +223,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       alignment: Alignment.bottomLeft,
                                       child: Padding(
                                         padding: const EdgeInsets.all(20.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Hi welcome ${patientsInfo?.name}",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const Text(
-                                              'How can I help you today?',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                        child: greetingSection,
                                       ),
                                     ),
                                   ),

@@ -359,7 +359,7 @@ Future<String> pickImage({ImageSource? source,}) async {
           width: double.infinity,
            child: ElevatedButton(
                     onPressed: () {
-                      UserRepository.instance.addImage(imageFile,profileuid);
+                      UserRepository.instance.addImage(imageFile,profileuid, context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0CE25C),

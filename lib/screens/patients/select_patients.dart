@@ -22,9 +22,11 @@ class SelectPatientScreen extends StatefulWidget {
 class _SelectPatientScreenState extends State<SelectPatientScreen> {
   final userRepo = Get.put(UserRepository());
   Map<String, bool> _isCheckedMap = {};
-  Map<String, bool> _isTimeDropdownOpen = {}; // Track dropdown state for each patient
-  Map<String, TimeOfDay?> _selectedTimes = {}; // Track selected times for each patient
-  
+  Map<String, bool> _isTimeDropdownOpen =
+      {}; // Track dropdown state for each patient
+  Map<String, TimeOfDay?> _selectedTimes =
+      {}; // Track selected times for each patient
+
   String lol = '';
 
   @override
@@ -50,327 +52,373 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                color: const Color(0xFF9EE8BF),
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
-                child: const Text(
-                  'Select Patient',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-              ),
-                       Container(
-                        height: 200,
-                         child: 
-                         StreamBuilder<List<GraceUser>>(
-                          stream: userRepo.getAllPatientsWithMedications2(),
-                          builder: (context, snapshot) {
-                             if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }  else if (snapshot.hasError) {
-                            return Center(child: Text(snapshot.error.toString()));
-                          } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                        return Center(
-                        child: Column(
-                        children: [
-                        const SizedBox(height: 10,),
-                        Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
-                        const SizedBox(height: 10,),
-                        Text('No questions added yet'),
-                      ],
-                    ),
-                  );
-                    } else if (snapshot.hasData) {
-                                      return ListView.builder(
-                                    shrinkWrap: true,
-                                  itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                  GraceUser patient = snapshot.data![index];
-                                      String uid = patient.id ?? '';
-                                      String email = patient.email ?? '';
-                                      String name = patient.name ?? '';
-                                      bool isChecked = _isCheckedMap[uid] ?? false;
-                                  return Container(
-                                  decoration: BoxDecoration(
-                         border: Border.all(
-                           color: Colors.black,
-                           width: 1.0,
-                         ),
-                                   ),
-                                   child: CheckboxListTile(
-                         title: Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             Text(
-                               name,
-                               style: const TextStyle(fontSize: 15),
-                             ),
-                             Text(email,
-                                 style: const TextStyle(fontSize: 12)),
-                           ],
-                         ),
-                         value:  isChecked,
-                         onChanged: (newValue) {
-                           setState(() {
-                             _isCheckedMap[uid] = newValue ?? false;
-                           });
-                         },
-                         activeColor: const Color(0xFF0CE25C),
-                                   ),
-                                 );
-                               },
-                             );
-                    } else {
-                    return const Center(child: Text('Something went wrong'));
-                    }
-                          })
-                       ),
-                          Container(
-                padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    addPatientsToCurrentUser();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color(0xFF0CE25C), // Button background color
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12), // Rounded corner radius
-                    ),
-                    minimumSize: const Size(double.infinity,
-                        40), // Adjust the width by modifying the minimumSize property
-                  ),
+                  color: const Color(0xFF9EE8BF),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
                   child: const Text(
                     'Select Patient',
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-                  StreamBuilder<List<Map<String, dynamic>>>(
-                stream:  fetchSelectedPatients(),
-                builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-                } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 10,),
-                  Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
-                  const SizedBox(height: 10,),
-                  Text('No patients added yet'),
-                ],
-              ),
-            );
-                } else if (snapshot.hasData) {
-            return Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(10.0),
-                shrinkWrap: true,
-                itemCount: snapshot.data!.length,
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 10);
-                },
-                itemBuilder: (context, i) {
-                  String patientName = snapshot.data![i]['name'];
-                  String patientEmail = snapshot.data![i]['email'];
-                  String patientid = snapshot.data![i]['id'];
-                  bool isTimeDropdownOpen = _isTimeDropdownOpen[patientid] ?? false;
-                  TimeOfDay? selectedTime = _selectedTimes[patientid];
-                  
-                  return Container(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(22)),
-                      color: Color(0xDDF6F6F6),
-                      border: Border.all(
-                        color: Colors.black.withOpacity(0.5),
-                        width: 1,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.5),
-                          offset: Offset(0, 1),
-                          blurRadius: 4,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          patientName,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        Text(patientEmail, style: TextStyle(fontSize: 14)),
-                        SizedBox(height: 8),
-                        
-                        // Add Alert Button
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0CE25C),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isTimeDropdownOpen[patientid] = !isTimeDropdownOpen;
-                            });
-                          },
-                          child: Text(
-                            isTimeDropdownOpen ? 'Cancel Alert' : 'Add Alert',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        
-                        // Time Selector Dropdown
-                        if (isTimeDropdownOpen) ...[
-                          SizedBox(height: 10),
-                          Container(
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.grey),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Set Notification Time:',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                Container(
+                    height: 200,
+                    child: StreamBuilder<List<GraceUser>>(
+                        stream: userRepo.getAllPatientsWithMedications2(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text(snapshot.error.toString()));
+                          } else if (snapshot.hasData &&
+                              snapshot.data!.isEmpty) {
+                            return Center(
+                              child: Column(
+                                children: [
+                                  const SizedBox(
+                                    height: 10,
                                   ),
-                                ),
-                                SizedBox(height: 8),
-                                
-                                // Time Display and Picker
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.grey),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          selectedTime != null
-                                              ? selectedTime!.format(context)
-                                              : 'Select time',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      ),
+                                  Image.asset(
+                                      'assets/images/to-do-list.png'), // Adjust the image path accordingly
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text('No questions added yet'),
+                                ],
+                              ),
+                            );
+                          } else if (snapshot.hasData) {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                GraceUser patient = snapshot.data![index];
+                                String uid = patient.id ?? '';
+                                String email = patient.email ?? '';
+                                String name = patient.name ?? '';
+                                bool isChecked = _isCheckedMap[uid] ?? false;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 1.0,
                                     ),
-                                    SizedBox(width: 8),
-                                    IconButton(
-                                      icon: Icon(Icons.access_time),
-                                      onPressed: () async {
-                                        final TimeOfDay? picked = await showTimePicker(
-                                          context: context,
-                                          initialTime: selectedTime ?? TimeOfDay.now(),
-                                        );
-                                        if (picked != null) {
-                                          setState(() {
-                                            _selectedTimes[patientid] = picked;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                
-                                SizedBox(height: 10),
-                                
-                                // Save and Cancel buttons
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _isTimeDropdownOpen[patientid] = false;
-                                          _selectedTimes[patientid] = null;
-                                        });
-                                      },
-                                      child: Text('Cancel'),
-                                    ),
-                                    SizedBox(width: 8),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFF0CE25C),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: CheckboxListTile(
+                                    title: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          name,
+                                          style: const TextStyle(fontSize: 15),
                                         ),
-                                      ),
-                                      onPressed: selectedTime != null
-                                          ? () async {
-                                              await _scheduleNotification(
-                                                patientid,
-                                                patientName,
-                                                selectedTime!,
-                                              );
-                                              setState(() {
-                                                _isTimeDropdownOpen[patientid] = false;
-                                                _selectedTimes[patientid] = null;
-                                              });
-                                            }
-                                          : null,
-                                      child: Text(
-                                        'Save',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                        Text(email,
+                                            style:
+                                                const TextStyle(fontSize: 12)),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        // // Existing medication info dropdown
-                        // Row(
-                        //   children: [
-                        //     // const Text(
-                        //     //   'View more for medication info',
-                        //     //   style: TextStyle(fontSize: 10),
-                        //     // ),
-                        //     IconButton(
-                        //       onPressed: () {
-                        //         setState(() {
-                        //           isDropdownOpen = !isDropdownOpen;
-                        //         });
-                        //       },
-                        //       icon: Icon(isDropdownOpen
-                        //           ? Icons.expand_less
-                        //           : Icons.expand_more),
-                        //     ),
-                        //   ],
-                        // ),
-                        caregiverPatientCardView(i, patientid),
-                      ],
+                                    value: isChecked,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        _isCheckedMap[uid] = newValue ?? false;
+                                      });
+                                    },
+                                    activeColor: const Color(0xFF0CE25C),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return const Center(
+                                child: Text('Something went wrong'));
+                          }
+                        })),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      addPatientsToCurrentUser();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          const Color(0xFF0CE25C), // Button background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Rounded corner radius
+                      ),
+                      minimumSize: const Size(double.infinity,
+                          40), // Adjust the width by modifying the minimumSize property
                     ),
-                  );
-                },
-              ),
-            );
-                } else {
-            return const Center(child: Text('Something went wrong'));
-                }
-                },
-              ),
+                    child: const Text(
+                      'Select Patient',
+                      style:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: fetchSelectedPatients(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text(snapshot.error.toString()));
+                    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                      return Center(
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Image.asset(
+                                'assets/images/to-do-list.png'), // Adjust the image path accordingly
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text('No patients added yet'),
+                          ],
+                        ),
+                      );
+                    } else if (snapshot.hasData) {
+                      return Expanded(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(10.0),
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length,
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(height: 10);
+                          },
+                          itemBuilder: (context, i) {
+                            String patientName = snapshot.data![i]['name'];
+                            String patientEmail = snapshot.data![i]['email'];
+                            String patientid = snapshot.data![i]['id'];
+                            bool isTimeDropdownOpen =
+                                _isTimeDropdownOpen[patientid] ?? false;
+                            TimeOfDay? selectedTime = _selectedTimes[patientid];
+
+                            return Container(
+                              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(22)),
+                                color: Color(0xDDF6F6F6),
+                                border: Border.all(
+                                  color: Colors.black.withOpacity(0.5),
+                                  width: 1,
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.5),
+                                    offset: Offset(0, 1),
+                                    blurRadius: 4,
+                                    spreadRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    patientName,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(patientEmail,
+                                      style: TextStyle(fontSize: 14)),
+                                  SizedBox(height: 8),
+
+                                  // Add Alert Button
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF0CE25C),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isTimeDropdownOpen[patientid] =
+                                            !isTimeDropdownOpen;
+                                      });
+                                    },
+                                    child: Text(
+                                      isTimeDropdownOpen
+                                          ? 'Cancel Alert'
+                                          : 'Add Alert',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Time Selector Dropdown
+                                  if (isTimeDropdownOpen) ...[
+                                    SizedBox(height: 10),
+                                    Container(
+                                      padding: EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.grey),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Set Notification Time:',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+
+                                          // Time Display and Picker
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.grey),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                  ),
+                                                  child: Text(
+                                                    selectedTime != null
+                                                        ? selectedTime!
+                                                            .format(context)
+                                                        : 'Select time',
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 8),
+                                              IconButton(
+                                                icon: Icon(Icons.access_time),
+                                                onPressed: () async {
+                                                  final TimeOfDay? picked =
+                                                      await showTimePicker(
+                                                    context: context,
+                                                    initialTime: selectedTime ??
+                                                        TimeOfDay.now(),
+                                                  );
+                                                  if (picked != null) {
+                                                    setState(() {
+                                                      _selectedTimes[
+                                                          patientid] = picked;
+                                                    });
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          ),
+
+                                          SizedBox(height: 10),
+
+                                          // Save and Cancel buttons
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _isTimeDropdownOpen[
+                                                        patientid] = false;
+                                                    _selectedTimes[patientid] =
+                                                        null;
+                                                  });
+                                                },
+                                                child: Text('Cancel'),
+                                              ),
+                                              SizedBox(width: 8),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Color(0xFF0CE25C),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                  ),
+                                                ),
+                                                onPressed: selectedTime != null
+                                                    ? () async {
+                                                        await _scheduleNotification(
+                                                          context,
+                                                          patientid,
+                                                          patientName,
+                                                          selectedTime!,
+                                                        );
+
+                                                        setState(() {
+                                                          _isTimeDropdownOpen[
+                                                                  patientid] =
+                                                              false;
+                                                          _selectedTimes[
+                                                              patientid] = null;
+                                                        });
+                                                      }
+                                                    : null,
+                                                child: Text(
+                                                  'Save',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                  // // Existing medication info dropdown
+                                  // Row(
+                                  //   children: [
+                                  //     // const Text(
+                                  //     //   'View more for medication info',
+                                  //     //   style: TextStyle(fontSize: 10),
+                                  //     // ),
+                                  //     IconButton(
+                                  //       onPressed: () {
+                                  //         setState(() {
+                                  //           isDropdownOpen = !isDropdownOpen;
+                                  //         });
+                                  //       },
+                                  //       icon: Icon(isDropdownOpen
+                                  //           ? Icons.expand_less
+                                  //           : Icons.expand_more),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  caregiverPatientCardView(i, patientid),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    } else {
+                      return const Center(child: Text('Something went wrong'));
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -404,7 +452,6 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             GraceUser selectedPatient =
                 patients.firstWhere((patient) => patient.id == uid);
 
-           
             Map<String, dynamic> patientData = {
               'id': selectedPatient.id,
               'email': selectedPatient.email,
@@ -418,9 +465,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             snackPosition: SnackPosition.TOP,
             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
             colorText: Color(0xFFF6F3E7));
-        setState(() {
-          
-        });
+        setState(() {});
       }
     } catch (e) {
       print('Error adding patients: $e');
@@ -449,59 +494,59 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
   }
 }
 
-  // Method to schedule notification
-  Future<void> _scheduleNotification(
-    String patientId,
-    String patientName,
-    TimeOfDay selectedTime,
-  ) async {
-    try {
-      // Create notification time for today at selected time
-      final now = DateTime.now();
-      final scheduledDateTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        selectedTime.hour,
-        selectedTime.minute,
-      );
-      
-      // If time has already passed today, schedule for tomorrow
-      final finalScheduledTime = scheduledDateTime.isBefore(now)
-          ? scheduledDateTime.add(Duration(days: 1))
-          : scheduledDateTime;
+// Method to schedule notification
+Future<void> _scheduleNotification(
+  BuildContext context,
+  String patientId,
+  String patientName,
+  TimeOfDay selectedTime,
+) async {
+  try {
+    // Create notification time for today at selected time
+    final now = DateTime.now();
+    final scheduledDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
 
-      // Schedule local notification
-      await NotificationService.scheduleNotification(
-        DateTime.now().millisecondsSinceEpoch, // unique notification ID
-        "Medication Reminder",
-        "It's time for $patientName to take their medication!",
-        finalScheduledTime,
-      );
+    // If time has already passed today, schedule for tomorrow
+    final finalScheduledTime = scheduledDateTime.isBefore(now)
+        ? scheduledDateTime.add(Duration(days: 1))
+        : scheduledDateTime;
 
-      // Optionally save to Firestore for tracking
-      await userRepo.createMedicationNotification(
-        patientId,
-        "Medication Reminder",
-        "It's time for $patientName to take their medication!",
-        finalScheduledTime.toIso8601String(),
-      );
+    // Schedule local notification
+    await NotificationService.scheduleNotification(
+      DateTime.now().millisecondsSinceEpoch, // unique notification ID
+      "Medication Reminder",
+      "It's time for $patientName to take their medication!",
+      finalScheduledTime,
+    );
 
-      Get.snackbar(
-        "Success",
-        "Medication reminder set for ${selectedTime.format(context)}",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-        colorText: Color(0xFFF6F3E7),
-      );
-    } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to schedule notification: $e",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
-    }
+    // Optionally save to Firestore for tracking
+    await userRepo.createMedicationNotification(
+      patientId,
+      "Medication Reminder",
+      "It's time for $patientName to take their medication!",
+      finalScheduledTime.toIso8601String(),
+    );
+
+    Get.snackbar(
+      "Success",
+      "Medication reminder set for ${selectedTime.format(context)}",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Color(0xFF35365D).withOpacity(0.5),
+      colorText: Color(0xFFF6F3E7),
+    );
+  } catch (e) {
+    Get.snackbar(
+      "Error",
+      "Failed to schedule notification: $e",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
   }
 }

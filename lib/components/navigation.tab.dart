@@ -4,6 +4,8 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/home.dart';
 import 'package:my_project/screens/patients/select_patients.dart';
 import 'package:my_project/screens/profile/profile_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class NavigatorBar extends StatefulWidget {
   final LoginType loginType; // Selected by user on login (e.g., caregiver)
@@ -30,43 +32,46 @@ class _NavigatorBarState extends State<NavigatorBar> {
     _currentLoginType = widget.loginType; // Start with user's selected role
   }
 
-  List<BottomNavigationBarItem> get bottomNavItems {
-    if (_currentLoginType == LoginType.caregiver) {
-      return const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.comment),
-          label: 'Communications',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.list_alt),
-          label: 'Patients',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ];
-    } else {
-      return const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.comment),
-          label: 'Communications',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ];
-    }
+  List<BottomNavigationBarItem> bottomNavItems(BuildContext context) {
+  final localizations = AppLocalizations.of(context)!;
+
+  if (_currentLoginType == LoginType.caregiver) {
+    return [
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.home),
+        label: localizations.home,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.comment),
+        label: localizations.communications,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.list_alt),
+        label: localizations.patients,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.person),
+        label: localizations.profile,
+      ),
+    ];
+  } else {
+    return [
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.home),
+        label: localizations.home,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.comment),
+        label: localizations.communications,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.person),
+        label: localizations.profile,
+      ),
+    ];
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +115,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
               widget.selectedIndex = index;
             });
           },
-          items: bottomNavItems,
+          items: bottomNavItems(context),
         ),
       ),
     );

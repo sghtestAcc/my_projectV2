@@ -474,6 +474,7 @@ bool doesSecondWordContainTablets(String text) {
                                     print('Pills images count: ${widget.imageFilePills.length}');
 
                                     await userRepo.createPatientMedications(
+                                      context,
                                       textController1.text.trim(),
                                       widget.imageFiles,
                                       widget.imageFilePills,

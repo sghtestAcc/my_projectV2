@@ -8,7 +8,7 @@ import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
 import 'package:my_project/screens/communications/patient/patients_vocalization.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../repos/authentication_repository.dart';
 import '../screens/communications/bothusers/usersCameraScreen.dart';
 import '../screens/communications/caregiver/caregiver_prescription.dart';
@@ -135,7 +135,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
       leading: const Icon(Icons.swap_horiz),
       iconColor: Colors.black,
       title: Text(
-        'Switch to ${newLoginType == LoginType.patient ? 'Patient' : 'Caregiver'} View',
+        newLoginType == LoginType.patient
+            ? AppLocalizations.of(context)!.switchToPatient
+            : AppLocalizations.of(context)!.switchToCaregiver,
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       ),
       onTap: () {
@@ -183,12 +185,13 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  title: Text(
+                    AppLocalizations.of(context)!.logout,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    AuthenticationRepository.instance.logout();
+                    AuthenticationRepository.instance.logout(context);
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
@@ -197,19 +200,21 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Change Language',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  title: Text(AppLocalizations.of(context)!.changeLanguage,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold)),
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text('Select Language'),
+                          title: Text(AppLocalizations.of(context)!
+                              .dialogSelectLanguageTitle),
                           content: Container(
                             padding: const EdgeInsets.all(10.0),
                             child: DropdownButton(
-                              hint: Text('English'),
+                              hint: Text(AppLocalizations.of(context)!
+                                  .languageEnglish),
                               value: sourceLang,
                               onChanged: (newValue) {
                                 setState(() {
@@ -237,7 +242,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Prescriptions'),
+                  title: Text(
+                    AppLocalizations.of(context)!.prescriptions,
+                  ),
                   onTap: () {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
@@ -252,7 +259,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Vocalizations'),
+                  title: Text(
+                    AppLocalizations.of(context)!.vocalizations,
+                  ),
                   onTap: () {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
@@ -267,7 +276,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('PhotoScanner'),
+                  title: Text(
+                    AppLocalizations.of(context)!.photoScanner,
+                  ),
                   onTap: () async {
                     await pickImage(source: ImageSource.gallery).then((value) {
                       if (value != '') {
@@ -278,7 +289,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: const Icon(Icons.home),
-                  title: const Text('Home'),
+                  title: Text(
+                    AppLocalizations.of(context)!.home,
+                  ),
                   iconColor: Colors.black,
                   onTap: () {
                     Navigator.pushReplacement(
@@ -296,7 +309,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.comment),
                   iconColor: Colors.black,
-                  title: const Text('Communications'),
+                  title: Text(
+                    AppLocalizations.of(context)!.communications,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -314,7 +329,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.person),
                   iconColor: Colors.black,
-                  title: const Text('Profile'),
+                  title: Text(
+                    AppLocalizations.of(context)!.profile,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -355,12 +372,13 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  title: Text(
+                    AppLocalizations.of(context)!.logout,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    AuthenticationRepository.instance.logout();
+                    AuthenticationRepository.instance.logout(context);
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
@@ -369,11 +387,40 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Change Language',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  title: Text(AppLocalizations.of(context)!.changeLanguage,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold)),
                   onTap: () {
-                    // Navigator.of(context).pushReplacementNamed(WeatherScreen.routeName);
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(AppLocalizations.of(context)!
+                              .dialogSelectLanguageTitle),
+                          content: Container(
+                            padding: const EdgeInsets.all(10.0),
+                            child: DropdownButton(
+                              hint: Text(AppLocalizations.of(context)!
+                                  .languageEnglish),
+                              value: sourceLang,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  sourceLang = newValue ?? '';
+                                  // translateTextFunction(typedText);
+                                });
+                                Navigator.pop(context); // Close the dialog
+                              },
+                              items: languagePicker.map((valueItem) {
+                                return DropdownMenuItem(
+                                  value: valueItem,
+                                  child: Text(valueItem),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        );
+                      },
+                    );
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
@@ -382,7 +429,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Prescriptions'),
+                  title: Text(
+                    AppLocalizations.of(context)!.prescriptions,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -399,7 +448,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Vocalizations'),
+                  title: Text(
+                    AppLocalizations.of(context)!.vocalizations,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -415,7 +466,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('PhotoScanner'),
+                  title: Text(
+                    AppLocalizations.of(context)!.photoScanner,
+                  ),
                   onTap: () async {
                     await pickImage(source: ImageSource.gallery).then((value) {
                       if (value != '') {
@@ -426,7 +479,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.home),
                   iconColor: Colors.black,
-                  title: const Text('Home'),
+                  title: Text(
+                    AppLocalizations.of(context)!.home,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -444,7 +499,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.comment),
                   iconColor: Colors.black,
-                  title: const Text('Communications'),
+                  title: Text(
+                    AppLocalizations.of(context)!.communications,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -463,7 +520,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.list),
                   iconColor: Colors.black,
-                  title: const Text('Patients'),
+                  title: Text(
+                    AppLocalizations.of(context)!.patients,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -481,7 +540,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.person),
                   iconColor: Colors.black,
-                  title: const Text('Profile'),
+                  title: Text(
+                    AppLocalizations.of(context)!.profile,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
