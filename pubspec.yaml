@@ -61,7 +61,8 @@ dependencies:
   flutter_local_notifications: ^17.2.4
   timezone: ^0.9.4
   flutter_timezone: ^1.0.8
-  tutorial_coach_mark: 1.2.0
+  tutorial_coach_mark: 1.2.4
+
 
 
 flutter_launcher_icons:

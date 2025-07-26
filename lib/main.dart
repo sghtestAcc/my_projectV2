@@ -86,40 +86,40 @@ class _HomeScreenState extends State<HomeScreen> {
   void initTargets() {
     targets = [
       TargetFocus(
-        identify: "login", // use lowercase for simpler comparisons
+        identify: "login",
         keyTarget: keyLoginButton,
         contents: [],
+        shape: ShapeLightFocus.RRect, // Rounded rectangle
+        radius: 8, // Smaller radius = tighter corner roundness
+        paddingFocus: 4, // Smaller padding = tighter circle
       ),
       TargetFocus(
         identify: "signup",
         keyTarget: keySignUpButton,
         contents: [],
+        shape: ShapeLightFocus.RRect,
+        radius: 8,
+        paddingFocus: 4,
       ),
     ];
   }
 
   void showTutorial() {
-    TutorialCoachMark(
-      context,
+    TutorialCoachMark tutorial = TutorialCoachMark(
       targets: targets,
       colorShadow: Colors.black.withOpacity(0.8),
       textSkip: "SKIP",
       paddingFocus: 10,
-      onFinish: () => print("Tutorial finished"),
-      onSkip: () => print("Tutorial skipped"),
       onClickTarget: (target) {
         String msg = "";
-
         switch (target.identify) {
           case "login":
-            msg = AppLocalizations.of(context)!.titlepage4thMsg;
+            msg = "Click here to login as a patient or caregiver";
             break;
           case "signup":
             msg = "Or create a new account here!";
             break;
         }
-
-        // Show the SnackBar message
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -127,11 +127,13 @@ class _HomeScreenState extends State<HomeScreen> {
               content: Text(msg),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.black87,
-              duration: const Duration(seconds: 3),
+              duration: Duration(seconds: 3),
             ),
           );
       },
-    ).show();
+      onSkip: () => true,
+      onFinish: () => print("Tutorial finished"),
+    )..show(context: context);
   }
 
   @override
