@@ -13,6 +13,8 @@ import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/models/notification.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../notification_service.dart';
+
 
 class UserRepository extends GetxController {
   static UserRepository get instance => Get.find();
@@ -601,145 +603,143 @@ class UserRepository extends GetxController {
 
   //function to create notification
   // Add this method to your UserRepository class
-  Future<void> createMedicationNotification(
-    String patientId,
-    String title,
-    String body,
-    String dateTime,
-  ) async {
-    try {
-      String uid = FirebaseAuth.instance.currentUser!.uid;
-
-      await firestore
-          .collection('users')
-          .doc(uid)
-          .collection('patient_notifications')
-          .add({
-        'patientId': patientId,
-        'title': title,
-        'body': body,
-        'dateTime': dateTime,
-        'createdAt': FieldValue.serverTimestamp(),
-        'sent': false,
-      });
-
-      print('Notification saved to Firestore');
-    } catch (error) {
-      print('Error saving notification: $error');
-      throw error;
-    }
-  }
-
-  //function to delete notification
-  Future<void> deleteMedicationNotification(
-      String medicationUid, String notificationUid, BuildContext context) async {
-    try {
-      String uid = FirebaseAuth.instance.currentUser!.uid;
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .collection('medications')
-          .doc(medicationUid)
-          .collection('notification')
-          .doc(notificationUid)
-          .delete();
-      Get.snackbar(
-        AppLocalizations.of(context)!.snackbarCongrats,
-        AppLocalizations.of(context)!.notificationDeletedSuccess,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-        colorText: const Color(0xFFF6F3E7),
-      );
-    } catch (error) {
-      Get.snackbar(
-        AppLocalizations.of(context)!.snackbarInvalid,
-        AppLocalizations.of(context)!.notificationDeleteFailed,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
-      print(error.toString());
-    }
-  }
-
-  //function to update notification
-  Future<void> updateMedicationNotification(
-      String medicationUid, Notifications updatedNotification, BuildContext context) async {
+Future<void> createMedicationNotification(
+  String patientId,
+  String title,
+  String body,
+  String dateTime,
+) async {
+  try {
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    try {
-      var notificationDocRef = FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .collection('medications')
-          .doc(medicationUid)
-          .collection('notification')
-          .doc(updatedNotification.id);
-      print(medicationUid);
-      print(updatedNotification.id);
-      // Check if the medication document exists
-      var notificationDoc = await notificationDocRef.get();
 
-      if (notificationDoc.exists) {
-        // Document exists, proceed with update
-        await notificationDocRef.update({
-          "Title": updatedNotification.title,
-          "Body": updatedNotification.body,
-          "DateTime": updatedNotification.dateTime,
-        });
-
-        Get.snackbar(
-          AppLocalizations.of(context)!.snackbarCongrats,
-          AppLocalizations.of(context)!.medicationUpdateSuccess,
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-          colorText: const Color(0xFFF6F3E7),
-        );
-      } else {
-        // Document doesn't exist, create a new document
-        await notificationDocRef.set({
-          "Title": updatedNotification.title,
-          "Body": updatedNotification.body,
-          "DateTime": updatedNotification.dateTime,
-        });
-
-        Get.snackbar(
-          AppLocalizations.of(context)!.snackbarCongrats,
-          AppLocalizations.of(context)!.medicationCreateSuccess,
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-          colorText: const Color(0xFFF6F3E7),
-        );
-      }
-    } catch (error) {
-      // Handle errors and show an error message
-      Get.snackbar(
-        AppLocalizations.of(context)!.snackbarInvalid,
-        AppLocalizations.of(context)!.medicationUpdateFailed,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
-
-      // Print the error message and the document path for debugging
-      print("Error updating medication: ${error.toString()}");
-      print(
-          "Document path: users/$uid/medications/$medicationUid/notification/${updatedNotification.id}");
-    }
-  }
-
-  Stream<Notifications> getMedicationNotificationStream(
-      String medicationUid, String notificationUid) {
-    String uid = FirebaseAuth.instance.currentUser!.uid;
-    return firestore
-        .collection("users")
+    await firestore
+        .collection('users')
         .doc(uid)
-        .collection('medications')
-        .doc(medicationUid)
-        .collection('notification')
-        .doc(notificationUid)
-        .snapshots()
-        .map((documentSnapshot) {
-      return Notifications.fromSnapshot(documentSnapshot);
-    });
+        .collection('patient_notifications')
+        .add({
+          'patientId': patientId,
+          'title': title,
+          'body': body,
+          'dateTime': dateTime,
+          'createdAt': FieldValue.serverTimestamp(),
+          'sent': false,
+        });
+
+    print('Notification saved to Firestore');
+  } catch (error) {
+    print('Error saving notification: $error');
+    throw error;
   }
+}
+
+  // //function to delete notification
+  // Future<void> deleteMedicationNotification(
+  //     String medicationUid, String notificationUid) async {
+  //   try {
+  //     String uid = FirebaseAuth.instance.currentUser!.uid;
+  //     await FirebaseFirestore.instance
+  //         .collection("users")
+  //         .doc(uid)
+  //         .collection('medications')
+  //         .doc(medicationUid)
+  //         .collection('notification')
+  //         .doc(notificationUid)
+  //         .delete();
+  //     Get.snackbar(
+  //       "Success",
+  //       "Notification deleted successfully",
+  //       snackPosition: SnackPosition.TOP,
+  //       backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+  //       colorText: const Color(0xFFF6F3E7),
+  //     );
+  //   } catch (error) {
+  //     Get.snackbar(
+  //       "Error",
+  //       "Failed to delete notification",
+  //       snackPosition: SnackPosition.TOP,
+  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
+  //       colorText: Colors.red,
+  //     );
+  //     print(error.toString());
+  //   }
+  // }
+  // //function to update notification
+  // Future<void> updateMedicationNotification(
+  //     String medicationUid, Notifications updatedNotification) async {
+  //   String uid = FirebaseAuth.instance.currentUser!.uid;
+  //   try {
+  //     var notificationDocRef = FirebaseFirestore.instance
+  //         .collection("users")
+  //         .doc(uid)
+  //         .collection('medications')
+  //         .doc(medicationUid)
+  //         .collection('notification')
+  //         .doc(updatedNotification.id);
+  //     print(medicationUid);
+  //     print(updatedNotification.id);
+  //     // Check if the medication document exists
+  //     var notificationDoc = await notificationDocRef.get();
+
+  //     if (notificationDoc.exists) {
+  //       // Document exists, proceed with update
+  //       await notificationDocRef.update({
+  //         "Title": updatedNotification.title,
+  //         "Body": updatedNotification.body,
+  //         "DateTime": updatedNotification.dateTime,
+  //       });
+
+  //       Get.snackbar(
+  //         "Success",
+  //         "Medication details updated successfully",
+  //         snackPosition: SnackPosition.TOP,
+  //         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+  //         colorText: const Color(0xFFF6F3E7),
+  //       );
+  //     } else {
+  //       // Document doesn't exist, create a new document
+  //       await notificationDocRef.set({
+  //         "Title": updatedNotification.title,
+  //         "Body": updatedNotification.body,
+  //         "DateTime": updatedNotification.dateTime,
+  //       });
+
+  //       Get.snackbar(
+  //         "Success",
+  //         "Medication details created successfully",
+  //         snackPosition: SnackPosition.TOP,
+  //         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+  //         colorText: const Color(0xFFF6F3E7),
+  //       );
+  //     }
+  //   } catch (error) {
+  //     // Handle errors and show an error message
+  //     Get.snackbar(
+  //       "Error",
+  //       "Failed to update medication details",
+  //       snackPosition: SnackPosition.TOP,
+  //       backgroundColor: Colors.redAccent.withOpacity(0.1),
+  //       colorText: Colors.red,
+  //     );
+
+  //     // Print the error message and the document path for debugging
+  //     print("Error updating medication: ${error.toString()}");
+  //     print(
+  //         "Document path: users/$uid/medications/$medicationUid/notification/${updatedNotification.id}");
+  //   }
+  // }
+  // Stream<Notifications> getMedicationNotificationStream(
+  //     String medicationUid, String notificationUid) {
+  //   String uid = FirebaseAuth.instance.currentUser!.uid;
+  //   return firestore
+  //       .collection("users")
+  //       .doc(uid)
+  //       .collection('medications')
+  //       .doc(medicationUid)
+  //       .collection('notification')
+  //       .doc(notificationUid)
+  //       .snapshots()
+  //       .map((documentSnapshot) {
+  //     return Notifications.fromSnapshot(documentSnapshot);
+  //   });
+  // }
 }

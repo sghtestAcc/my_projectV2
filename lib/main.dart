@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:my_project/screens/auth/login_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:my_project/notification_service.dart'; // Add this import
 import 'package:my_project/controllers/account_controller.dart';
 import 'firebase_options.dart';
 import 'repos/authentication_repository.dart';

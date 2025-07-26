@@ -6,6 +6,7 @@ import 'package:my_project/main.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/error/register_failure.dart';
+import 'package:my_project/notification_service.dart';
 import 'package:my_project/controllers/account_controller.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
@@ -33,47 +34,54 @@ class AuthenticationRepository extends GetxController {
   // }
 //register function with backend validation -applies to both patients and caregivers-
   Future<void> registerUser(
-    String email,
-    String password,
-    LoginType loginType,
-    GraceUser user,
-    BuildContext context,
-  ) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      String uid = FirebaseAuth.instance.currentUser!.uid;
+  String email,
+  String password,
+  LoginType loginType,
+  GraceUser user,
+  BuildContext context,
+) async {
+  try {
+    await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    String uid = FirebaseAuth.instance.currentUser!.uid;
 
-      // ✅ WAIT for createUser to finish
-      bool success =
-          await UserRepository.instance.createUser(user, uid, context);
+    // ✅ Create user in DB
+    bool success = await UserRepository.instance.createUser(user, uid, context);
 
-      if (success) {
-        await Future.delayed(
-            Duration(milliseconds: 1500)); // optional: wait for snackbar
-        Get.offAll(() => const HomeScreen());
-      }
-    } on FirebaseAuthException catch (e) {
-      print('🔥 Firebase error: ${e.code}');
-      Get.snackbar(
-        AppLocalizations.of(context)!.snackbarInvalid,
-        RegisterFailure.fromCode(e.code, context).message,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-        colorText: Color(0xFFF6F3E7),
-      );
-    } catch (ex) {
-      Get.snackbar(
-        AppLocalizations.of(context)!.snackbarInvalid,
-        AppLocalizations.of(context)!.errorUnknown,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
+    if (success) {
+      // ✅ Apply saved locale before navigation
+      final prefs = await SharedPreferences.getInstance();
+      String savedLocaleCode = prefs.getString('selectedLocale') ?? 'en';
+      Get.updateLocale(Locale(savedLocaleCode));
+
+      await Future.delayed(const Duration(milliseconds: 1500));
+
+      // ✅ Navigate to HomeScreen
+      Get.offAll(() => const HomeScreen());
     }
+
+  } on FirebaseAuthException catch (e) {
+    print('🔥 Firebase error: ${e.code}');
+    Get.snackbar(
+      AppLocalizations.of(context)!.snackbarInvalid,
+      RegisterFailure.fromCode(e.code, context).message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+      colorText: const Color(0xFFF6F3E7),
+    );
+  } catch (ex) {
+    Get.snackbar(
+      AppLocalizations.of(context)!.snackbarInvalid,
+      AppLocalizations.of(context)!.errorUnknown,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
   }
+}
+
 
 //forgetpassword function with backend validation -applies to both patients and caregivers-
   Future<void> forgetpassword(email, BuildContext context) async {
