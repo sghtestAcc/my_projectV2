@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:my_project/components/navigation_drawer.dart';
 import 'package:my_project/models/login_type.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../communications_page.dart';
 
 class PatientsVocalScreen extends StatefulWidget {
@@ -83,9 +83,9 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text(
-          'Vocalization',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          AppLocalizations.of(context)!.vocalization,
+          style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -112,9 +112,9 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                 color: const Color(0xFF9EE8BF),
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
-                child: const Text(
-                  'Translate Medication',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocalizations.of(context)!.translateMedication,
+                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
               ),
               Row(
@@ -166,7 +166,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                 maxLines: 6,
                 keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
-                  hintText: "Enter Text",
+                  hintText: AppLocalizations.of(context)!.enterText,
                   suffixIcon: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -200,7 +200,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                 child: Text(
                   _isLoading
                       ? 'Loading...'
-                      : _translatedText ?? 'Enter text to be translated',
+                      : _translatedText ?? AppLocalizations.of(context)!.texttobetranslated,
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
                 ),
@@ -217,7 +217,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                       return Center(child: Text(snapshot.error.toString()));
                     } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                       return Center(
-                        child: const Text('No questions added yet'),
+                        child: Text(AppLocalizations.of(context)!.noqnyet),
                       );
                     } else if (snapshot.hasData) {
                       return Container(
@@ -282,9 +282,9 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                                             (_) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
-                                                const SnackBar(
+                                                 SnackBar(
                                                   content: Text(
-                                                      'Copied to your clipboard !'),
+                                                      AppLocalizations.of(context)!.copied),
                                                 ),
                                               );
                                             },
@@ -297,7 +297,7 @@ class _PatientsVocalScreenState extends State<PatientsVocalScreen> {
                                 )),
                       );
                     } else {
-                      return const Center(child: Text('Something went wrong'));
+                      return Center(child: Text(AppLocalizations.of(context)!.smtwentwrong));
                     }
                   }),
             ],

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/screens/auth/forget_password_page.dart';
 import 'package:my_project/screens/auth/register_page.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/login_type.dart';
+import 'package:my_project/components/navigation_drawer_new.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -34,8 +35,17 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.black),
+          actions: [
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu), // Hamburger icon
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+              ),
+            ),
+          ],
         ),
       ),
+      endDrawer: AppDrawerNavigationNew(),
       resizeToAvoidBottomInset: false,
       body: Form(
         key: formData,
@@ -59,9 +69,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocalizations.of(context)!.login,
+                    style: const TextStyle(
+                        fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -69,9 +80,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                 child: Column(
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Email', style: TextStyle(fontSize: 20)),
+                      child: Text(
+                        AppLocalizations.of(context)!.email,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
@@ -84,15 +98,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(content: Text('Email is required.')),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .emailRequiredError),
+                            ),
                           );
-                          return 'Email is required.';
+                          return AppLocalizations.of(context)!
+                              .emailRequiredError;
                         } else if (!value.contains('@')) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                                content: Text('Invalid email format.')),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .errorInvalidEmail),
+                            ),
                           );
-                          return 'Invalid email format.';
+                          return AppLocalizations.of(context)!
+                              .errorInvalidEmail;
                         }
                         return null;
                       },
@@ -105,9 +126,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Password', style: TextStyle(fontSize: 20)),
+                      child: Text(
+                        AppLocalizations.of(context)!.password,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
@@ -118,17 +142,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                                content: Text('Password is required.')),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .errorPasswordRequired),
+                            ),
                           );
-                          return 'Password is required.';
+                          return AppLocalizations.of(context)!
+                              .errorPasswordRequired;
                         } else if (value.length < 6) {
                           scaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Password must be at least 6 characters long.')),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .errorPasswordTooShort),
+                            ),
                           );
-                          return 'Password must be at least 6 characters long.';
+                          return AppLocalizations.of(context)!
+                              .errorPasswordTooShort;
                         }
                         return null;
                       },
@@ -141,10 +170,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child:
-                          Text('Account Type', style: TextStyle(fontSize: 20)),
+                      child: Text(
+                        AppLocalizations.of(context)!.accountType,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<LoginType>(
@@ -155,7 +186,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         });
                       },
                       validator: (value) => value == null
-                          ? 'Please select an account type.'
+                          ? AppLocalizations.of(context)!
+                              .selectAccountTypeValidation
                           : null,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -166,8 +198,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           .map((LoginType type) {
                         return DropdownMenuItem<LoginType>(
                           value: type,
-                          child: Text(type.name[0].toUpperCase() +
-                              type.name.substring(1)),
+                          child: Text(
+                            type == LoginType.patient
+                                ? AppLocalizations.of(context)!
+                                    .accountTypePatient
+                                : AppLocalizations.of(context)!
+                                    .accountTypeCaregiver,
+                          ),
                         );
                       }).toList(),
                     ),
@@ -186,9 +223,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         alignment: Alignment
                             .centerRight, // Align the text to the right
                         child: Text(
-                          'Forget Password?',
+                          AppLocalizations.of(context)!.forgetPasswordHeader,
                           style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -196,39 +235,38 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       // height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          bool isFormValid = formData.currentState!.validate();
+
+                          if (!isFormValid) return;
+
                           if (selectedLoginType == null) {
-                            scaffoldMessengerKey.currentState?.showSnackBar(
-                              const SnackBar(
-                                content: Text('Please select an account type.'),
-                              ),
-                            );
+                            scaffoldMessengerKey.currentState
+                                ?.showSnackBar(SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .selectAccountTypeError),
+                            ));
                             return;
                           }
 
-                          if (formData.currentState!.validate()) {
-                            AuthenticationRepository.instance.loginUser(
-                              email.text.trim(),
-                              password.text.trim(),
-                              selectedLoginType!,
-                            );
-                            formData.currentState?.reset();
-                          }
+                          await AuthenticationRepository.instance.loginUser(
+                            email.text.trim(),
+                            password.text.trim(),
+                            selectedLoginType!,
+                            context,
+                          );
+                          formData.currentState?.reset();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0CE25C), // NEW
+                          backgroundColor: const Color(0xFF0CE25C),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              12,
-                            ), // Rounded corner radius
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Text(
+                          AppLocalizations.of(context)!.login,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -244,9 +282,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                      child: const Text(
-                        'Don\'t have an account? Sign up',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.noAccountSignUp,
+                        style: const TextStyle(
                           fontSize: 15,
                           decoration: TextDecoration.underline,
                         ),

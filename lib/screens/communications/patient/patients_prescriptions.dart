@@ -6,7 +6,7 @@ import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/screens/home/home.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../repos/authentication_repository.dart';
 import '../../../repos/user_repo.dart';
 
@@ -27,9 +27,9 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Prescriptions',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          AppLocalizations.of(context)!.prescriptions,
+          style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -61,17 +61,17 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Patient',
+                      Text(
+                        AppLocalizations.of(context)!.patient,
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      const Text(
-                        'Medications',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.medications,
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
@@ -178,9 +178,11 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                                             .error
                                                             .toString()));
                                                   } else {
-                                                    return const Center(
+                                                    return Center(
                                                         child: Text(
-                                                            'Something went wrong'));
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .smtwentwrong));
                                                   }
                                                 } else {
                                                   return const Center(
@@ -195,8 +197,10 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                           child:
                                               Text(snapshot.error.toString()));
                                     } else {
-                                      return const Center(
-                                          child: Text('Something went wrong'));
+                                      return Center(
+                                          child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .smtwentwrong));
                                     }
                                   } else {
                                     return const Center(
@@ -221,8 +225,8 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                 ),
                 child: Container(
                     padding: EdgeInsets.all(10.0),
-                    child: const Text(
-                      'Patient info Medication List',
+                    child: Text(
+                      AppLocalizations.of(context)!.patientinfomedlist,
                       style: TextStyle(fontSize: 20),
                     )),
               ),
@@ -260,13 +264,13 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                         fontSize: 15,
                                       ),
                                     ),
-                                    const Text(
-                                      'Quantity',
-                                      style: TextStyle(fontSize: 15),
+                                    Text(
+                                      AppLocalizations.of(context)!.quantity,
+                                      style: const TextStyle(fontSize: 15),
                                     ),
-                                    const Text(
-                                      'Schedule',
-                                      style: TextStyle(fontSize: 15),
+                                    Text(
+                                      AppLocalizations.of(context)!.schedule,
+                                      style: const TextStyle(fontSize: 15),
                                     ),
                                   ],
                                 ),
@@ -393,9 +397,10 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                                               child: Text(
                                                   snapshot.error.toString()));
                                         } else {
-                                          return const Center(
-                                              child:
-                                                  Text('Something went wrong'));
+                                          return Center(
+                                              child: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .smtwentwrong));
                                         }
                                       } else {
                                         return const Center(
@@ -408,8 +413,9 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
                             return Center(
                                 child: Text(snapshot.error.toString()));
                           } else {
-                            return const Center(
-                                child: Text('Something went wrong'));
+                            return Center(
+                                child: Text(AppLocalizations.of(context)!
+                                    .smtwentwrong));
                           }
                         } else {
                           return const Center(
@@ -428,8 +434,7 @@ class _PatientsPrescripScreenState extends State<PatientsPrescripScreen> {
         ),
       ),
       //  endDrawer: AppDrawerNavigation(loginType: widget.loginType),
-endDrawer: const AppDrawerNavigation(),
-
+      endDrawer: const AppDrawerNavigation(),
     );
   }
 }

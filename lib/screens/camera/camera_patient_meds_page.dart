@@ -18,7 +18,7 @@ import 'package:http/http.dart' as http;
 import 'package:my_project/models/translated_text_line.dart';
 import 'package:my_project/utils/gpt_utils.dart';
 import 'dart:ui' as ui;
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../components/navigation_drawer_new.dart';
 
 class CameraHomePatientScreen extends StatefulWidget {
@@ -147,9 +147,10 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
               const SizedBox(
                 height: 20,
               ),
-              const Text(
-                ' Upload for Medication Packaging',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Text(
+                AppLocalizations.of(context)!.uploadmedicationpackaging,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 20,
@@ -188,9 +189,9 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Capture Photo',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.capturephoto,
+                  style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
@@ -235,9 +236,9 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                           BorderRadius.circular(12), // Rounded corner radius
                     ),
                   ),
-                  child: const Text(
-                    'Upload Photos',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.uploadphoto,
+                    style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
@@ -250,14 +251,14 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                     if (imageFiles.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            content: Text(
-                                'Please select an Medication Packaging image')),
+                            content: Text(AppLocalizations.of(context)!
+                                .medicationpackageempty)),
                       );
                     } else if (controller.text.isEmpty ||
                         controller.text.isEmpty) {
                       Get.snackbar(
-                        "Error",
-                        "Please select an image with medication text",
+                        AppLocalizations.of(context)!.snackbarInvalid,
+                        AppLocalizations.of(context)!.medicationpackagenotext,
                         snackPosition: SnackPosition.TOP,
                         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                         colorText: Color(0xFFF6F3E7),
@@ -283,9 +284,9 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                           BorderRadius.circular(12), // Rounded corner radius
                     ),
                   ),
-                  child: const Text(
-                    'Select Medication Pills',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.selectpillphoto,
+                    style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
@@ -362,9 +363,9 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
               ),
               Column(
                 children: [
-                  const Text(
-                    'Translated Medication Packaging:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocalizations.of(context)!.translatedmedicalpackaging,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
@@ -378,8 +379,8 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                             controller: controller,
                             maxLines: 1,
                             enabled: false,
-                            decoration: const InputDecoration(
-                              hintText: "Your Medication will appear here...",
+                            decoration: InputDecoration(
+                              hintText: AppLocalizations.of(context)!.yourmedswillappearhere,
                               border: InputBorder
                                   .none, // Set this to remove the border
                             ),

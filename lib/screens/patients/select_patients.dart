@@ -7,7 +7,7 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/medications.dart';
 import '../../notification_service.dart';
 import '../home/patient_card.dart';
@@ -22,9 +22,11 @@ class SelectPatientScreen extends StatefulWidget {
 class _SelectPatientScreenState extends State<SelectPatientScreen> {
   final userRepo = Get.put(UserRepository());
   Map<String, bool> _isCheckedMap = {};
-  Map<String, bool> _isTimeDropdownOpen = {}; // Track dropdown state for each patient
-  Map<String, TimeOfDay?> _selectedTimes = {}; // Track selected times for each patient
-  
+  Map<String, bool> _isTimeDropdownOpen =
+      {}; // Track dropdown state for each patient
+  Map<String, TimeOfDay?> _selectedTimes =
+      {}; // Track selected times for each patient
+
   String lol = '';
 
   @override
@@ -33,8 +35,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     return WillPopScope(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Patients',
+          title: Text(
+            AppLocalizations.of(context)!.patients,
             style: TextStyle(color: Colors.black),
           ),
           automaticallyImplyLeading: false,
@@ -50,99 +52,111 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                color: const Color(0xFF9EE8BF),
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
-                child: const Text(
-                  'Select Patient',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-              ),
-                       Container(
-                        height: 200,
-                         child: 
-                         StreamBuilder<List<GraceUser>>(
-                          stream: userRepo.getAllPatientsWithMedications2(),
-                          builder: (context, snapshot) {
-                             if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }  else if (snapshot.hasError) {
-                            return Center(child: Text(snapshot.error.toString()));
-                          } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                        return Center(
-                        child: Column(
-                        children: [
-                        const SizedBox(height: 10,),
-                        Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
-                        const SizedBox(height: 10,),
-                        Text('No questions added yet'),
-                      ],
-                    ),
-                  );
-                    } else if (snapshot.hasData) {
-                                      return ListView.builder(
-                                    shrinkWrap: true,
-                                  itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                  GraceUser patient = snapshot.data![index];
-                                      String uid = patient.id ?? '';
-                                      String email = patient.email ?? '';
-                                      String name = patient.name ?? '';
-                                      bool isChecked = _isCheckedMap[uid] ?? false;
-                                  return Container(
-                                  decoration: BoxDecoration(
-                         border: Border.all(
-                           color: Colors.black,
-                           width: 1.0,
-                         ),
-                                   ),
-                                   child: CheckboxListTile(
-                         title: Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             Text(
-                               name,
-                               style: const TextStyle(fontSize: 15),
-                             ),
-                             Text(email,
-                                 style: const TextStyle(fontSize: 12)),
-                           ],
-                         ),
-                         value:  isChecked,
-                         onChanged: (newValue) {
-                           setState(() {
-                             _isCheckedMap[uid] = newValue ?? false;
-                           });
-                         },
-                         activeColor: const Color(0xFF0CE25C),
-                                   ),
-                                 );
-                               },
-                             );
-                    } else {
-                    return const Center(child: Text('Something went wrong'));
-                    }
-                          })
-                       ),
-                          Container(
-                padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    addPatientsToCurrentUser();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color(0xFF0CE25C), // Button background color
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12), // Rounded corner radius
-                    ),
-                    minimumSize: const Size(double.infinity,
-                        40), // Adjust the width by modifying the minimumSize property
-                  ),
-                  child: const Text(
-                    'Select Patient',
+                  color: const Color(0xFF9EE8BF),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
+                  child: Text(
+                    AppLocalizations.of(context)!.selectPatient,
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                    height: 200,
+                    child: StreamBuilder<List<GraceUser>>(
+                        stream: userRepo.getAllPatientsWithMedications2(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text(snapshot.error.toString()));
+                          } else if (snapshot.hasData &&
+                              snapshot.data!.isEmpty) {
+                            return Center(
+                              child: Column(
+                                children: [
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Image.asset(
+                                      'assets/images/to-do-list.png'), // Adjust the image path accordingly
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(AppLocalizations.of(context)!.noqnyet),
+                                ],
+                              ),
+                            );
+                          } else if (snapshot.hasData) {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                GraceUser patient = snapshot.data![index];
+                                String uid = patient.id ?? '';
+                                String email = patient.email ?? '';
+                                String name = patient.name ?? '';
+                                bool isChecked = _isCheckedMap[uid] ?? false;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: CheckboxListTile(
+                                    title: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          name,
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                        Text(email,
+                                            style:
+                                                const TextStyle(fontSize: 12)),
+                                      ],
+                                    ),
+                                    value: isChecked,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        _isCheckedMap[uid] = newValue ?? false;
+                                      });
+                                    },
+                                    activeColor: const Color(0xFF0CE25C),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(
+                                child: Text(AppLocalizations.of(context)!
+                                    .smtwentwrong));
+                          }
+                        })),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      addPatientsToCurrentUser();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          const Color(0xFF0CE25C), // Button background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Rounded corner radius
+                      ),
+                      minimumSize: const Size(double.infinity,
+                          40), // Adjust the width by modifying the minimumSize property
+                    ),
+                    child: const Text(
+                      'Select Patient',
+                      style:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
@@ -256,63 +270,75 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isTimeDropdownOpen[patientid] = !isTimeDropdownOpen;
-                            });
-                          },
-                          child: Text(
-                            isTimeDropdownOpen ? 'Cancel Alert' : 'Add Alert',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            Image.asset(
+                                'assets/images/to-do-list.png'), // Adjust the image path accordingly
+                            const SizedBox(
+                              height: 10,
                             ),
-                          ),
+                            Text(AppLocalizations.of(context)!.noPatientYet),
+                          ],
                         ),
-                        
-                        // Time Selector Dropdown
-                        if (isTimeDropdownOpen) ...[
-                          SizedBox(height: 10),
-                          Container(
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.grey),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Set Notification Time:',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                      );
+                    } else if (snapshot.hasData) {
+                      return Expanded(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(10.0),
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length,
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(height: 10);
+                          },
+                          itemBuilder: (context, i) {
+                            String patientName = snapshot.data![i]['name'];
+                            String patientEmail = snapshot.data![i]['email'];
+                            String patientid = snapshot.data![i]['id'];
+                            bool isTimeDropdownOpen =
+                                _isTimeDropdownOpen[patientid] ?? false;
+                            TimeOfDay? selectedTime = _selectedTimes[patientid];
+
+                            return Container(
+                              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(22)),
+                                color: Color(0xDDF6F6F6),
+                                border: Border.all(
+                                  color: Colors.black.withOpacity(0.5),
+                                  width: 1,
                                 ),
-                                SizedBox(height: 8),
-                                
-                                // Time Display and Picker
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.grey),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          selectedTime != null
-                                              ? selectedTime!.format(context)
-                                              : 'Select time',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.5),
+                                    offset: Offset(0, 1),
+                                    blurRadius: 4,
+                                    spreadRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    patientName,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(patientEmail,
+                                      style: TextStyle(fontSize: 14)),
+                                  SizedBox(height: 8),
+
+                                  // Add Alert Button
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF0CE25C),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
                                     ),
+
                                     SizedBox(width: 8),
                                     IconButton(
                                       icon: Icon(Icons.access_time),
@@ -342,15 +368,21 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                         });
                                       },
                                       child: Text('Cancel'),
+
                                     ),
-                                    SizedBox(width: 8),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFF0CE25C),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
+                                  ),
+
+                                  // Time Selector Dropdown
+                                  if (isTimeDropdownOpen) ...[
+                                    SizedBox(height: 10),
+                                    Container(
+                                      padding: EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.grey),
                                       ),
+
                                       onPressed: selectedTime != null
                                           ? () async {
                                               await _scheduleNotificationForPatient(
@@ -373,42 +405,39 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                                       ),
                                     ),
                                   ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        // // Existing medication info dropdown
-                        // Row(
-                        //   children: [
-                        //     // const Text(
-                        //     //   'View more for medication info',
-                        //     //   style: TextStyle(fontSize: 10),
-                        //     // ),
-                        //     IconButton(
-                        //       onPressed: () {
-                        //         setState(() {
-                        //           isDropdownOpen = !isDropdownOpen;
-                        //         });
-                        //       },
-                        //       icon: Icon(isDropdownOpen
-                        //           ? Icons.expand_less
-                        //           : Icons.expand_more),
-                        //     ),
-                        //   ],
-                        // ),
-                        caregiverPatientCardView(i, patientid),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            );
-                } else {
-            return const Center(child: Text('Something went wrong'));
-                }
-                },
-              ),
+                                  // // Existing medication info dropdown
+                                  // Row(
+                                  //   children: [
+                                  //     // const Text(
+                                  //     //   'View more for medication info',
+                                  //     //   style: TextStyle(fontSize: 10),
+                                  //     // ),
+                                  //     IconButton(
+                                  //       onPressed: () {
+                                  //         setState(() {
+                                  //           isDropdownOpen = !isDropdownOpen;
+                                  //         });
+                                  //       },
+                                  //       icon: Icon(isDropdownOpen
+                                  //           ? Icons.expand_less
+                                  //           : Icons.expand_more),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  caregiverPatientCardView(i, patientid),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    } else {
+                      return Center(
+                          child:
+                              Text(AppLocalizations.of(context)!.smtwentwrong));
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -442,7 +471,6 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             GraceUser selectedPatient =
                 patients.firstWhere((patient) => patient.id == uid);
 
-           
             Map<String, dynamic> patientData = {
               'id': selectedPatient.id,
               'email': selectedPatient.email,
@@ -452,13 +480,12 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             _isCheckedMap[uid] = false; // Set to false after adding the patient
           }
         }
-        Get.snackbar("Congrats", "A new user has been added to your list.",
+        Get.snackbar(AppLocalizations.of(context)!.snackbarCongrats,
+            AppLocalizations.of(context)!.newUserList,
             snackPosition: SnackPosition.TOP,
             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
             colorText: Color(0xFFF6F3E7));
-        setState(() {
-          
-        });
+        setState(() {});
       }
     } catch (e) {
       print('Error adding patients: $e');
@@ -485,6 +512,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     }
     return Stream.value([]); // Return an empty stream if there's an error
   }
+
   
   // Add this method to your _SelectPatientScreenState class
   Future<void> _scheduleNotificationForPatient(

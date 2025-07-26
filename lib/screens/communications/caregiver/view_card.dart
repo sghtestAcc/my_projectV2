@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../models/grace_user.dart';
 import '../../../models/medications.dart';
 import 'caregiver_vocal.dart';
@@ -27,8 +27,8 @@ class _myCardPrescriptionState extends State<myCardPrescription> {
             children: [  
               Row(
                 children: [
-                  const Text(
-                    'View more for medication info',
+                  Text(
+                    AppLocalizations.of(context)!.viewmore,
                     style: TextStyle(fontSize: 10),
                   ),
                   IconButton(
@@ -95,8 +95,8 @@ class _myCardPrescriptionState extends State<myCardPrescription> {
                                     child: Text(snapshot.error.toString()),
                                   );
                                 } else {
-                                  return const Center(
-                                    child: Text('Something went wrong'),
+                                  return Center(
+                                    child: Text(AppLocalizations.of(context)!.smtwentwrong),
                                   );
                                 }
                               } else {

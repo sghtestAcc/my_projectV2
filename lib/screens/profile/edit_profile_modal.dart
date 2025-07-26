@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
  var formEditDetails = GlobalKey<FormState>();
 
@@ -38,8 +39,8 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                       ),
                     ],
                   ),
-                  const Text(
-                    'Change Full Name',
+                  Text(
+                    AppLocalizations.of(context)!.changeFullName,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
@@ -49,10 +50,10 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                       const SizedBox(
                         height: 10,
                       ),
-                  const Align(
+                  Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'New Full Name',
+                          AppLocalizations.of(context)!.newFullName,
                           style:
                             TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
@@ -94,8 +95,8 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                         //-applies to both Patients and Caregivers-
                           if (newFullNameText.text == null || newFullNameText.text.isEmpty) {
                           Get.snackbar(
-                          "Error",
-                          "Please fill up Full Name.",
+                          AppLocalizations.of(context)!.snackbarInvalid,
+                          AppLocalizations.of(context)!.errNoFullName,
                           snackPosition: SnackPosition.TOP,
                           backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                           colorText: Color(0xFFF6F3E7),
@@ -107,8 +108,8 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                           else if (!RegExp(r"^[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+$")
                             .hasMatch(newFullNameText.text.trim())) {
                            Get.snackbar(
-                          "Error",
-                          "All characters should have capital letters with capital letters.",
+                          AppLocalizations.of(context)!.snackbarInvalid,
+                          AppLocalizations.of(context)!.errNoCaps,
                           // "Full name should start with capital letters.",
                           snackPosition: SnackPosition.TOP,
                           backgroundColor: Color(0xFF35365D).withOpacity(0.5),
@@ -153,8 +154,8 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                         //   newpasswordText.clear();
                         //   }
                       },
-                      child: const Text(
-                        'Change Full Name',
+                      child: Text(
+                        AppLocalizations.of(context)!.changeFullName,
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -173,8 +174,8 @@ import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
                       onPressed: () {
                          Navigator.pop(context);
                       },
-                      child: const Text(
-                        'Close',
+                      child: Text(
+                        AppLocalizations.of(context)!.close,
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),

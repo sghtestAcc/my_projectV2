@@ -8,7 +8,7 @@ import 'package:my_project/controllers/select_patient_controller.dart';
 import 'package:my_project/repos/authentication_repository.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/communications/components/add_questions_modal.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/login_type.dart';
 
 class CommunicationsScreen extends StatefulWidget {
@@ -73,8 +73,8 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: const Text(
-            'Communications',
+          title: Text(
+            AppLocalizations.of(context)!.communications,
             style: TextStyle(color: Colors.black, fontSize: 25),
           ),
           backgroundColor: Colors.transparent,
@@ -95,10 +95,10 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                     color: const Color(0xFF9EE8BF),
                     width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                    child: const Text(
-                      'Translate Questions',
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    child: Text(
+                      AppLocalizations.of(context)!.translateQn,
+                      style: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Row(
@@ -150,7 +150,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                     maxLines: 3,
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
-                      hintText: 'Enter text',
+                      hintText: AppLocalizations.of(context)!.enterText,
                       suffixIcon: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -184,7 +184,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                     child: Text(
                       _isLoading
                           ? 'Loading...'
-                          : _translatedText ?? 'Enter text to be translated',
+                          : _translatedText ?? AppLocalizations.of(context)!.texttobetranslated,
                       style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.bold),
                     ),
@@ -198,9 +198,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                           )),
                           width: double.infinity,
                           padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
-                          child: const Text(
-                            'Common / Saved questions for Patients',
-                            style: TextStyle(fontSize: 20),
+                          child: Text(
+                            AppLocalizations.of(context)!.cmnQn4Patient,
+                            style: const TextStyle(fontSize: 20),
                           ),
                         )
                       : Container(
@@ -210,9 +210,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                           )),
                           width: double.infinity,
                           padding: const EdgeInsets.fromLTRB(15, 20, 0, 20),
-                          child: const Text(
-                            'Common / Saved questions for Caregivers',
-                            style: TextStyle(fontSize: 20),
+                          child: Text(
+                            AppLocalizations.of(context)!.cmnQn4Caregiver,
+                            style: const TextStyle(fontSize: 20),
                           ),
                         ),
                   //patients view questions
@@ -241,7 +241,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text('No questions added yet'),
+                                    Text(AppLocalizations.of(context)!.noqnyet),
                                   ],
                                 ),
                               );
@@ -289,9 +289,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                                     ScaffoldMessenger.of(
                                                             context)
                                                         .showSnackBar(
-                                                      const SnackBar(
+                                                      SnackBar(
                                                         content: Text(
-                                                            'Copied to your clipboard !'),
+                                                            AppLocalizations.of(context)!.copied),
                                                       ),
                                                     );
                                                   },
@@ -314,21 +314,21 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                                                     .circular(
                                                                         12),
                                                           ),
-                                                          title: const Text(
-                                                            'Are you Sure?',
+                                                          title: Text(
+                                                            AppLocalizations.of(context)!.confirmation,
                                                             style: TextStyle(
                                                                 color: Colors
                                                                     .white),
                                                           ),
-                                                          content: const Text(
-                                                              'This would delete a question',
+                                                          content: Text(
+                                                              AppLocalizations.of(context)!.cfmdlQn,
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .white)),
                                                           actions: [
                                                             MaterialButton(
-                                                              child: const Text(
-                                                                'Delete',
+                                                              child: Text(
+                                                                AppLocalizations.of(context)!.delete,
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .white),
@@ -353,7 +353,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                                                     context);
                                                               },
                                                               child: Text(
-                                                                'cancel',
+                                                                AppLocalizations.of(context)!.cancel,
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .white),
@@ -372,8 +372,8 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                 },
                               );
                             } else {
-                              return const Center(
-                                  child: Text('Something went wrong'));
+                              return Center(
+                                  child: Text(AppLocalizations.of(context)!.smtwentwrong));
                             }
                           },
                         ))
@@ -401,7 +401,7 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    Text('No questions added yet'),
+                                    Text(AppLocalizations.of(context)!.noqnyet),
                                   ],
                                 ),
                               );
@@ -449,9 +449,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                                     ScaffoldMessenger.of(
                                                             context)
                                                         .showSnackBar(
-                                                      const SnackBar(
+                                                      SnackBar(
                                                         content: Text(
-                                                            'Copied to your clipboard !'),
+                                                            AppLocalizations.of(context)!.copied),
                                                       ),
                                                     );
                                                   },
@@ -474,22 +474,22 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                                                     .circular(
                                                                         12),
                                                           ),
-                                                          title: const Text(
-                                                            'Are you Sure?',
-                                                            style: TextStyle(
+                                                          title: Text(
+                                                            AppLocalizations.of(context)!.confirmation,
+                                                            style: const TextStyle(
                                                                 color: Colors
                                                                     .white),
                                                           ),
-                                                          content: const Text(
-                                                              'This would delete a question',
-                                                              style: TextStyle(
+                                                          content:  Text(
+                                                              AppLocalizations.of(context)!.cfmdlQn,
+                                                              style: const TextStyle(
                                                                   color: Colors
                                                                       .white)),
                                                           actions: [
                                                             MaterialButton(
-                                                              child: const Text(
-                                                                'Delete',
-                                                                style: TextStyle(
+                                                              child: Text(
+                                                                AppLocalizations.of(context)!.delete,
+                                                                style:const TextStyle(
                                                                     color: Colors
                                                                         .white),
                                                               ),
@@ -513,8 +513,8 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                                                     context);
                                                               },
                                                               child: Text(
-                                                                'cancel',
-                                                                style: TextStyle(
+                                                                AppLocalizations.of(context)!.cancel,
+                                                                style: const TextStyle(
                                                                     color: Colors
                                                                         .white),
                                                               ),
@@ -532,8 +532,8 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                 },
                               );
                             } else {
-                              return const Center(
-                                  child: Text('Something went wrong'));
+                              return Center(
+                                  child: Text(AppLocalizations.of(context)!.smtwentwrong));
                             }
                           },
                         )),
@@ -562,9 +562,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                 ),
                               ),
                             ),
-                            child: const Text(
-                              'Add Questions?',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.addQn1,
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -592,9 +592,9 @@ class _CommunicationsScreenState extends State<CommunicationsScreen> {
                                 ),
                               ),
                             ),
-                            child: const Text(
-                              'Add Questions?',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.addQn1,
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,

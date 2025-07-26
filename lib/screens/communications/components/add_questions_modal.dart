@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/repos/user_repo.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
   final questionsText = TextEditingController();
   final questionsText2 = TextEditingController();
@@ -39,7 +40,7 @@ import 'package:my_project/repos/user_repo.dart';
                             ],
                           ),
                           Text(
-                          'Add Questions',
+                          AppLocalizations.of(context)!.addqn,
                           style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -60,10 +61,10 @@ import 'package:my_project/repos/user_repo.dart';
                             controller: questionsText,
                             maxLines: 3,
                             keyboardType: TextInputType.multiline,
-                            decoration: const InputDecoration(
-                            hintText: 'Enter your question here...',
+                            decoration: InputDecoration(
+                            hintText: AppLocalizations.of(context)!.etryrquestionhere,
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(10.0),
+                            contentPadding: const EdgeInsets.all(10.0),
                               ),
                             ),
                           ),
@@ -79,8 +80,8 @@ import 'package:my_project/repos/user_repo.dart';
                                 //validation textfield of questions of questions if empty -applies to both Patients and Caregivers-
                                 if(questionsText.text == null || questionsText.text.isEmpty) {
                                 Get.snackbar(
-                                "Error",
-                                "Please fill in, Question is required.",
+                                AppLocalizations.of(context)!.snackbarInvalid,
+                                AppLocalizations.of(context)!.qnEmpty,
                                 snackPosition: SnackPosition.TOP,
                                 backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                                 colorText: Color(0xFFF6F3E7)
@@ -104,9 +105,9 @@ import 'package:my_project/repos/user_repo.dart';
                               ), // Rounded corner radius
                             ),
                           ) ,
-                              child: const Text(
-                                'Add',
-                                style: TextStyle(
+                              child: Text(
+                                AppLocalizations.of(context)!.add,
+                                style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -131,9 +132,9 @@ import 'package:my_project/repos/user_repo.dart';
                               ), // Rounded corner radius
                             ),
                           ) ,
-                              child: const Text(
-                                'Close',
-                                style: TextStyle(
+                              child: Text(
+                                AppLocalizations.of(context)!.close,
+                                style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -177,7 +178,7 @@ import 'package:my_project/repos/user_repo.dart';
                             ],
                           ),
                           Text(
-                          'Add Questions',
+                          AppLocalizations.of(context)!.addqn,
                           style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -199,10 +200,10 @@ import 'package:my_project/repos/user_repo.dart';
                             controller: questionsText2,
                             maxLines: 3,
                             keyboardType: TextInputType.multiline,
-                            decoration: const InputDecoration(
-                            hintText: 'Enter your question here...',
+                            decoration: InputDecoration(
+                            hintText: AppLocalizations.of(context)!.etryrquestionhere,
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(10.0),
+                            contentPadding: const EdgeInsets.all(10.0),
                               ),
                             ),
                           ),
@@ -217,8 +218,8 @@ import 'package:my_project/repos/user_repo.dart';
                                 
                                 if(questionsText2.text == null || questionsText2.text.isEmpty) {
                                 Get.snackbar(
-                                "Error",
-                                "Please fill in, Question is required.",
+                                AppLocalizations.of(context)!.snackbarInvalid,
+                                AppLocalizations.of(context)!.qnEmpty,
                                 snackPosition: SnackPosition.TOP,
                                 backgroundColor: Color(0xFF35365D).withOpacity(0.5),
                                 colorText: Color(0xFFF6F3E7)
@@ -241,9 +242,9 @@ import 'package:my_project/repos/user_repo.dart';
                               ), // Rounded corner radius
                             ),
                           ) ,
-                              child: const Text(
-                                'Add',
-                                style: TextStyle(
+                              child: Text(
+                                AppLocalizations.of(context)!.add,
+                                style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -268,9 +269,9 @@ import 'package:my_project/repos/user_repo.dart';
                               ), // Rounded corner radius
                             ),
                           ) ,
-                              child: const Text(
-                                'Close',
-                                style: TextStyle(
+                              child:  Text(
+                                AppLocalizations.of(context)!.close,
+                                style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
