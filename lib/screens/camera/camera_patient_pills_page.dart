@@ -320,7 +320,6 @@ class _CameraHomePatientPillScreenState
       if (getImage != null) {
         textScanning = true;
 
-        // ✅ Add this image to the list instead of replacing
         setState(() {
           imageFilepills.add(getImage);
         });
