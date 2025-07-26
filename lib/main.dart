@@ -12,6 +12,8 @@ import 'models/login_type.dart';
 import 'package:my_project/screens/auth/register_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_project/screens/home/app_guide_screen.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,10 +31,25 @@ Future<void> main() async {
   runApp(MyApp(savedLocale));
 }
 
+Future<void> checkFirstLaunch(
+    BuildContext context, VoidCallback showTutorial) async {
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('hasSeenGuide') ?? true;
+
+  if (isFirstLaunch) {
+    // Delay so widgets are rendered
+    debugPrint("✅ First launch detected, showing tutorial");
+    Future.delayed(Duration(milliseconds: 300), showTutorial);
+
+    // Mark guide as seen
+    await prefs.setBool('hasSeenGuide', false);
+  }
+}
+
 class MyApp extends StatelessWidget {
   final Locale initialLocale;
 
-  MyApp(this.initialLocale); 
+  MyApp(this.initialLocale);
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +71,69 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey keyLoginButton = GlobalKey();
+  final GlobalKey keySignUpButton = GlobalKey();
+  late List<TargetFocus> targets;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initTargets();
+      checkFirstLaunch(context, showTutorial);
+    });
+  }
+
+  void initTargets() {
+    targets = [
+      TargetFocus(
+        identify: "login", // use lowercase for simpler comparisons
+        keyTarget: keyLoginButton,
+        contents: [],
+      ),
+      TargetFocus(
+        identify: "signup",
+        keyTarget: keySignUpButton,
+        contents: [],
+      ),
+    ];
+  }
+
+  void showTutorial() {
+    TutorialCoachMark(
+      context,
+      targets: targets,
+      colorShadow: Colors.black.withOpacity(0.8),
+      textSkip: "SKIP",
+      paddingFocus: 10,
+      onFinish: () => print("Tutorial finished"),
+      onSkip: () => print("Tutorial skipped"),
+      onClickTarget: (target) {
+        String msg = "";
+
+        switch (target.identify) {
+          case "login":
+            msg = AppLocalizations.of(context)!.titlepage4thMsg;
+            break;
+          case "signup":
+            msg = "Or create a new account here!";
+            break;
+        }
+
+        // Show the SnackBar message
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(msg),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.black87,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+      },
+    ).show();
+  }
+
   @override
   Widget build(BuildContext context) {
     //  final localizations = AppLocalizations.of(context);
@@ -95,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 30,
               ),
               ElevatedButton(
+                key: keyLoginButton,
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -119,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
+                key: keySignUpButton,
                 onPressed: () {
                   Navigator.push(
                     context,

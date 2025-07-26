@@ -946,6 +946,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.4"
+  tutorial_coach_mark:
+    dependency: "direct main"
+    description:
+      name: tutorial_coach_mark
+      sha256: "32fe53f0f5e6f2a720e3bb5169d1178e0dcf0d931d9e0c44bea3a5f17958d270"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   typed_data:
     dependency: transitive
     description:
