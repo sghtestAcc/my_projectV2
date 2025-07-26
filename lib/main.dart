@@ -10,27 +10,36 @@ import 'repos/authentication_repository.dart';
 import 'models/login_type.dart';
 import 'package:my_project/screens/auth/register_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final prefs = await SharedPreferences.getInstance();
+  final savedLocaleCode =
+      prefs.getString('selectedLocale') ?? 'en'; // default to English
+  final savedLocale = Locale(savedLocaleCode);
 
   Get.put(AccountController());
   Get.put(AuthenticationRepository());
 
-  runApp(MyApp()); // ✅ Removed 'const' if MyApp constructor is not const
+  runApp(MyApp(savedLocale));
 }
 
 class MyApp extends StatelessWidget {
+  final Locale initialLocale;
+
+  MyApp(this.initialLocale); // pass in locale
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: "App",
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'), // or use Get.deviceLocale for dynamic support
+      locale: initialLocale, // set saved locale
       home: const HomeScreen(),
     );
   }

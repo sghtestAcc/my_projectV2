@@ -244,38 +244,58 @@ class _FullScreenTranslatedImageState extends State<FullScreenTranslatedImage> {
                   DropdownMenuItem(
                     value: '',
                     child: Text(
-                        AppLocalizations.of(context)!.defaultNoLangSelected,
-                        style: TextStyle(color: Colors.white)),
+                      AppLocalizations.of(context)!.defaultNoLangSelected,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'English',
-                    child: Text(AppLocalizations.of(context)!.english,
-                        style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      AppLocalizations.of(context)!.english,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'Chinese',
-                    child: Text(AppLocalizations.of(context)!.chinese,
-                        style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      AppLocalizations.of(context)!.chinese,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Malay',
+                    child: Text(
+                      AppLocalizations.of(context)!.malay,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'Tagalog',
-                    child: Text(AppLocalizations.of(context)!.tagalog,
-                        style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      AppLocalizations.of(context)!.tagalog,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'Indonesian',
-                    child: Text(AppLocalizations.of(context)!.indonesian,
-                        style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      AppLocalizations.of(context)!.indonesian,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'Burmese',
-                    child: Text(AppLocalizations.of(context)!.burmese,
-                        style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      AppLocalizations.of(context)!.burmese,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'Tamil',
-                    child: Text(AppLocalizations.of(context)!.tamil,
-                        style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      AppLocalizations.of(context)!.tamil,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
                 selectedItemBuilder: (BuildContext context) {
@@ -283,6 +303,7 @@ class _FullScreenTranslatedImageState extends State<FullScreenTranslatedImage> {
                     AppLocalizations.of(context)!.defaultNoLangSelected,
                     AppLocalizations.of(context)!.english,
                     AppLocalizations.of(context)!.chinese,
+                    AppLocalizations.of(context)!.malay,
                     AppLocalizations.of(context)!.tagalog,
                     AppLocalizations.of(context)!.indonesian,
                     AppLocalizations.of(context)!.burmese,

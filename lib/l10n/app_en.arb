@@ -170,6 +170,7 @@
   "indonesian" : "Indonesian",
   "burmese" : "Bermese",
   "tamil" : "Tamil",
+  "malay": "Malay",
   "selectPatient" : "Select Patient",
   "noPatientYet" : "No patient added yet",
   "cancelAlert" : "Cancel Alert",
@@ -200,6 +201,4 @@
   "titlepage3rdMsg" : "Welcome to SGH's Medication",
   "titlepage4thMsg" : "Tracker Application",
   "signUp" : "Sign Up"
-
-
 }

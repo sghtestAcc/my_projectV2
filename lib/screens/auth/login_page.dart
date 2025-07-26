@@ -4,6 +4,7 @@ import 'package:my_project/screens/auth/forget_password_page.dart';
 import 'package:my_project/screens/auth/register_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/login_type.dart';
+import 'package:my_project/components/navigation_drawer_new.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -34,8 +35,17 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.black),
+          actions: [
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu), // Hamburger icon
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+              ),
+            ),
+          ],
         ),
       ),
+      endDrawer: AppDrawerNavigationNew(),
       resizeToAvoidBottomInset: false,
       body: Form(
         key: formData,

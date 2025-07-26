@@ -14,6 +14,7 @@ import '../screens/communications/bothusers/usersCameraScreen.dart';
 import '../screens/communications/caregiver/caregiver_prescription.dart';
 import '../screens/communications/caregiver/caregiver_vocalization_patient_view.dart';
 import 'package:my_project/controllers/account_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppDrawerNavigation extends StatefulWidget {
   const AppDrawerNavigation({Key? key}) : super(key: key);
@@ -126,6 +127,28 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
     }
   }
 
+  String _getLanguageNameFromLocale(Locale locale, BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    switch (locale.languageCode) {
+      case 'en':
+        return loc.languageEnglish;
+      case 'zh':
+        return loc.chinese;
+      case 'tl':
+        return loc.tagalog;
+      case 'id':
+        return loc.indonesian;
+      case 'my':
+        return loc.burmese;
+      case 'ta':
+        return loc.tamil;
+      case 'ms':
+        return loc.malay;
+      default:
+        return loc.languageEnglish;
+    }
+  }
+
   ListTile buildSwitchViewTile() {
     final newLoginType = accountController.loginType == LoginType.patient
         ? LoginType.caregiver
@@ -195,46 +218,87 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: Image.asset(
-                    'assets/images/world.png',
-                    height: 28,
-                    width: 28,
-                  ),
-                  title: Text(AppLocalizations.of(context)!.changeLanguage,
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.bold)),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(AppLocalizations.of(context)!
-                              .dialogSelectLanguageTitle),
-                          content: Container(
-                            padding: const EdgeInsets.all(10.0),
-                            child: DropdownButton(
-                              hint: Text(AppLocalizations.of(context)!
-                                  .languageEnglish),
-                              value: sourceLang,
-                              onChanged: (newValue) {
+                leading: Image.asset(
+                  'assets/images/world.png',
+                  height: 28,
+                  width: 28,
+                ),
+                title: Text(AppLocalizations.of(context)!.changeLanguage,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(AppLocalizations.of(context)!
+                            .dialogSelectLanguageTitle),
+                        content: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          child: DropdownButton<Locale>(
+                            isExpanded: true,
+                            value: Get.locale ?? const Locale('en'),
+                            onChanged: (Locale? newLocale) async {
+                              if (newLocale != null) {
                                 setState(() {
-                                  sourceLang = newValue ?? '';
-                                  // translateTextFunction(typedText);
+                                  sourceLang = _getLanguageNameFromLocale(
+                                      newLocale, context);
                                 });
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              items: languagePicker.map((valueItem) {
-                                return DropdownMenuItem(
-                                  value: valueItem,
-                                  child: Text(valueItem),
-                                );
-                              }).toList(),
-                            ),
+                                Get.updateLocale(newLocale);
+
+                                // ✅ Save selected locale
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setString(
+                                    'selectedLocale', newLocale.languageCode);
+
+                                Navigator.pop(context);
+                              }
+                            },
+                            items: [
+                              DropdownMenuItem(
+                                value: const Locale('en'),
+                                child: Text(AppLocalizations.of(context)!
+                                    .languageEnglish),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('zh'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.chinese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('tl'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tagalog),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('id'),
+                                child: Text(
+                                    AppLocalizations.of(context)!.indonesian),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('my'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.burmese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ta'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tamil),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ms'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.malay),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    );
-                  }),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
@@ -382,46 +446,87 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: Image.asset(
-                    'assets/images/world.png',
-                    height: 28,
-                    width: 28,
-                  ),
-                  title: Text(AppLocalizations.of(context)!.changeLanguage,
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.bold)),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(AppLocalizations.of(context)!
-                              .dialogSelectLanguageTitle),
-                          content: Container(
-                            padding: const EdgeInsets.all(10.0),
-                            child: DropdownButton(
-                              hint: Text(AppLocalizations.of(context)!
-                                  .languageEnglish),
-                              value: sourceLang,
-                              onChanged: (newValue) {
+                leading: Image.asset(
+                  'assets/images/world.png',
+                  height: 28,
+                  width: 28,
+                ),
+                title: Text(AppLocalizations.of(context)!.changeLanguage,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(AppLocalizations.of(context)!
+                            .dialogSelectLanguageTitle),
+                        content: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          child: DropdownButton<Locale>(
+                            isExpanded: true,
+                            value: Get.locale ?? const Locale('en'),
+                            onChanged: (Locale? newLocale) async {
+                              if (newLocale != null) {
                                 setState(() {
-                                  sourceLang = newValue ?? '';
-                                  // translateTextFunction(typedText);
+                                  sourceLang = _getLanguageNameFromLocale(
+                                      newLocale, context);
                                 });
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              items: languagePicker.map((valueItem) {
-                                return DropdownMenuItem(
-                                  value: valueItem,
-                                  child: Text(valueItem),
-                                );
-                              }).toList(),
-                            ),
+                                Get.updateLocale(newLocale);
+
+                                // ✅ Save selected locale
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setString(
+                                    'selectedLocale', newLocale.languageCode);
+
+                                Navigator.pop(context);
+                              }
+                            },
+                            items: [
+                              DropdownMenuItem(
+                                value: const Locale('en'),
+                                child: Text(AppLocalizations.of(context)!
+                                    .languageEnglish),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('zh'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.chinese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('tl'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tagalog),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('id'),
+                                child: Text(
+                                    AppLocalizations.of(context)!.indonesian),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('my'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.burmese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ta'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tamil),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ms'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.malay),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    );
-                  }),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
