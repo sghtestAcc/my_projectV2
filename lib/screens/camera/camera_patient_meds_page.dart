@@ -561,7 +561,6 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
       if (getImage != null) {
         textScanning = true;
 
-        // ✅ Add this image to the list instead of replacing
         setState(() {
           imageFiles.add(getImage);
         });

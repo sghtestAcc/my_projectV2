@@ -29,426 +29,234 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
 
   String lol = '';
 
-  @override
-  Widget build(BuildContext context) {
-    bool isDropdownOpen = false;
-    return WillPopScope(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            AppLocalizations.of(context)!.patients,
-            style: TextStyle(color: Colors.black),
-          ),
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
-          centerTitle: true,
+@override
+Widget build(BuildContext context) {
+  return WillPopScope(
+    onWillPop: () async => false,
+    child: Scaffold(
+      appBar: AppBar(
+        title: Text(
+          AppLocalizations.of(context)!.patients,
+          style: const TextStyle(color: Colors.black),
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height / 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  color: const Color(0xFF9EE8BF),
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
-                  child: Text(
-                    AppLocalizations.of(context)!.selectPatient,
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Container(
-                    height: 200,
-                    child: StreamBuilder<List<GraceUser>>(
-                        stream: userRepo.getAllPatientsWithMedications2(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(
-                                child: Text(snapshot.error.toString()));
-                          } else if (snapshot.hasData &&
-                              snapshot.data!.isEmpty) {
-                            return Center(
-                              child: Column(
-                                children: [
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Image.asset(
-                                      'assets/images/to-do-list.png'), // Adjust the image path accordingly
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(AppLocalizations.of(context)!.noqnyet),
-                                ],
-                              ),
-                            );
-                          } else if (snapshot.hasData) {
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                GraceUser patient = snapshot.data![index];
-                                String uid = patient.id ?? '';
-                                String email = patient.email ?? '';
-                                String name = patient.name ?? '';
-                                bool isChecked = _isCheckedMap[uid] ?? false;
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: CheckboxListTile(
-                                    title: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          name,
-                                          style: const TextStyle(fontSize: 15),
-                                        ),
-                                        Text(email,
-                                            style:
-                                                const TextStyle(fontSize: 12)),
-                                      ],
-                                    ),
-                                    value: isChecked,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        _isCheckedMap[uid] = newValue ?? false;
-                                      });
-                                    },
-                                    activeColor: const Color(0xFF0CE25C),
-                                  ),
-                                );
-                              },
-                            );
-                          } else {
-                            return Center(
-                                child: Text(AppLocalizations.of(context)!
-                                    .smtwentwrong));
-                          }
-                        })),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      addPatientsToCurrentUser();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xFF0CE25C), // Button background color
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12), // Rounded corner radius
-                      ),
-                      minimumSize: const Size(double.infinity,
-                          40), // Adjust the width by modifying the minimumSize property
-                    ),
-                    child: const Text(
-                      'Select Patient',
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(50, 10, 50, 10),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    // Test immediate notification
-                    await NotificationService.showTestNotification();
-                    
-                    // Test scheduled notification (5 seconds from now)
-                    await NotificationService.scheduleNotification(
-                      id: 998,
-                      title: '⏰ Test Scheduled Notification',
-                      body: 'This notification was scheduled 5 seconds ago!',
-                      scheduledTime: DateTime.now().add(Duration(seconds: 5)),
-                      data: {'type': 'test_scheduled'},
-                    );
-                    
-                    Get.snackbar(
-                      "Test Notifications Sent",
-                      "Check for immediate notification and scheduled notification in 5 seconds",
-                      snackPosition: SnackPosition.TOP,
-                      backgroundColor: Colors.blue.withOpacity(0.7),
-                      colorText: Colors.white,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    minimumSize: const Size(double.infinity, 40),
-                  ),
-                  child: const Text(
-                    '🧪 Test Notifications',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-                  StreamBuilder<List<Map<String, dynamic>>>(
-                stream:  fetchSelectedPatients(),
-                builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-                } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 10,),
-                  Image.asset('assets/images/to-do-list.png'), // Adjust the image path accordingly
-                  const SizedBox(height: 10,),
-                  Text('No patients added yet'),
-                ],
-              ),
-            );
-                } else if (snapshot.hasData) {
-            return Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(10.0),
-                shrinkWrap: true,
-                itemCount: snapshot.data!.length,
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 10);
-                },
-                itemBuilder: (context, i) {
-                  String patientName = snapshot.data![i]['name'];
-                  String patientEmail = snapshot.data![i]['email'];
-                  String patientid = snapshot.data![i]['id'];
-                  bool isTimeDropdownOpen = _isTimeDropdownOpen[patientid] ?? false;
-                  TimeOfDay? selectedTime = _selectedTimes[patientid];
-                  
-                  return Container(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(22)),
-                      color: Color(0xDDF6F6F6),
-                      border: Border.all(
-                        color: Colors.black.withOpacity(0.5),
-                        width: 1,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.5),
-                          offset: Offset(0, 1),
-                          blurRadius: 4,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          patientName,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        Text(patientEmail, style: TextStyle(fontSize: 14)),
-                        SizedBox(height: 8),
-                        
-                        // Add Alert Button
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0CE25C),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            Image.asset(
-                                'assets/images/to-do-list.png'), // Adjust the image path accordingly
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(AppLocalizations.of(context)!.noPatientYet),
-                          ],
-                        ),
-                      );
-                    } else if (snapshot.hasData) {
-                      return Expanded(
-                        child: ListView.separated(
-                          padding: const EdgeInsets.all(10.0),
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.length,
-                          separatorBuilder: (context, index) {
-                            return const SizedBox(height: 10);
-                          },
-                          itemBuilder: (context, i) {
-                            String patientName = snapshot.data![i]['name'];
-                            String patientEmail = snapshot.data![i]['email'];
-                            String patientid = snapshot.data![i]['id'];
-                            bool isTimeDropdownOpen =
-                                _isTimeDropdownOpen[patientid] ?? false;
-                            TimeOfDay? selectedTime = _selectedTimes[patientid];
-
-                            return Container(
-                              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(22)),
-                                color: Color(0xDDF6F6F6),
-                                border: Border.all(
-                                  color: Colors.black.withOpacity(0.5),
-                                  width: 1,
-                                ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.5),
-                                    offset: Offset(0, 1),
-                                    blurRadius: 4,
-                                    spreadRadius: 0,
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    patientName,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(patientEmail,
-                                      style: TextStyle(fontSize: 14)),
-                                  SizedBox(height: 8),
-
-                                  // Add Alert Button
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF0CE25C),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 8),
-                                    ),
-
-                                    SizedBox(width: 8),
-                                    IconButton(
-                                      icon: Icon(Icons.access_time),
-                                      onPressed: () async {
-                                        final TimeOfDay? picked = await showTimePicker(
-                                          context: context,
-                                          initialTime: selectedTime ?? TimeOfDay.now(),
-                                        );
-                                        if (picked != null) {
-                                          setState(() {
-                                            _selectedTimes[patientid] = picked;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _isTimeDropdownOpen[patientid] = false;
-                                          _selectedTimes[patientid] = null;
-                                        });
-                                      },
-                                      child: Text('Cancel'),
-
-                                    ),
-                                  ),
-
-                                  // Time Selector Dropdown
-                                  if (isTimeDropdownOpen) ...[
-                                    SizedBox(height: 10),
-                                    Container(
-                                      padding: EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.grey),
-                                      ),
-
-                                      onPressed: selectedTime != null
-                                          ? () async {
-                                              await _scheduleNotificationForPatient(
-                                                patientid,
-                                                patientName,
-                                                selectedTime!,
-                                              );
-                                              setState(() {
-                                                _isTimeDropdownOpen[patientid] = false;
-                                                _selectedTimes[patientid] = null;
-                                              });
-                                            }
-                                          : null,
-                                      child: Text(
-                                        'Save',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                  // // Existing medication info dropdown
-                                  // Row(
-                                  //   children: [
-                                  //     // const Text(
-                                  //     //   'View more for medication info',
-                                  //     //   style: TextStyle(fontSize: 10),
-                                  //     // ),
-                                  //     IconButton(
-                                  //       onPressed: () {
-                                  //         setState(() {
-                                  //           isDropdownOpen = !isDropdownOpen;
-                                  //         });
-                                  //       },
-                                  //       icon: Icon(isDropdownOpen
-                                  //           ? Icons.expand_less
-                                  //           : Icons.expand_more),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  caregiverPatientCardView(i, patientid),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    } else {
-                      return Center(
-                          child:
-                              Text(AppLocalizations.of(context)!.smtwentwrong));
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-        endDrawer: const AppDrawerNavigation(),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        centerTitle: true,
       ),
-      onWillPop: () async {
-        return false;
-      },
-    );
-  }
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              color: const Color(0xFF9EE8BF),
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 30, 0, 30),
+              child: Text(
+                AppLocalizations.of(context)!.selectPatient,
+                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 200,
+              child: StreamBuilder<List<GraceUser>>(
+                stream: userRepo.getAllPatientsWithMedications2(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error.toString()));
+                  } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                    return _emptyListView(AppLocalizations.of(context)!.noqnyet);
+                  } else if (snapshot.hasData) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        GraceUser patient = snapshot.data![index];
+                        String uid = patient.id ?? '';
+                        bool isChecked = _isCheckedMap[uid] ?? false;
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black, width: 1.0),
+                          ),
+                          child: CheckboxListTile(
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(patient.name ?? '', style: const TextStyle(fontSize: 15)),
+                                Text(patient.email ?? '', style: const TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                            value: isChecked,
+                            onChanged: (newValue) {
+                              setState(() => _isCheckedMap[uid] = newValue ?? false);
+                            },
+                            activeColor: const Color(0xFF0CE25C),
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(child: Text(AppLocalizations.of(context)!.smtwentwrong));
+                  }
+                },
+              ),
+            ),
+            _buildSelectButton(),
+            _buildTestNotificationButton(),
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: fetchSelectedPatients(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error.toString()));
+                } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                  return _emptyListView(AppLocalizations.of(context)!.noPatientYet);
+                } else if (snapshot.hasData) {
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(10),
+                    itemCount: snapshot.data!.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, i) {
+                      final data = snapshot.data![i];
+                      final patientid = data['id'];
+                      final patientName = data['name'];
+                      final patientEmail = data['email'];
+                      final isTimeDropdownOpen = _isTimeDropdownOpen[patientid] ?? false;
+                      final selectedTime = _selectedTimes[patientid];
+
+                      return _buildPatientCard(
+                        patientid, patientName, patientEmail, isTimeDropdownOpen, selectedTime);
+                    },
+                  );
+                } else {
+                  return Center(child: Text(AppLocalizations.of(context)!.smtwentwrong));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+      endDrawer: const AppDrawerNavigation(),
+    ),
+  );
+}
+
+Widget _emptyListView(String message) => Center(
+  child: Column(
+    children: [
+      const SizedBox(height: 10),
+      Image.asset('assets/images/to-do-list.png'),
+      const SizedBox(height: 10),
+      Text(message),
+    ],
+  ),
+);
+
+Widget _buildSelectButton() => Padding(
+  padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+  child: ElevatedButton(
+    onPressed: addPatientsToCurrentUser,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF0CE25C),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      minimumSize: const Size(double.infinity, 40),
+    ),
+    child: const Text('Select Patient', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+  ),
+);
+
+Widget _buildTestNotificationButton() => Padding(
+  padding: const EdgeInsets.fromLTRB(50, 10, 50, 10),
+  child: ElevatedButton(
+    onPressed: () async {
+      await NotificationService.showTestNotification();
+      await NotificationService.scheduleNotification(
+        id: 998,
+        title: '⏰ Test Scheduled Notification',
+        body: 'This notification was scheduled 5 seconds ago!',
+        scheduledTime: DateTime.now().add(const Duration(seconds: 5)),
+        data: {'type': 'test_scheduled'},
+      );
+      Get.snackbar(
+        "Test Notifications Sent",
+        "Check for immediate and scheduled notifications",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.blue.withOpacity(0.7),
+        colorText: Colors.white,
+      );
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.blue,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      minimumSize: const Size(double.infinity, 40),
+    ),
+    child: const Text('🧪 Test Notifications', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+  ),
+);
+
+Widget _buildPatientCard(String id, String name, String email, bool isDropdownOpen, TimeOfDay? time) {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(22),
+      color: const Color(0xDDF6F6F6),
+      border: Border.all(color: Colors.black.withOpacity(0.5)),
+      boxShadow: const [BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.5), offset: Offset(0, 1), blurRadius: 4)],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(email, style: const TextStyle(fontSize: 14)),
+        const SizedBox(height: 8),
+        ElevatedButton(
+          onPressed: () async {
+            final picked = await showTimePicker(context: context, initialTime: time ?? TimeOfDay.now());
+            if (picked != null) setState(() => _selectedTimes[id] = picked);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF0CE25C),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
+          child: const Text('Select Time'),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () => setState(() {
+                _isTimeDropdownOpen[id] = false;
+                _selectedTimes[id] = null;
+              }),
+              child: const Text('Cancel'),
+            ),
+            const SizedBox(width: 8),
+            if (isDropdownOpen && time != null)
+              ElevatedButton(
+                onPressed: () async {
+                  await _scheduleNotificationForPatient(id, name, time);
+                  setState(() {
+                    _isTimeDropdownOpen[id] = false;
+                    _selectedTimes[id] = null;
+                  });
+                },
+                child: const Text('Save'),
+              )
+          ],
+        ),
+        caregiverPatientCardView(id.hashCode, id),
+      ],
+    ),
+  );
+}
+
 
 //add selected Patients that has medications
   Future<void> addPatientsToCurrentUser() async {

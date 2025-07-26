@@ -11,6 +11,7 @@ import 'package:my_project/controllers/account_controller.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -47,23 +48,20 @@ class AuthenticationRepository extends GetxController {
     );
     String uid = FirebaseAuth.instance.currentUser!.uid;
 
-    // ✅ Create user in DB
     bool success = await UserRepository.instance.createUser(user, uid, context);
 
     if (success) {
-      // ✅ Apply saved locale before navigation
       final prefs = await SharedPreferences.getInstance();
       String savedLocaleCode = prefs.getString('selectedLocale') ?? 'en';
       Get.updateLocale(Locale(savedLocaleCode));
 
       await Future.delayed(const Duration(milliseconds: 1500));
 
-      // ✅ Navigate to HomeScreen
       Get.offAll(() => const HomeScreen());
     }
 
   } on FirebaseAuthException catch (e) {
-    print('🔥 Firebase error: ${e.code}');
+    print('Firebase error: ${e.code}');
     Get.snackbar(
       AppLocalizations.of(context)!.snackbarInvalid,
       RegisterFailure.fromCode(e.code, context).message,

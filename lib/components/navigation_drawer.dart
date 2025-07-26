@@ -246,7 +246,6 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                                 });
                                 Get.updateLocale(newLocale);
 
-                                // ✅ Save selected locale
                                 final prefs =
                                     await SharedPreferences.getInstance();
                                 await prefs.setString(
@@ -474,7 +473,6 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                                 });
                                 Get.updateLocale(newLocale);
 
-                                // ✅ Save selected locale
                                 final prefs =
                                     await SharedPreferences.getInstance();
                                 await prefs.setString(

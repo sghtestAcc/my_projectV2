@@ -32,7 +32,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   final Locale initialLocale;
 
-  MyApp(this.initialLocale); // pass in locale
+  MyApp(this.initialLocale); 
 
   @override
   Widget build(BuildContext context) {
