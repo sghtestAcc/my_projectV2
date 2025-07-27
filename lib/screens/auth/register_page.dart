@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:my_project/main.dart';
 import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../repos/authentication_repository.dart';
+import 'package:my_project/utils/tutorial_manager.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -17,11 +20,110 @@ class _RegisterScreenState extends State<RegisterScreen> {
   List<LoginType> selectedLoginTypes = [];
 
   var formData = GlobalKey<FormState>();
+  final GlobalKey keyRegisterForm = GlobalKey();
+  final GlobalKey keyCheckboxSection = GlobalKey();
+  late TutorialManager tutorialManager;
 
   final email = TextEditingController();
   final fullName = TextEditingController();
   final password = TextEditingController();
   bool showAccountTypeError = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final step = await getTutorialStep();
+      if (step == 2) {
+        currentTutorialStep = 2;
+
+        tutorialManager = TutorialManager(
+          context,
+          keyLoginButton: keyRegisterForm,
+        );
+
+        tutorialManager.targets = [
+          TargetFocus(
+            identify: "register_fields",
+            keyTarget: keyRegisterForm,
+            contents: [
+              TargetContent(
+                align: ContentAlign.top,
+                child: const Text(
+                  "Fill in these fields to register.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+            shape: ShapeLightFocus.RRect,
+            radius: 12,
+            paddingFocus: 0,
+          ),
+          TargetFocus(
+            identify: "register_checkboxes",
+            keyTarget: keyCheckboxSection,
+            contents: [
+              TargetContent(
+                align: ContentAlign.bottom,
+                child: const Text(
+                  "To register as a Dual Account, check both Patient and Caregiver.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+            shape: ShapeLightFocus.RRect,
+            radius: 12,
+            paddingFocus: 0,
+          ),
+/*           TargetFocus(
+            identify: "intro_fullscreen",
+            targetPosition: TargetPosition(
+              const Size(1, 1), // Valid size
+              const Offset(0, 0), // On screen (not -500)
+            ),
+            shape: ShapeLightFocus.RRect,
+            radius: 0,
+            contents: [
+              TargetContent(
+                align: ContentAlign.bottom,
+                child: const Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Text(
+                    "Let’s try making your own account!",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ), */
+        ];
+
+        tutorialManager.showTutorial(
+          onFinish: () async {
+            await setTutorialStep(3);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              (route) => false,
+            );
+          },
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 10),
               Container(
+                key: keyRegisterForm,
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
@@ -117,6 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 10),
                     Container(
+                      key: keyCheckboxSection,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: showAccountTypeError

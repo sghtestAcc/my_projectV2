@@ -11,6 +11,8 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/home.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../components/navigation_drawer_new.dart';
+import 'package:my_project/utils/tutorial_manager.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class PatientUploadMedsScreen extends StatefulWidget {
   final TextEditingController? imagetakenText;
@@ -47,10 +49,12 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   final currentUid = FirebaseAuth.instance.currentUser!.uid;
   TextEditingController medsLabel = TextEditingController();
   final controller = Get.put(SelectPatientController());
-
+  final GlobalKey keyUploadImageButton = GlobalKey();
   TextEditingController medicineInput = TextEditingController();
   TextEditingController quantityController = TextEditingController();
   TextEditingController instructionsController = TextEditingController();
+  late TutorialManager tutorialManager;
+  final GlobalKey keyuploadimg = GlobalKey();
 
   var formDataQuestionsInput = GlobalKey<FormState>();
   var formDataQuestions = GlobalKey<FormState>();
@@ -86,6 +90,48 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
     }
     return words[1].toLowerCase() == 'tabs' ||
         words[1].toLowerCase() == 'tablets';
+  }
+
+  void _maybeStartTutorial() async {
+    final step = await getTutorialStep();
+
+    if (step == 3) {
+      final tutorialManager = TutorialManager(context);
+
+      tutorialManager.targets = [
+        TargetFocus(
+          identify: "upload_button",
+          keyTarget: keyuploadimg,
+          shape: ShapeLightFocus.RRect,
+          radius: 12,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              child: const Text(
+                "Tap here to upload Medication Images.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ];
+
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      tutorialManager.showTutorial(
+        onFinish: () async {
+          await setTutorialStep(4); 
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CameraHomePatientScreen()),
+          );
+        },
+      );
+    }
   }
 
   // void showAddMedsScheduleModal(BuildContext context) {
@@ -249,6 +295,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   @override
   void initState() {
     super.initState();
+    _maybeStartTutorial();
   }
 
   @override
@@ -282,7 +329,6 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                   future: controller.getPatientData(),
                   builder: (context, snapshot) {
                     return Container(
-                      // height: MediaQuery.of(context).size.height/ 2,
                       padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
                       child: Center(
                         child: Column(
@@ -312,13 +358,12 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                             const SizedBox(
                               height: 20,
                             ),
-                            //upload images button
                             SizedBox(
                               width: double
-                                  .infinity, // Set the width to expand to the available space
+                                  .infinity, 
                               child: ElevatedButton(
+                                key: keyuploadimg,
                                 onPressed: () {
-                                  // Add your onPressed logic here
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -334,7 +379,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical:
-                                          12), // Adjust the padding as needed
+                                          12), 
                                   child: Text(
                                     AppLocalizations.of(context)!.uploadimg,
                                     style: const TextStyle(
@@ -354,7 +399,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
                             //upload schdules button
                             SizedBox(
                               width: double
-                                  .infinity, // Set the width to expand to the available space
+                                  .infinity, 
                             ),
                             const SizedBox(
                               height: 20,

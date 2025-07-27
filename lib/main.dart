@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,12 +7,15 @@ import 'package:my_project/screens/auth/login_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:my_project/notification_service.dart'; // Add this import
 import 'package:my_project/controllers/account_controller.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import 'firebase_options.dart';
 import 'repos/authentication_repository.dart';
 import 'models/login_type.dart';
 import 'package:my_project/screens/auth/register_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:my_project/utils/tutorial_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,10 +33,24 @@ Future<void> main() async {
   runApp(MyApp(savedLocale));
 }
 
+Future<void> checkFirstLaunch(
+    BuildContext context, VoidCallback showTutorial) async {
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('hasSeenGuide') ?? true;
+
+  if (isFirstLaunch) {
+    debugPrint("First launch detected, showing tutorial");
+    Future.delayed(Duration(milliseconds: 300), showTutorial);
+
+    // Mark guide as seen
+    await prefs.setBool('hasSeenGuide', false);
+  }
+}
+
 class MyApp extends StatelessWidget {
   final Locale initialLocale;
 
-  MyApp(this.initialLocale); 
+  MyApp(this.initialLocale);
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +72,107 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey keyLoginButton = GlobalKey();
+  final GlobalKey keySignUpButton = GlobalKey();
+  late TutorialManager tutorialManager;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      tutorialManager = TutorialManager(
+        context,
+        keyLoginButton: keyLoginButton,
+        keySignUpButton: keySignUpButton,
+      );
+      checkFirstLaunch(context, startHomeTutorial);
+      _resumeTutorialIfNeeded(); 
+    });
+  }
+
+  void startHomeTutorial() async {
+    tutorialManager = TutorialManager(
+      context,
+      keyLoginButton: keyLoginButton,
+      keySignUpButton: keySignUpButton,
+    );
+
+    tutorialManager.targets = [
+      TargetFocus(
+        identify: "login",
+        keyTarget: keyLoginButton,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: const Text(
+              "Tap here to login if you already have an account.",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 12,
+        paddingFocus: 0,
+      ),
+      TargetFocus(
+        identify: "register",
+        keyTarget: keySignUpButton,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: const Text(
+              "New user? Tap here to register.",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 12,
+        paddingFocus: 0,
+      ),
+    ];
+
+    tutorialManager.showTutorial(
+      onFinish: () async {
+        await setTutorialStep(1); 
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+    );
+  }
+
+  void _resumeTutorialIfNeeded() async {
+    final step = await getTutorialStep();
+
+    switch (step) {
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+        );
+        break;
+      default:
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     //  final localizations = AppLocalizations.of(context);
@@ -95,6 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 30,
               ),
               ElevatedButton(
+                key: keyLoginButton,
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -119,6 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
+                key: keySignUpButton,
                 onPressed: () {
                   Navigator.push(
                     context,

@@ -20,6 +20,8 @@ import 'package:my_project/utils/gpt_utils.dart';
 import 'dart:ui' as ui;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../components/navigation_drawer_new.dart';
+import 'package:my_project/utils/tutorial_manager.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class CameraHomePatientScreen extends StatefulWidget {
   final String? path;
@@ -117,9 +119,72 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
   TextEditingController instructionsController = TextEditingController(); // NEW
   TextEditingController detailsController = TextEditingController(); // NEW
 
+  final GlobalKey keyCombinedButtons = GlobalKey();
+  final GlobalKey keyselectpills = GlobalKey();
+
+  void _maybeStartTutorial() async {
+    final step = await getTutorialStep();
+
+    if (step == 4) {
+      final tutorialManager = TutorialManager(
+        context,
+      );
+
+      tutorialManager.targets = [
+        TargetFocus(
+          identify: "combined_buttons",
+          keyTarget: keyCombinedButtons,
+          shape: ShapeLightFocus.RRect,
+          radius: 12,
+          contents: [
+            TargetContent(
+              align: ContentAlign.top,
+              child: const Text(
+                "These are your key actions: Capture, Upload your medication image",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+                TargetFocus(
+          identify: "select_pills",
+          keyTarget: keyselectpills,
+          shape:
+              ShapeLightFocus.RRect, 
+          radius: 12, 
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              child: const Text(
+                "After adding medication image, tap here to add pill image.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ];
+
+      await Future.delayed(const Duration(milliseconds: 300));
+      tutorialManager.showTutorial(onFinish: () async {
+        await setTutorialStep(-1); // Done
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeStartTutorial();
+    });
   }
 
   @override
@@ -156,97 +221,87 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 height: 20,
               ),
 
-              ElevatedButton(
-                onPressed: () async {
-                  // Open MultiImageCapture screen for multi-photo capture
-                  final List<XFile> capturedFiles = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MultiImageCapture(
-                        onAddImage: (file) async {
+              Container(
+                key: keyCombinedButtons,
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        final List<XFile> capturedFiles = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MultiImageCapture(
+                              onAddImage: (file) async {
+                                setState(() {
+                                  imageFiles.add(XFile(file.path));
+                                });
+                              },
+                              onRemoveImage: (file) async {
+                                return true;
+                              },
+                              onComplete: (files) async {},
+                            ),
+                          ),
+                        );
+
+                        if (capturedFiles != null && capturedFiles.isNotEmpty) {
                           setState(() {
-                            imageFiles.add(XFile(file.path));
+                            imageFiles.addAll(capturedFiles);
                           });
-                        },
-                        onRemoveImage: (file) async {
-                          return true;
-                        },
-                        onComplete: (files) async {},
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0CE25C),
+                        minimumSize: const Size(320, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!.capturephoto,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  );
-                  // After MultiImageCapture closes, add images to your list and refresh UI
-                  if (capturedFiles != null && capturedFiles.isNotEmpty) {
-                    setState(() {
-                      imageFiles.addAll(capturedFiles);
-                    });
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0CE25C),
-                  minimumSize: const Size(320, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.capturephoto,
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-              ),
-
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                  // onPressed: () async {
-                  // // Pick multiple images using the ImagePicker
-                  //   final List<XFile>? selectedImages = await ImagePicker().pickMultiImage();
-
-                  //   if (selectedImages != null && selectedImages.isNotEmpty) {
-                  //     // Add the selected images to your list and update UI
-                  //     setState(() {
-                  //       imageFiles.addAll(selectedImages);  // Add all selected images to imageFilepills list
-                  //     });
-                  //   }
-                  // },
-                  onPressed: () {
-                    // Pick multiple images using pickMultiImage
-                    pickImages().then((selectedImages) {
-                      if (selectedImages.isNotEmpty) {
-                        setState(() {
-                          imageFiles.addAll(
-                              selectedImages); // Add sel ected images to the list
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        pickImages().then((selectedImages) {
+                          if (selectedImages.isNotEmpty) {
+                            setState(() {
+                              imageFiles.addAll(selectedImages);
+                            });
+                            getRecognisedText(selectedImages);
+                          }
                         });
-
-                        // Directly process each selected image for text recognition
-                        getRecognisedText(
-                            selectedImages); // Recognize text for all selected images
-                      }
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0CE25C),
-                    minimumSize: const Size(320, 50), // NEW
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12), // Rounded corner radius
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0CE25C),
+                        minimumSize: const Size(320, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!.uploadphoto,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.uploadphoto,
-                    style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                  )),
+                  ],
+                ),
+              ),
               const SizedBox(
                 height: 20,
               ),
               ElevatedButton(
+                key: keyselectpills,
                   onPressed: () {
                     if (imageFiles.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -365,7 +420,8 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                 children: [
                   Text(
                     AppLocalizations.of(context)!.translatedmedicalpackaging,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
@@ -380,7 +436,8 @@ class _CameraHomePatientScreenState extends State<CameraHomePatientScreen> {
                             maxLines: 1,
                             enabled: false,
                             decoration: InputDecoration(
-                              hintText: AppLocalizations.of(context)!.yourmedswillappearhere,
+                              hintText: AppLocalizations.of(context)!
+                                  .yourmedswillappearhere,
                               border: InputBorder
                                   .none, // Set this to remove the border
                             ),
