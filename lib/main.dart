@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,14 +7,15 @@ import 'package:my_project/screens/auth/login_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:my_project/notification_service.dart'; // Add this import
 import 'package:my_project/controllers/account_controller.dart';
+import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
 import 'firebase_options.dart';
 import 'repos/authentication_repository.dart';
 import 'models/login_type.dart';
 import 'package:my_project/screens/auth/register_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:my_project/screens/home/app_guide_screen.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:my_project/utils/tutorial_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,8 +39,7 @@ Future<void> checkFirstLaunch(
   final isFirstLaunch = prefs.getBool('hasSeenGuide') ?? true;
 
   if (isFirstLaunch) {
-    // Delay so widgets are rendered
-    debugPrint("✅ First launch detected, showing tutorial");
+    debugPrint("First launch detected, showing tutorial");
     Future.delayed(Duration(milliseconds: 300), showTutorial);
 
     // Mark guide as seen
@@ -73,67 +74,103 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey keyLoginButton = GlobalKey();
   final GlobalKey keySignUpButton = GlobalKey();
-  late List<TargetFocus> targets;
+  late TutorialManager tutorialManager;
+
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      initTargets();
-      checkFirstLaunch(context, showTutorial);
+      tutorialManager = TutorialManager(
+        context,
+        keyLoginButton: keyLoginButton,
+        keySignUpButton: keySignUpButton,
+      );
+      checkFirstLaunch(context, startHomeTutorial);
+      _resumeTutorialIfNeeded(); 
     });
   }
 
-  void initTargets() {
-    targets = [
+  void startHomeTutorial() async {
+    tutorialManager = TutorialManager(
+      context,
+      keyLoginButton: keyLoginButton,
+      keySignUpButton: keySignUpButton,
+    );
+
+    tutorialManager.targets = [
       TargetFocus(
         identify: "login",
         keyTarget: keyLoginButton,
-        contents: [],
-        shape: ShapeLightFocus.RRect, // Rounded rectangle
-        radius: 8, // Smaller radius = tighter corner roundness
-        paddingFocus: 4, // Smaller padding = tighter circle
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: const Text(
+              "Tap here to login if you already have an account.",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 12,
+        paddingFocus: 0,
       ),
       TargetFocus(
-        identify: "signup",
+        identify: "register",
         keyTarget: keySignUpButton,
-        contents: [],
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: const Text(
+              "New user? Tap here to register.",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
         shape: ShapeLightFocus.RRect,
-        radius: 8,
-        paddingFocus: 4,
+        radius: 12,
+        paddingFocus: 0,
       ),
     ];
+
+    tutorialManager.showTutorial(
+      onFinish: () async {
+        await setTutorialStep(1); 
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+    );
   }
 
-  void showTutorial() {
-    TutorialCoachMark tutorial = TutorialCoachMark(
-      targets: targets,
-      colorShadow: Colors.black.withOpacity(0.8),
-      textSkip: "SKIP",
-      paddingFocus: 10,
-      onClickTarget: (target) {
-        String msg = "";
-        switch (target.identify) {
-          case "login":
-            msg = "Click here to login as a patient or caregiver";
-            break;
-          case "signup":
-            msg = "Or create a new account here!";
-            break;
-        }
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(msg),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.black87,
-              duration: Duration(seconds: 3),
-            ),
-          );
-      },
-      onSkip: () => true,
-      onFinish: () => print("Tutorial finished"),
-    )..show(context: context);
+  void _resumeTutorialIfNeeded() async {
+    final step = await getTutorialStep();
+
+    switch (step) {
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+        );
+        break;
+      default:
+        break;
+    }
   }
 
   @override

@@ -5,6 +5,8 @@ import 'package:my_project/screens/auth/register_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/login_type.dart';
 import 'package:my_project/components/navigation_drawer_new.dart';
+import 'package:my_project/utils/tutorial_manager.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,11 +21,67 @@ class _LoginScreenState extends State<LoginScreen> {
       GlobalKey<ScaffoldMessengerState>();
   // String? email;
   // String? password;
+  final GlobalKey keyFormFields = GlobalKey();
+  late TutorialManager tutorialManager;
 
   final email = TextEditingController();
   final password = TextEditingController();
 
   var formData = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final step = await getTutorialStep();
+
+      if (step == 1) {
+        startLoginTutorial();
+      }
+    });
+  }
+
+  void startLoginTutorial() {
+    currentTutorialStep = 1;
+
+    tutorialManager = TutorialManager(
+      context,
+      keyLoginButton: keyFormFields,
+    );
+
+    tutorialManager.targets = [
+      TargetFocus(
+        identify: "login_fields",
+        keyTarget: keyFormFields,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            child: const Text(
+              "Fill in these fields to login.",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 8,
+        paddingFocus: 8,
+      ),
+    ];
+
+    tutorialManager.showTutorial(
+      onFinish: () async {
+        await setTutorialStep(2); // Proceed to register screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               Container(
+                key: keyFormFields,
                 padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                 child: Column(
                   children: [
