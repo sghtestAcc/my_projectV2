@@ -13,6 +13,8 @@ import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/medications.dart';
 import 'package:my_project/models/notification.dart';
 import '../notification_service.dart';
+import 'package:my_project/utils/medication_refill_calculator.dart';
+
 
 class UserRepository extends GetxController {
   static UserRepository get instance => Get.find();
@@ -346,7 +348,7 @@ Future<GraceUser> getUserById(String uid) async {
       List<String> pillsUrls = [];
       List<String> packagingUrls = [];
 
-      // Upload each image and store URL
+      // Upload images (existing code)
       for (XFile pill in pills) {
         final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
         final pathRoute = 'medicationPills/$fileName';
@@ -354,48 +356,94 @@ Future<GraceUser> getUserById(String uid) async {
         pillsUrls.add(imageUrl);
       }
 
-      // Upload packaging images
       for (XFile packaging in packagingImages) {
         final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-        final pathRoute = 'medications/$fileName';
+        final pathRoute = 'medicationPackaging/$fileName';
         String imageUrl = await uploadImageToStorage(pathRoute, packaging);
         packagingUrls.add(imageUrl);
       }
 
-      // Store all image URLs in one document
-      await FirebaseFirestore.instance
+      // Create medication document
+      final medicationRef = await FirebaseFirestore.instance
           .collection("users")
           .doc(uid)
           .collection('medications')
           .add({
-            "Labels": labels ?? '',
-            "Pills": pillsUrls, 
-            "Packaging": packagingUrls,
-            "Quantity": quantity,
-            "Dosage": dosage,
-            "Instructions": instructions,
-            "Details": details ?? '',
-          });
+        "Labels": labels,
+        "Pills": pillsUrls,
+        "Packaging": packagingUrls,
+        "Quantity": quantity,
+        "Dosage": dosage,
+        "Email": FirebaseAuth.instance.currentUser!.email,
+        "Name": FirebaseAuth.instance.currentUser!.displayName,
+        "Instructions": instructions,
+        "Details": details,
+        "CreatedAt": FieldValue.serverTimestamp(),
+        "RefillNotificationScheduled": true,
+      });
+
+      // ✅ Schedule automatic refill notification
+      await _scheduleRefillNotificationForMedication(
+        medicationId: medicationRef.id,
+        medicationName: labels ?? 'Unknown Medication',
+        uid: uid,
+        quantity: quantity,
+        instructions: instructions,
+      );
 
       Get.snackbar(
-        "Congrats",
-        "Medication has been added with ${pillsUrls.length + packagingUrls.length} image(s).",
+        "Success ✅",
+        "Medication added and refill notification scheduled!",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-        colorText: Color(0xFFF6F3E7),
+        colorText: Color(0xFFF6F3E7)
       );
     } catch (error) {
       Get.snackbar(
         "Error",
-        "Failed to add medication.",
+        "Failed to add medication: ${error.toString()}",
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-        colorText: Color(0xFFF6F3E7),
+        backgroundColor: Colors.redAccent.withOpacity(0.1),
+        colorText: Colors.red,
       );
       print(error.toString());
     }
   }
 
+  // ✅ Add this helper method to UserRepository
+  Future<void> _scheduleRefillNotificationForMedication({
+    required String medicationId,
+    required String medicationName,
+    required String uid,
+    required String quantity,
+    required String instructions,
+  }) async {
+    try {
+      // Get patient data
+      final userDoc = await firestore.collection('users').doc(uid).get();
+      final patientName = userDoc.data()?['FullName'] ?? 'Patient';
+
+      // Schedule refill notification
+      await NotificationService.scheduleRefillNotification(
+        medicationId: medicationId,
+        medicationName: medicationName,
+        patientName: patientName,
+        quantity: quantity,
+        instructions: instructions,
+        medicationStartDate: DateTime.now(),
+      );
+
+      // Log the calculation for debugging
+      final description = MedicationRefillCalculator.getCalculationDescription(
+        quantity: quantity,
+        instructions: instructions,
+      );
+      print('📊 Refill calculation: $description');
+
+    } catch (e) {
+      print('❌ Error scheduling refill notification: $e');
+    }
+  }
 
   Future<void> deleteBothUserQuestions(
     BuildContext context,

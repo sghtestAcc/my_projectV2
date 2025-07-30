@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:my_project/utils/medication_refill_calculator.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:get/get.dart';
@@ -40,6 +41,7 @@ class NotificationService {
     
     // Create notification channel
     await _createNotificationChannel();
+    await _createRefillNotificationChannel();
   }
 
   // Request notification permissions
@@ -232,5 +234,128 @@ class NotificationService {
       body: 'This is a test notification!',
       data: {'type': 'test', 'message': 'Hello World!'},
     );
+  }
+  // Schedule automatic refill notification
+static Future<void> scheduleRefillNotification({
+  required String medicationId,
+  required String medicationName,
+  required String patientName,
+  required String quantity,
+  required String instructions,
+  DateTime? medicationStartDate,
+}) async {
+  try {
+    // Calculate when to send refill notification
+    final refillDate = MedicationRefillCalculator.calculateRefillNotificationDate(
+      quantity: quantity,
+      instructions: instructions,
+      startDate: medicationStartDate,
+    );
+
+    if (refillDate == null) {
+      print('❌ Could not calculate refill date for $medicationName');
+      return;
+    }
+
+    // Check if refill date is in the past
+    if (refillDate.isBefore(DateTime.now())) {
+      print('⚠️ Refill date is in the past for $medicationName, scheduling for 1 hour from now');
+      final immediateRefillDate = DateTime.now().add(Duration(hours: 1));
+      await _scheduleRefillNotificationAt(
+        medicationId: medicationId,
+        medicationName: medicationName,
+        patientName: patientName,
+        scheduledTime: immediateRefillDate,
+        isUrgent: true,
+      );
+      return;
+    }
+
+    await _scheduleRefillNotificationAt(
+      medicationId: medicationId,
+      medicationName: medicationName,
+      patientName: patientName,
+      scheduledTime: refillDate,
+      isUrgent: false,
+    );
+
+    print('✅ Refill notification scheduled for $medicationName on ${refillDate.toString()}');
+  } catch (e) {
+    print('❌ Error scheduling refill notification: $e');
+  }
+}
+
+// Private method to schedule the actual notification
+static Future<void> _scheduleRefillNotificationAt({
+  required String medicationId,
+  required String medicationName,
+  required String patientName,
+  required DateTime scheduledTime,
+  required bool isUrgent,
+}) async {
+  final notificationId = int.parse(medicationId.hashCode.toString().substring(0, 8));
+  
+  final title = isUrgent 
+      ? '🚨 Urgent: Refill $medicationName'
+      : '💊 Time to Refill $medicationName';
+      
+  final body = isUrgent
+      ? '$patientName needs to refill $medicationName immediately!'
+      : '$patientName should refill $medicationName soon - running low in 2 days';
+
+  const androidDetails = AndroidNotificationDetails(
+    'refill_channel',
+    'Medication Refill Reminders',
+    importance: Importance.high,
+    priority: Priority.high,
+    icon: '@mipmap/ic_launcher',
+    enableVibration: true,
+    playSound: true,
+    color: Colors.orange, // Different color for refill notifications
+  );
+  
+  const notificationDetails = NotificationDetails(android: androidDetails);
+  final scheduledTZTime = tz.TZDateTime.from(scheduledTime, tz.local);
+
+  await _localNotifications.zonedSchedule(
+    notificationId,
+    title,
+    body,
+    scheduledTZTime,
+    notificationDetails,
+    androidAllowWhileIdle: true,
+    uiLocalNotificationDateInterpretation: 
+        UILocalNotificationDateInterpretation.absoluteTime,
+    payload: jsonEncode({
+      'type': 'medication_refill',
+      'medicationId': medicationId,
+      'medicationName': medicationName,
+      'patientName': patientName,
+      'isUrgent': isUrgent,
+    }),
+  );
+}
+
+// Cancel refill notification for a specific medication
+static Future<void> cancelRefillNotification(String medicationId) async {
+  final notificationId = int.parse(medicationId.hashCode.toString().substring(0, 8));
+  await _localNotifications.cancel(notificationId);
+  print('✅ Refill notification cancelled for medication: $medicationId');
+}
+
+// Create a separate channel for refill notifications
+static Future<void> _createRefillNotificationChannel() async {
+  const channel = AndroidNotificationChannel(
+    'refill_channel',
+    'Medication Refill Reminders',
+    description: 'Notifications for medication refills',
+    importance: Importance.high,
+    playSound: true,
+    enableVibration: true,
+  );
+
+  await _localNotifications
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
   }
 }
