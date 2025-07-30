@@ -10,6 +10,8 @@ import 'package:my_project/notification_service.dart';
 import 'package:my_project/controllers/account_controller.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -32,46 +34,69 @@ class AuthenticationRepository extends GetxController {
   //       : Get.offAll(() => NavigatorBar());
   // }
 //register function with backend validation -applies to both patients and caregivers-
-  Future<void> registerUser(String email, String password, LoginType loginType,
-      GraceUser user) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      String uid = FirebaseAuth.instance.currentUser!.uid;
-      UserRepository.instance.createUser(user, uid);
+  Future<void> registerUser(
+  String email,
+  String password,
+  LoginType loginType,
+  GraceUser user,
+  BuildContext context,
+) async {
+  try {
+    await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+
+    bool success = await UserRepository.instance.createUser(user, uid, context);
+
+    if (success) {
+      final prefs = await SharedPreferences.getInstance();
+      String savedLocaleCode = prefs.getString('selectedLocale') ?? 'en';
+      Get.updateLocale(Locale(savedLocaleCode));
+
+      await Future.delayed(const Duration(milliseconds: 1500));
 
       Get.offAll(() => const HomeScreen());
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar('Invalid', RegisterFailure.fromCode(e.code).message,
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-          colorText: Color(0xFFF6F3E7));
-    } catch (ex) {
-      Get.snackbar(
-        'Invalid',
-        "Something went wrong. Please try again.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
     }
+
+  } on FirebaseAuthException catch (e) {
+    print('Firebase error: ${e.code}');
+    Get.snackbar(
+      AppLocalizations.of(context)!.snackbarInvalid,
+      RegisterFailure.fromCode(e.code, context).message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+      colorText: const Color(0xFFF6F3E7),
+    );
+  } catch (ex) {
+    Get.snackbar(
+      AppLocalizations.of(context)!.snackbarInvalid,
+      AppLocalizations.of(context)!.errorUnknown,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.redAccent.withOpacity(0.1),
+      colorText: Colors.red,
+    );
   }
+}
+
 
 //forgetpassword function with backend validation -applies to both patients and caregivers-
-  Future<void> forgetpassword(email) async {
+  Future<void> forgetpassword(email, BuildContext context) async {
     try {
 // if function is successful, an congrat massage will be sent to user -applies to both patients and caregivers-
       await _auth.sendPasswordResetEmail(email: email);
       Get.snackbar(
-          'Congrats', 'Your password reset link will be send to your email',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Color(0xFF35365D).withOpacity(0.5),
-          colorText: Color(0xFFF6F3E7));
+        AppLocalizations.of(context)!.snackbarCongrats,
+        AppLocalizations.of(context)!.passwordResetSent,
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+        colorText: const Color(0xFFF6F3E7),
+      );
     } catch (ex) {
 // if email is not matching firebase authemtication, error massage will be sent to user -applies to both patients and caregivers-
-      Get.snackbar('Invalid', "This email does not exist.",
+      Get.snackbar(AppLocalizations.of(context)!.snackbarInvalid,
+          AppLocalizations.of(context)!.errorEmailNotExist,
           snackPosition: SnackPosition.TOP,
           // backgroundColor: Colors.redAccent.withOpacity(0.1),
           // colorText: Colors.red,
@@ -91,7 +116,8 @@ class AuthenticationRepository extends GetxController {
           .then((value) =>
               FirebaseAuth.instance.currentUser!.updatePassword(newpassword));
       // if function is successful, show an change password message
-      Get.snackbar('Congrats', 'Your password has been successfully changed',
+      Get.snackbar(AppLocalizations.of(context)!.snackbarCongrats,
+          AppLocalizations.of(context)!.passwordChangedSuccess,
           snackPosition: SnackPosition.TOP,
           backgroundColor: Color(0xFF35365D).withOpacity(0.5),
           colorText: Color(0xFFF6F3E7));
@@ -100,7 +126,8 @@ class AuthenticationRepository extends GetxController {
     }
     // if function is not working, it means that password is not matching
     catch (e) {
-      Get.snackbar('Invalid', 'Your old password is not matching',
+      Get.snackbar(AppLocalizations.of(context)!.snackbarInvalid,
+          AppLocalizations.of(context)!.errorOldPasswordMismatch,
           snackPosition: SnackPosition.TOP,
           backgroundColor: Color(0xFF35365D).withOpacity(0.5),
           colorText: Color(0xFFF6F3E7));
@@ -116,8 +143,8 @@ class AuthenticationRepository extends GetxController {
 
     if (!patientMedicationExists) {
       Get.snackbar(
-        'Invalid',
-        'You have not entered any medication yet!',
+        AppLocalizations.of(context)!.snackbarInvalid,
+        AppLocalizations.of(context)!.errorMedicationMissing,
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
         colorText: const Color(0xFFF6F3E7),
@@ -134,19 +161,16 @@ class AuthenticationRepository extends GetxController {
   }
 
 //login function with backend validation - applies to both patients and caregivers -
-  Future<void> loginUser(
-    String email,
-    String password,
-    LoginType loginType,
-  ) async {
+  Future<void> loginUser(String email, String password, LoginType loginType,
+      BuildContext context) async {
     try {
       // 🔍 Fetch user (regardless of login type)
       final user = await userRepo.getUserByEmail(email);
 
       if (user == null) {
         Get.snackbar(
-          'Invalid',
-          'Login information, please sign up for an account',
+          AppLocalizations.of(context)!.snackbarInvalid,
+          AppLocalizations.of(context)!.errorLogin,
           snackPosition: SnackPosition.TOP,
           backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
           colorText: const Color(0xFFF6F3E7),
@@ -157,8 +181,8 @@ class AuthenticationRepository extends GetxController {
       if (user.loginType != loginType &&
           user.loginType != LoginType.dualAccount) {
         Get.snackbar(
-          'Invalid Account Type',
-          'This account is not registered as a ${loginType.name}.',
+          AppLocalizations.of(context)!.invalidAccountType,
+          AppLocalizations.of(context)!.notRegisteredAs(loginType.name),
           snackPosition: SnackPosition.TOP,
           backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
           colorText: const Color(0xFFF6F3E7),
@@ -177,6 +201,14 @@ class AuthenticationRepository extends GetxController {
       if (loginType == LoginType.patient && !hasMedications) {
         Get.to(() => const PatientUploadMedsScreen());
       } else {
+        Get.snackbar(
+          AppLocalizations.of(context)!.snackbarCongrats,
+          AppLocalizations.of(context)!.loginSuccess,
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+          colorText: const Color(0xFFF6F3E7),
+        );
+        await Future.delayed(const Duration(milliseconds: 1500));
         Get.to(() => NavigatorBar(
               loginType: loginType,
               actualAccountType: user.loginType,
@@ -185,8 +217,8 @@ class AuthenticationRepository extends GetxController {
     } on FirebaseAuthException catch (e) {
       print("ERROR: $e");
       Get.snackbar(
-        'Invalid',
-        RegisterFailure.fromCode(e.code).message,
+        AppLocalizations.of(context)!.snackbarInvalid,
+        RegisterFailure.fromCode(e.code, context).message,
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
         colorText: const Color(0xFFF6F3E7),
@@ -195,12 +227,13 @@ class AuthenticationRepository extends GetxController {
   }
 
 //logout function
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     try {
       if (firebaseUser.value != null) {
         await _auth.signOut();
         Get.offAll(const HomeScreen());
-        Get.snackbar('Logout', 'You have been successfully logged out',
+        Get.snackbar(AppLocalizations.of(context)!.snackbarLogoutTitle,
+            AppLocalizations.of(context)!.snackbarLogoutSuccess,
             duration: const Duration(seconds: 2),
             backgroundColor: Color(0xFF35365D).withOpacity(0.5),
             colorText: Color(0xFFF6F3E7));
@@ -208,8 +241,8 @@ class AuthenticationRepository extends GetxController {
     } catch (e) {
       print('Logout error: $e');
       Get.snackbar(
-        'Error',
-        'An error occurred while logging out',
+        AppLocalizations.of(context)!.snackbarInvalid,
+        AppLocalizations.of(context)!.errorLogout,
         duration: const Duration(seconds: 2),
       );
     }

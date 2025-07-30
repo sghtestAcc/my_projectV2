@@ -1,26 +1,23 @@
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/widgets.dart';
+
 class RegisterFailure {
   final String message;
 
   const RegisterFailure({required this.message});
 
-  factory RegisterFailure.fromCode(String code) {
+  factory RegisterFailure.fromCode(String code, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     switch (code) {
       case 'invalid-email':
-        return const RegisterFailure(
-          message: 'Email is not valid.',
-        );
+        return RegisterFailure(message: localizations.invalidEmailError);
       case 'operation-not-allowed':
-        return const RegisterFailure(
-          message: 'Operation is not allowed. Please contact support.',
-        );
+        return RegisterFailure(message: localizations.operationNotAllowedError);
       case 'wrong-password':
-        return const RegisterFailure(
-          message: 'Your password is invalid.',
-        );
+        return RegisterFailure(message: localizations.wrongPasswordError);
       default:
-        return const RegisterFailure(
-          message: "Email already exists.",
-        );
+        return RegisterFailure(message: localizations.emailExistsError);
     }
   }
 }

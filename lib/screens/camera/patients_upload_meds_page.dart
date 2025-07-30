@@ -9,8 +9,10 @@ import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/camera/camera_patient_meds_page.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/home/home.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../components/navigation_drawer_new.dart';
+import 'package:my_project/utils/tutorial_manager.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class PatientUploadMedsScreen extends StatefulWidget {
   final TextEditingController? imagetakenText;
@@ -22,18 +24,19 @@ class PatientUploadMedsScreen extends StatefulWidget {
   final String? details;
   // final XFile? image;
   const PatientUploadMedsScreen({
-    Key? key, 
-    this.imagetakenText, 
+    Key? key,
+    this.imagetakenText,
     this.imageFiles = const [],
     this.imageFilePills = const [],
     this.quantity,
     this.dosage,
     this.instructions,
     this.details,
-  }): super(key: key);
+  }) : super(key: key);
 
   @override
-  State<PatientUploadMedsScreen> createState() => _PatientUploadMedsScreenState();
+  State<PatientUploadMedsScreen> createState() =>
+      _PatientUploadMedsScreenState();
 }
 
 XFile? imageFile2;
@@ -46,45 +49,90 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   final currentUid = FirebaseAuth.instance.currentUser!.uid;
   TextEditingController medsLabel = TextEditingController();
   final controller = Get.put(SelectPatientController());
-
+  final GlobalKey keyUploadImageButton = GlobalKey();
   TextEditingController medicineInput = TextEditingController();
   TextEditingController quantityController = TextEditingController();
   TextEditingController instructionsController = TextEditingController();
+  late TutorialManager tutorialManager;
+  final GlobalKey keyuploadimg = GlobalKey();
 
   var formDataQuestionsInput = GlobalKey<FormState>();
   var formDataQuestions = GlobalKey<FormState>();
 
   bool isMedicationQuantityValid(String text) {
-  if (text.isEmpty|| text.isEmpty) {
-    return false;
+    if (text.isEmpty || text.isEmpty) {
+      return false;
+    }
+
+    List<String> words = text.split(' ');
+    if (words.isEmpty) {
+      return false;
+    }
+
+    int? value = int.tryParse(words[0]);
+
+    if (value == null || value < 1 || value > 100) {
+      return false;
+    }
+
+    return true;
   }
 
-  List<String> words = text.split(' ');
-  if (words.isEmpty) {
-    return false;
+  bool doesSecondWordContainTablets(String text) {
+    if (text.isEmpty || text.isEmpty) {
+      return false;
+    }
+
+    List<String> words = text.split(' ');
+
+    if (words.length < 2) {
+      return false;
+    }
+    return words[1].toLowerCase() == 'tabs' ||
+        words[1].toLowerCase() == 'tablets';
   }
 
-  int? value = int.tryParse(words[0]);
+  void _maybeStartTutorial() async {
+    final step = await getTutorialStep();
 
-  if (value == null || value < 1 || value > 100) {
-    return false;
+    if (step == 3) {
+      final tutorialManager = TutorialManager(context);
+
+      tutorialManager.targets = [
+        TargetFocus(
+          identify: "upload_button",
+          keyTarget: keyuploadimg,
+          shape: ShapeLightFocus.RRect,
+          radius: 12,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              child: const Text(
+                "Tap here to upload Medication Images.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ];
+
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      tutorialManager.showTutorial(
+        onFinish: () async {
+          await setTutorialStep(4); 
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CameraHomePatientScreen()),
+          );
+        },
+      );
+    }
   }
-
-  return true;
-}
-
-bool doesSecondWordContainTablets(String text) {
-  if (text.isEmpty|| text.isEmpty) {
-    return false;
-  }
-
-  List<String> words = text.split(' ');
-
-  if (words.length < 2) {
-    return false;
-  }
-  return words[1].toLowerCase() == 'tabs' || words[1].toLowerCase() == 'tablets';
-}
 
   // void showAddMedsScheduleModal(BuildContext context) {
   //   showModalBottomSheet(
@@ -188,7 +236,7 @@ bool doesSecondWordContainTablets(String text) {
   //                           colorText: Color(0xFFF6F3E7),
   //                         );
   //                         return;
-  //                       } 
+  //                       }
   //                       else if (!isMedicationQuantityValid(medicineInput.text)) {
   //                         Get.snackbar(
   //                           "Error",
@@ -207,7 +255,7 @@ bool doesSecondWordContainTablets(String text) {
   //                           colorText: Color(0xFFF6F3E7),
   //                         );
   //                         return;
-  //                       } 
+  //                       }
   //                     },
   //                     child: const Text(
   //                       'Add',
@@ -247,6 +295,7 @@ bool doesSecondWordContainTablets(String text) {
   @override
   void initState() {
     super.initState();
+    _maybeStartTutorial();
   }
 
   @override
@@ -280,42 +329,41 @@ bool doesSecondWordContainTablets(String text) {
                   future: controller.getPatientData(),
                   builder: (context, snapshot) {
                     return Container(
-                      // height: MediaQuery.of(context).size.height/ 2,
                       padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
                       child: Center(
                         child: Column(
                           children: [
-                            const Text(
-                              'New Patients Must',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.newpatientmust,
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            const Text(
-                              'upload your medication',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .uploadyourmedication,
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            const Text(
-                              'These information would assist caregivers',
-                              style: TextStyle(fontSize: 12),
+                            Text(
+                              AppLocalizations.of(context)!.hosyaku1,
+                              style: const TextStyle(fontSize: 12),
                             ),
-                            const Text(
-                              'in managing your medication effectively',
-                              style: TextStyle(fontSize: 12),
+                            Text(
+                              AppLocalizations.of(context)!.hosyaku2,
+                              style: const TextStyle(fontSize: 12),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            //upload images button
                             SizedBox(
                               width: double
-                                  .infinity, // Set the width to expand to the available space
+                                  .infinity, 
                               child: ElevatedButton(
+                                key: keyuploadimg,
                                 onPressed: () {
-                                  // Add your onPressed logic here
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -331,10 +379,10 @@ bool doesSecondWordContainTablets(String text) {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical:
-                                          12), // Adjust the padding as needed
-                                  child: const Text(
-                                    'Upload Images',
-                                    style: TextStyle(
+                                          12), 
+                                  child: Text(
+                                    AppLocalizations.of(context)!.uploadimg,
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
@@ -351,7 +399,7 @@ bool doesSecondWordContainTablets(String text) {
                             //upload schdules button
                             SizedBox(
                               width: double
-                                  .infinity, // Set the width to expand to the available space
+                                  .infinity, 
                             ),
                             const SizedBox(
                               height: 20,
@@ -370,20 +418,23 @@ bool doesSecondWordContainTablets(String text) {
                                                 BorderRadius.circular(12),
                                           ),
                                           title: Text(
-                                            'Are you Sure?',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            AppLocalizations.of(context)!
+                                                .confirmation,
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
                                           content: Text(
-                                            'This would take you to Home',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            AppLocalizations.of(context)!
+                                                .takehome,
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
                                           actions: [
                                             MaterialButton(
                                               child: Text(
-                                                'Confirm',
-                                                style: TextStyle(
+                                                AppLocalizations.of(context)!
+                                                    .confirm,
+                                                style: const TextStyle(
                                                     color: Colors.white),
                                               ),
                                               onPressed: () async {
@@ -398,8 +449,9 @@ bool doesSecondWordContainTablets(String text) {
                                                 Navigator.pop(context);
                                               },
                                               child: Text(
-                                                'cancel',
-                                                style: TextStyle(
+                                                AppLocalizations.of(context)!
+                                                    .cancel,
+                                                style: const TextStyle(
                                                     color: Colors.white),
                                               ),
                                             )
@@ -416,9 +468,9 @@ bool doesSecondWordContainTablets(String text) {
                                 child: Container(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12),
-                                  child: const Text(
-                                    'Proceed to home',
-                                    style: TextStyle(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.proceedtohome,
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
@@ -431,9 +483,9 @@ bool doesSecondWordContainTablets(String text) {
                             const SizedBox(
                               height: 20,
                             ),
-                            const Text(
-                              'Medication Label:',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.medicationLabel,
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Container(
@@ -444,8 +496,9 @@ bool doesSecondWordContainTablets(String text) {
                                 ),
                                 controller: textController1,
                                 enabled: false,
-                                decoration: const InputDecoration(
-                                  hintText: "Your Medication Label... ",
+                                decoration: InputDecoration(
+                                  hintText: AppLocalizations.of(context)!
+                                      .yourmedicationlabel,
                                   border: InputBorder
                                       .none, // Set this to remove the border
                                 ),
@@ -460,27 +513,34 @@ bool doesSecondWordContainTablets(String text) {
                                   if (textController1.text == null ||
                                       textController1.text.isEmpty) {
                                     Get.snackbar(
-                                      "Error",
-                                      "Please fill in the Medication Label.",
+                                      AppLocalizations.of(context)!
+                                          .snackbarInvalid,
+                                      AppLocalizations.of(context)!
+                                          .medicationlabelError,
                                       snackPosition: SnackPosition.TOP,
-                                      backgroundColor:Color(0xFF35365D).withOpacity(0.5),
+                                      backgroundColor:
+                                          Color(0xFF35365D).withOpacity(0.5),
                                       colorText: Color(0xFFF6F3E7),
                                     );
                                     return;
-                                  } 
+                                  }
                                   // validation field of textmedicationQuantity if empty
-                                  if (formDataQuestions.currentState!.validate()) {
-                                    print('Packaging images count: ${widget.imageFiles.length}');
-                                    print('Pills images count: ${widget.imageFilePills.length}');
+                                  if (formDataQuestions.currentState!
+                                      .validate()) {
+                                    print(
+                                        'Packaging images count: ${widget.imageFiles.length}');
+                                    print(
+                                        'Pills images count: ${widget.imageFilePills.length}');
 
                                     await userRepo.createPatientMedications(
+                                      context,
                                       textController1.text.trim(),
                                       widget.imageFiles,
                                       widget.imageFilePills,
                                       widget.quantity ?? '',
                                       widget.dosage ?? '',
                                       widget.instructions ?? '',
-                                      details : widget.details,
+                                      details: widget.details,
                                     );
                                   }
                                 },
@@ -494,9 +554,10 @@ bool doesSecondWordContainTablets(String text) {
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 12,
                                   ), // Adjust the padding as needed
-                                  child: const Text(
-                                    'Add Medications',
-                                    style: TextStyle(
+                                  child: Text(
+                                    AppLocalizations.of(context)!
+                                        .addMedications,
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,

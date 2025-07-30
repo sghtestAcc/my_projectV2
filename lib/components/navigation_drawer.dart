@@ -8,12 +8,13 @@ import 'package:my_project/components/navigation.tab.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/screens/communications/patient/patients_prescriptions.dart';
 import 'package:my_project/screens/communications/patient/patients_vocalization.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../repos/authentication_repository.dart';
 import '../screens/communications/bothusers/usersCameraScreen.dart';
 import '../screens/communications/caregiver/caregiver_prescription.dart';
 import '../screens/communications/caregiver/caregiver_vocalization_patient_view.dart';
 import 'package:my_project/controllers/account_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppDrawerNavigation extends StatefulWidget {
   const AppDrawerNavigation({Key? key}) : super(key: key);
@@ -126,6 +127,28 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
     }
   }
 
+  String _getLanguageNameFromLocale(Locale locale, BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    switch (locale.languageCode) {
+      case 'en':
+        return loc.languageEnglish;
+      case 'zh':
+        return loc.chinese;
+      case 'tl':
+        return loc.tagalog;
+      case 'id':
+        return loc.indonesian;
+      case 'my':
+        return loc.burmese;
+      case 'ta':
+        return loc.tamil;
+      case 'ms':
+        return loc.malay;
+      default:
+        return loc.languageEnglish;
+    }
+  }
+
   ListTile buildSwitchViewTile() {
     final newLoginType = accountController.loginType == LoginType.patient
         ? LoginType.caregiver
@@ -135,7 +158,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
       leading: const Icon(Icons.swap_horiz),
       iconColor: Colors.black,
       title: Text(
-        'Switch to ${newLoginType == LoginType.patient ? 'Patient' : 'Caregiver'} View',
+        newLoginType == LoginType.patient
+            ? AppLocalizations.of(context)!.switchToPatient
+            : AppLocalizations.of(context)!.switchToCaregiver,
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       ),
       onTap: () {
@@ -183,53 +208,96 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  title: Text(
+                    AppLocalizations.of(context)!.logout,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    AuthenticationRepository.instance.logout();
+                    AuthenticationRepository.instance.logout(context);
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: Image.asset(
-                    'assets/images/world.png',
-                    height: 28,
-                    width: 28,
-                  ),
-                  title: const Text('Change Language',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Select Language'),
-                          content: Container(
-                            padding: const EdgeInsets.all(10.0),
-                            child: DropdownButton(
-                              hint: Text('English'),
-                              value: sourceLang,
-                              onChanged: (newValue) {
+                leading: Image.asset(
+                  'assets/images/world.png',
+                  height: 28,
+                  width: 28,
+                ),
+                title: Text(AppLocalizations.of(context)!.changeLanguage,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(AppLocalizations.of(context)!
+                            .dialogSelectLanguageTitle),
+                        content: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          child: DropdownButton<Locale>(
+                            isExpanded: true,
+                            value: Get.locale ?? const Locale('en'),
+                            onChanged: (Locale? newLocale) async {
+                              if (newLocale != null) {
                                 setState(() {
-                                  sourceLang = newValue ?? '';
-                                  // translateTextFunction(typedText);
+                                  sourceLang = _getLanguageNameFromLocale(
+                                      newLocale, context);
                                 });
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              items: languagePicker.map((valueItem) {
-                                return DropdownMenuItem(
-                                  value: valueItem,
-                                  child: Text(valueItem),
-                                );
-                              }).toList(),
-                            ),
+                                Get.updateLocale(newLocale);
+
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setString(
+                                    'selectedLocale', newLocale.languageCode);
+
+                                Navigator.pop(context);
+                              }
+                            },
+                            items: [
+                              DropdownMenuItem(
+                                value: const Locale('en'),
+                                child: Text(AppLocalizations.of(context)!
+                                    .languageEnglish),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('zh'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.chinese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('tl'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tagalog),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('id'),
+                                child: Text(
+                                    AppLocalizations.of(context)!.indonesian),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('my'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.burmese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ta'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tamil),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ms'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.malay),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    );
-                  }),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
@@ -237,7 +305,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Prescriptions'),
+                  title: Text(
+                    AppLocalizations.of(context)!.prescriptions,
+                  ),
                   onTap: () {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
@@ -252,7 +322,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Vocalizations'),
+                  title: Text(
+                    AppLocalizations.of(context)!.vocalizations,
+                  ),
                   onTap: () {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
@@ -267,7 +339,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('PhotoScanner'),
+                  title: Text(
+                    AppLocalizations.of(context)!.photoScanner,
+                  ),
                   onTap: () async {
                     await pickImage(source: ImageSource.gallery).then((value) {
                       if (value != '') {
@@ -278,7 +352,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: const Icon(Icons.home),
-                  title: const Text('Home'),
+                  title: Text(
+                    AppLocalizations.of(context)!.home,
+                  ),
                   iconColor: Colors.black,
                   onTap: () {
                     Navigator.pushReplacement(
@@ -296,7 +372,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.comment),
                   iconColor: Colors.black,
-                  title: const Text('Communications'),
+                  title: Text(
+                    AppLocalizations.of(context)!.communications,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -314,7 +392,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.person),
                   iconColor: Colors.black,
-                  title: const Text('Profile'),
+                  title: Text(
+                    AppLocalizations.of(context)!.profile,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -355,26 +435,96 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  title: Text(
+                    AppLocalizations.of(context)!.logout,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    AuthenticationRepository.instance.logout();
+                    AuthenticationRepository.instance.logout(context);
                   }),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
-                  leading: Image.asset(
-                    'assets/images/world.png',
-                    height: 28,
-                    width: 28,
-                  ),
-                  title: const Text('Change Language',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  onTap: () {
-                    // Navigator.of(context).pushReplacementNamed(WeatherScreen.routeName);
-                  }),
+                leading: Image.asset(
+                  'assets/images/world.png',
+                  height: 28,
+                  width: 28,
+                ),
+                title: Text(AppLocalizations.of(context)!.changeLanguage,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(AppLocalizations.of(context)!
+                            .dialogSelectLanguageTitle),
+                        content: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          child: DropdownButton<Locale>(
+                            isExpanded: true,
+                            value: Get.locale ?? const Locale('en'),
+                            onChanged: (Locale? newLocale) async {
+                              if (newLocale != null) {
+                                setState(() {
+                                  sourceLang = _getLanguageNameFromLocale(
+                                      newLocale, context);
+                                });
+                                Get.updateLocale(newLocale);
+
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setString(
+                                    'selectedLocale', newLocale.languageCode);
+
+                                Navigator.pop(context);
+                              }
+                            },
+                            items: [
+                              DropdownMenuItem(
+                                value: const Locale('en'),
+                                child: Text(AppLocalizations.of(context)!
+                                    .languageEnglish),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('zh'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.chinese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('tl'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tagalog),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('id'),
+                                child: Text(
+                                    AppLocalizations.of(context)!.indonesian),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('my'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.burmese),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ta'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.tamil),
+                              ),
+                              DropdownMenuItem(
+                                value: const Locale('ms'),
+                                child:
+                                    Text(AppLocalizations.of(context)!.malay),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
               const Divider(height: 3, color: Colors.blueGrey),
               ListTile(
                   leading: Image.asset(
@@ -382,7 +532,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Prescriptions'),
+                  title: Text(
+                    AppLocalizations.of(context)!.prescriptions,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -399,7 +551,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('Vocalizations'),
+                  title: Text(
+                    AppLocalizations.of(context)!.vocalizations,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -415,7 +569,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                     height: 28,
                     width: 28,
                   ),
-                  title: const Text('PhotoScanner'),
+                  title: Text(
+                    AppLocalizations.of(context)!.photoScanner,
+                  ),
                   onTap: () async {
                     await pickImage(source: ImageSource.gallery).then((value) {
                       if (value != '') {
@@ -426,7 +582,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.home),
                   iconColor: Colors.black,
-                  title: const Text('Home'),
+                  title: Text(
+                    AppLocalizations.of(context)!.home,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -444,7 +602,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.comment),
                   iconColor: Colors.black,
-                  title: const Text('Communications'),
+                  title: Text(
+                    AppLocalizations.of(context)!.communications,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -463,7 +623,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.list),
                   iconColor: Colors.black,
-                  title: const Text('Patients'),
+                  title: Text(
+                    AppLocalizations.of(context)!.patients,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -481,7 +643,9 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
               ListTile(
                   leading: const Icon(Icons.person),
                   iconColor: Colors.black,
-                  title: const Text('Profile'),
+                  title: Text(
+                    AppLocalizations.of(context)!.profile,
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(
                       context,

@@ -7,7 +7,7 @@ import 'package:my_project/models/login_type.dart';
 import 'package:my_project/repos/user_repo.dart';
 import 'package:my_project/screens/communications/caregiver/view_card.dart';
 import 'package:my_project/screens/home/patient_card.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../components/navigation.tab.dart';
 
 class CaregiverPrescription extends StatefulWidget {
@@ -26,9 +26,9 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
     String lol = '';
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Prescriptions',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          AppLocalizations.of(context)!.prescriptions,
+          style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -125,9 +125,9 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
                                       if (isDropdownOpen)
                                         Row(
                                           children: [
-                                            const Text(
-                                              'View more for medication info',
-                                              style: TextStyle(fontSize: 10),
+                                            Text(
+                                              AppLocalizations.of(context)!.viewmore,
+                                              style: const TextStyle(fontSize: 10),
                                             ),
                                             IconButton(
                                               onPressed: () {
@@ -149,8 +149,8 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
                                 );
                               });
                         } else {
-                          return const Center(
-                              child: Text('Something went wrong'));
+                          return Center(
+                              child: Text(AppLocalizations.of(context)!.smtwentwrong));
                         }
                       }),
                 ),
@@ -168,9 +168,9 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
                 ),
                 child: Container(
                     padding: const EdgeInsets.all(10.0),
-                    child: const Text(
-                      'Patient info Medication List',
-                      style: TextStyle(fontSize: 20),
+                    child: Text(
+                      AppLocalizations.of(context)!.patientinfomedlist,
+                      style: const TextStyle(fontSize: 20),
                     )),
               ),
               const SizedBox(
@@ -242,8 +242,8 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
                                       if (isDropdownOpen)
                                         Row(
                                           children: [
-                                            const Text(
-                                              'View more for medication info',
+                                            Text(
+                                              AppLocalizations.of(context)!.viewmore,
                                               style: TextStyle(fontSize: 10),
                                             ),
                                             IconButton(
@@ -265,7 +265,7 @@ class _CaregiverPrescriptionState extends State<CaregiverPrescription> {
                                 );
                               }));
                     } else {
-                      return const Center(child: Text('Something went wrong'));
+                      return Center(child: Text(AppLocalizations.of(context)!.smtwentwrong));
                     }
                   })
             ],

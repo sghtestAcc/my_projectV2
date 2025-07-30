@@ -7,7 +7,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_image_capture/multi_image_capture.dart';
 import 'package:my_project/screens/camera/patients_upload_meds_page.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../components/navigation_drawer_new.dart';
 
 class CameraHomePatientPillScreen extends StatefulWidget {
@@ -19,28 +19,27 @@ class CameraHomePatientPillScreen extends StatefulWidget {
   final String? instructions;
   final String? details;
 
-  const CameraHomePatientPillScreen({
-    Key? key, 
-    this.path, 
-    this.imagetakenText,
-    this.imageFiles= const [],
-    this.dosage = '',
-    this.quantity,
-    this.instructions,
-    this.details
-
-    }) : super(key: key);
+  const CameraHomePatientPillScreen(
+      {Key? key,
+      this.path,
+      this.imagetakenText,
+      this.imageFiles = const [],
+      this.dosage = '',
+      this.quantity,
+      this.instructions,
+      this.details})
+      : super(key: key);
   @override
   State<CameraHomePatientPillScreen> createState() =>
       _CameraHomePatientPillScreenState();
 }
 
-class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScreen> {
+class _CameraHomePatientPillScreenState
+    extends State<CameraHomePatientPillScreen> {
   bool textScanning = false;
   List<XFile> imageFilepills = [];
   String scannedTextpills = "";
   List<File> croppedImageFile = [];
-
 
   TextEditingController controller = TextEditingController();
 
@@ -70,63 +69,69 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
       ),
       body: SingleChildScrollView(
         child: SizedBox(
-          height: MediaQuery.of(context).size.height/ 1,
+          height: MediaQuery.of(context).size.height / 1,
           child: Center(
             child: Column(children: [
               const SizedBox(
                 height: 20,
               ),
-              const Text(
-                ' Upload for Medication Pills',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-               const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MultiImageCapture(
-                        onAddImage: (file) async {
-                          setState(() {
-                            imageFilepills.add(XFile(file.path));
-                          });
-                        },
-                        onRemoveImage: (file) async {return true;},
-                        onComplete: (files) async {},
-                      ), 
-                    )
-                  );
-                  // Do NOT add capturedFiles again here!
-                  return;
-                  // onPressed: () {
-                  //   pickImage(source: ImageSource.camera).then((value) {
-                  //     if (value != '') {
-                  //       imageCropperView(value, context);
-                  //     }
-                  //   });
-                  // },
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0CE25C),
-                    minimumSize: const Size(320, 50), // NEW
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12), // Rounded corner radius
-                    ),
-                  ),
-                child: const Text(
-                  'Capture Photo',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                )
+              Text(
+                AppLocalizations.of(context)!.uploadForMedicationPills,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 20,
               ),
               ElevatedButton(
                   onPressed: () async {
-                    final List<XFile>? selectedImages = await ImagePicker().pickMultiImage();
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MultiImageCapture(
+                            onAddImage: (file) async {
+                              setState(() {
+                                imageFilepills.add(XFile(file.path));
+                              });
+                            },
+                            onRemoveImage: (file) async {
+                              return true;
+                            },
+                            onComplete: (files) async {},
+                          ),
+                        ));
+                    // Do NOT add capturedFiles again here!
+                    return;
+                    // onPressed: () {
+                    //   pickImage(source: ImageSource.camera).then((value) {
+                    //     if (value != '') {
+                    //       imageCropperView(value, context);
+                    //     }
+                    //   });
+                    // },
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0CE25C),
+                    minimumSize: const Size(320, 50), // NEW
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(12), // Rounded corner radius
+                    ),
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.capturephoto,
+                    style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  )),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    final List<XFile>? selectedImages =
+                        await ImagePicker().pickMultiImage();
 
                     if (selectedImages != null && selectedImages.isNotEmpty) {
                       setState(() {
@@ -144,12 +149,16 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                     backgroundColor: const Color(0xFF0CE25C),
                     minimumSize: const Size(320, 50), // NEW
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12), // Rounded corner radius
+                      borderRadius:
+                          BorderRadius.circular(12), // Rounded corner radius
                     ),
                   ),
-                  child: const Text(
-                    'Upload Photos',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                  child: Text(
+                    AppLocalizations.of(context)!.uploadphoto,
+                    style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   )),
               const SizedBox(
                 height: 20,
@@ -157,23 +166,23 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               ElevatedButton(
                   onPressed: () {
                     if (imageFilepills.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please select an image Pill')),
-                    );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(AppLocalizations.of(context)!
+                              .selectImagePillError),
+                        ),
+                      );
                     } else {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
+                      Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => PatientUploadMedsScreen(
-                            imagetakenText: widget.imagetakenText,
-                            imageFiles: widget.imageFiles,
-                            imageFilePills: imageFilepills,
-                            quantity: widget.quantity, 
-                            dosage: widget.dosage,
-                            instructions: widget.instructions,
-                            details: widget.details,
-                          )
-                        )
-                      );  
+                                imagetakenText: widget.imagetakenText,
+                                imageFiles: widget.imageFiles,
+                                imageFilePills: imageFilepills,
+                                quantity: widget.quantity,
+                                dosage: widget.dosage,
+                                instructions: widget.instructions,
+                                details: widget.details,
+                              )));
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -184,9 +193,12 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
                           BorderRadius.circular(12), // Rounded corner radius
                     ),
                   ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                  child: Text(
+                    AppLocalizations.of(context)!.continue1,
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   )),
               const SizedBox(
                 height: 20,
@@ -206,24 +218,24 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
               //       fit: BoxFit.fitWidth,
               //     ),
               //   ),
-            if (imageFilepills.isNotEmpty)
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: imageFilepills.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Image.file(
-                        File(imageFilepills[index].path),
-                        width: 150,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    );
-                  },
+              if (imageFilepills.isNotEmpty)
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: imageFilepills.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.file(
+                          File(imageFilepills[index].path),
+                          width: 150,
+                          fit: BoxFit.fitWidth,
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
             ]),
           ),
         ),
@@ -232,7 +244,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     );
   }
 
-//crop function for label/image scanner 
+//crop function for label/image scanner
   Future<void> imageCropperView(String? path, BuildContext context) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: path!,
@@ -245,7 +257,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
         CropAspectRatioPreset.ratio5x4,
         CropAspectRatioPreset.ratio5x3,
         CropAspectRatioPreset.ratio16x9
-      ] ,
+      ],
       uiSettings: [
         AndroidUiSettings(
             toolbarTitle: 'Cropping Images for Medication Pills',
@@ -268,7 +280,6 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
       log('do nothing');
     }
   }
-
 
 //function to pick image by gallery and camera -patients-
   // Future<String> pickImage({ImageSource? source}) async {
@@ -304,11 +315,11 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     final picker = ImagePicker();
     String path = '';
     try {
-      final getImage = await picker.pickImage(source: source!, imageQuality: 50);
+      final getImage =
+          await picker.pickImage(source: source!, imageQuality: 50);
       if (getImage != null) {
         textScanning = true;
 
-        // ✅ Add this image to the list instead of replacing
         setState(() {
           imageFilepills.add(getImage);
         });
@@ -325,6 +336,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     }
     return path;
   }
+
   Future<void> captureAndCropImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? captured = await picker.pickImage(source: ImageSource.camera);
@@ -332,7 +344,7 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
     if (captured != null) {
       final CroppedFile? cropped = await ImageCropper().cropImage(
         sourcePath: captured.path,
-        );
+      );
 
       if (cropped != null) {
         setState(() {
@@ -341,5 +353,4 @@ class _CameraHomePatientPillScreenState extends State<CameraHomePatientPillScree
       }
     }
   }
-
 }
