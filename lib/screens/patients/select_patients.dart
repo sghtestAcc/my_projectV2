@@ -9,9 +9,12 @@ import 'package:my_project/utils/email_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:my_project/notification_service.dart';
+import 'package:http/http.dart' as http; // ✅ Add this import
+import 'dart:convert'; // ✅ Add this import
 import '../../models/medications.dart';
-import '../../notification_service.dart';
 import '../home/patient_card.dart';
+
 
 class SelectPatientScreen extends StatefulWidget {
   const SelectPatientScreen({Key? key}) : super(key: key);
@@ -28,6 +31,10 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
 
   Map<String, bool> _isTimeDropdownOpen = {};
   Map<String, TimeOfDay?> _selectedTimes = {};
+
+  // ✅ NEW: Add frequency and day selection state
+  Map<String, ReminderFrequency> _selectedFrequency = {};
+  Map<String, int> _selectedDayOfWeek = {}; // For weekly reminders
 
   @override
   void dispose() {
@@ -141,10 +148,6 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                   ),
                 ),
               ),
-
-              // Test Notification Button
-              _buildTestNotificationButton(),
-
               // Current Patients Section
               Container(
                 padding: const EdgeInsets.all(20),
@@ -212,7 +215,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       if (patient == null) {
         Get.snackbar(
           "Error",
-          "No patient found with this email address. Ask the patient to register first.",
+          "No patient found with this email address.",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red.withOpacity(0.7),
           colorText: Colors.white,
@@ -223,7 +226,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       if (patient.loginType != LoginType.patient && patient.loginType != LoginType.dualAccount) {
         Get.snackbar(
           "Error",
-          "This email is not registered as a patient account.",
+          "This user is not registered as a patient.",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red.withOpacity(0.7),
           colorText: Colors.white,
@@ -235,8 +238,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       final isAlreadyAdded = await _isPatientAlreadyAdded(patient.id!);
       if (isAlreadyAdded) {
         Get.snackbar(
-          "Info",
-          "This patient is already under your care.",
+          "Error",
+          "This patient is already in your patient list.",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.orange.withOpacity(0.7),
           colorText: Colors.white,
@@ -254,7 +257,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       final caregiverName = caregiverData?['FullName'] ?? 'Unknown Caregiver';
       final caregiverEmail = caregiverData?['Email'] ?? 'Unknown Email';
 
-      // Create verification request in Firestore
+      // ✅ Create verification request in Firestore
+      // This will automatically trigger the Firebase Function to send email
       final verificationDoc = await FirebaseFirestore.instance
           .collection('verification_requests')
           .add({
@@ -269,35 +273,20 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         'expiresAt': Timestamp.fromDate(DateTime.now().add(Duration(days: 1))), // 24 hour expiry
       });
 
-      // ✅ Send email to patient (ONLY email, no in-app notification)
-      final emailSent = await EmailService.sendPatientVerificationEmail(
-        patientEmail: patient.email!,
-        patientName: patient.name ?? 'Patient',
-        caregiverName: caregiverName,
-        caregiverEmail: caregiverEmail,
-        verificationRequestId: verificationDoc.id,
+      print('Verification request created: ${verificationDoc.id}');
+      print('Firebase Function will automatically send email to: ${patient.email}');
+
+      // ✅ Show success message
+      Get.snackbar(
+        "Email Sent!",
+        "Verification email sent to ${patient.name} (${patient.email}). They need to check their email and click the verification link.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+        colorText: const Color(0xFFF6F3E7),
+        duration: Duration(seconds: 5),
       );
 
-      if (emailSent) {
-        Get.snackbar(
-          "Email Sent ✅",
-          "Verification email sent to ${patient.email}. The patient will receive an email with verification instructions.",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-          colorText: const Color(0xFFF6F3E7),
-          duration: const Duration(seconds: 5),
-        );
-
-        _emailController.clear();
-      } else {
-        Get.snackbar(
-          "Email Failed",
-          "Failed to send verification email. Please check email service configuration and try again.",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withOpacity(0.7),
-          colorText: Colors.white,
-        );
-      }
+      _emailController.clear();
 
     } catch (e) {
       print('Error sending verification: $e');
@@ -342,38 +331,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     ),
   );
 
-  Widget _buildTestNotificationButton() => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-    child: ElevatedButton(
-      onPressed: () async {
-        await NotificationService.showTestNotification();
-        await NotificationService.scheduleNotification(
-          id: 998,
-          title: '⏰ Test Scheduled Notification',
-          body: 'This notification was scheduled 5 seconds ago!',
-          scheduledTime: DateTime.now().add(const Duration(seconds: 5)),
-          data: {'type': 'test_scheduled'},
-        );
-        Get.snackbar(
-          "Test Notifications Sent",
-          "Check for immediate and scheduled notifications",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.blue.withOpacity(0.7),
-          colorText: Colors.white,
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        minimumSize: const Size(double.infinity, 40),
-      ),
-      child: const Text(
-        '🧪 Test Notifications',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-    ),
-  );
-
+  // ✅ UPDATE: Enhanced patient card with frequency options
   Widget _buildPatientCard(String id, String name, String email, bool isDropdownOpen, TimeOfDay? time) {
     return Container(
       padding: const EdgeInsets.all(15),
@@ -397,7 +355,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               CircleAvatar(
                 backgroundColor: const Color(0xFF0CE25C),
                 child: Text(
-                  name.isNotEmpty ? name[0].toUpperCase() : 'P',
+                  name.isNotEmpty ? name[0].toUpperCase() : '?',
                   style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -412,7 +370,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
                     ),
                     Text(
                       email,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -425,46 +383,116 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             ],
           ),
           const SizedBox(height: 15),
+          
+          // ✅ NEW: Frequency Selection
+          Text(
+            "Reminder Frequency:",
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: ElevatedButton.icon(
+                child: RadioListTile<ReminderFrequency>(
+                  title: const Text('Daily', style: TextStyle(fontSize: 12)),
+                  value: ReminderFrequency.daily,
+                  groupValue: _selectedFrequency[id] ?? ReminderFrequency.daily,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedFrequency[id] = value!;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              Expanded(
+                child: RadioListTile<ReminderFrequency>(
+                  title: const Text('Weekly', style: TextStyle(fontSize: 12)),
+                  value: ReminderFrequency.weekly,
+                  groupValue: _selectedFrequency[id] ?? ReminderFrequency.daily,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedFrequency[id] = value!;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+
+          // ✅ NEW: Day of Week Selection (only for weekly)
+          if (_selectedFrequency[id] == ReminderFrequency.weekly) ...[
+            const SizedBox(height: 10),
+            Text(
+              "Day of Week:",
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<int>(
+              value: _selectedDayOfWeek[id],
+              decoration: InputDecoration(
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+              hint: const Text('Select Day'),
+              items: const [
+                DropdownMenuItem(value: 1, child: Text('Monday')),
+                DropdownMenuItem(value: 2, child: Text('Tuesday')),
+                DropdownMenuItem(value: 3, child: Text('Wednesday')),
+                DropdownMenuItem(value: 4, child: Text('Thursday')),
+                DropdownMenuItem(value: 5, child: Text('Friday')),
+                DropdownMenuItem(value: 6, child: Text('Saturday')),
+                DropdownMenuItem(value: 7, child: Text('Sunday')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedDayOfWeek[id] = value!;
+                });
+              },
+            ),
+          ],
+
+          const SizedBox(height: 15),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
                   onPressed: () async {
-                    final picked = await showTimePicker(
+                    final selectedTime = await showTimePicker(
                       context: context,
                       initialTime: time ?? TimeOfDay.now(),
                     );
-                    if (picked != null) {
-                      setState(() => _selectedTimes[id] = picked);
+                    if (selectedTime != null) {
+                      setState(() {
+                        _selectedTimes[id] = selectedTime;
+                      });
                     }
                   },
-                  icon: const Icon(Icons.schedule, size: 16),
-                  label: Text(
-                    time != null 
-                        ? 'Time: ${time.format(context)}'
-                        : 'Set Reminder Time',
-                    style: const TextStyle(fontSize: 14),
-                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0CE25C),
-                    foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: Text(
+                    time != null 
+                        ? 'Time: ${time.format(context)}' 
+                        : 'Set Time',
+                    style: const TextStyle(color: Colors.black, fontSize: 12),
                   ),
                 ),
               ),
               const SizedBox(width: 10),
               if (time != null)
                 ElevatedButton(
-                  onPressed: () async {
-                    await _scheduleNotificationForPatient(id, name, time);
-                    setState(() => _selectedTimes[id] = null);
-                  },
+                  onPressed: () => _scheduleEnhancedNotificationForPatient(id, name, time),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: const Text('Save'),
+                  child: const Text(
+                    'Set Reminder',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
                 ),
             ],
           ),
@@ -473,6 +501,180 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         ],
       ),
     );
+  }
+
+  // ✅ NEW: Schedule push notification to patient
+  Future<void> _schedulePatientPushNotification(
+    String patientId,
+    String patientName,
+    TimeOfDay selectedTime,
+    ReminderFrequency frequency,
+    {int? dayOfWeek, String? medicationName}
+  ) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+      
+      final idToken = await user.getIdToken();
+      
+      // Call Firebase Function to schedule push notification
+      final response = await http.post(
+        Uri.parse('https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/schedulePatientNotification'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $idToken',
+        },
+        body: jsonEncode({
+          'data': {
+            'patientId': patientId,
+            'patientName': patientName,
+            'medicationName': medicationName ?? 'medication',
+            'scheduledTime': '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
+            'frequency': frequency.name,
+            'dayOfWeek': dayOfWeek,
+            'title': '💊 Medication Reminder',
+            'message': 'Time to take your ${medicationName ?? 'medication'}!',
+          }
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        if (result['result']['success'] == true) {
+          final nextExecution = result['result']['nextExecution'];
+          
+          Get.snackbar(
+            "Push Notification Scheduled ✅",
+            "Patient will receive push notifications ${frequency.name} at ${selectedTime.format(context)}",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+            colorText: const Color(0xFFF6F3E7),
+            duration: const Duration(seconds: 4),
+          );
+        } else {
+          throw Exception(result['result']['message'] ?? 'Unknown error');
+        }
+      } else {
+        throw Exception('Failed to schedule notification: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error scheduling push notification: $e');
+      Get.snackbar(
+        "Error",
+        "Failed to schedule push notification: ${e.toString()}",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red.withOpacity(0.7),
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  // ✅ UPDATE: Enhanced scheduling method that includes both local AND push notifications
+  Future<void> _scheduleEnhancedNotificationForPatient(
+    String patientId,
+    String patientName,
+    TimeOfDay selectedTime,
+  ) async {
+    try {
+      final frequency = _selectedFrequency[patientId] ?? ReminderFrequency.daily;
+      final notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      
+      print('🔔 Scheduling ${frequency.name} notifications for patient: $patientName');
+      
+      // 1. Schedule LOCAL notification for CAREGIVER
+      if (frequency == ReminderFrequency.daily) {
+        await NotificationService.scheduleDailyNotification(
+          id: notificationId,
+          title: 'Daily Medication Reminder for $patientName',
+          body: 'Time to remind $patientName to take their medication!',
+          time: selectedTime,
+          data: {
+            'type': 'medication_reminder',
+            'patientId': patientId,
+            'patientName': patientName,
+            'frequency': 'daily',
+            'notificationId': notificationId,
+          },
+        );
+      } else if (frequency == ReminderFrequency.weekly) {
+        final dayOfWeek = _selectedDayOfWeek[patientId];
+        if (dayOfWeek == null) {
+          Get.snackbar(
+            "Error",
+            "Please select a day of the week for weekly reminders",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.red.withOpacity(0.7),
+            colorText: Colors.white,
+          );
+          return;
+        }
+
+        await NotificationService.scheduleWeeklyNotification(
+          id: notificationId,
+          title: 'Weekly Medication Reminder for $patientName',
+          body: 'Time to remind $patientName to take their medication!',
+          time: selectedTime,
+          dayOfWeek: dayOfWeek,
+          data: {
+            'type': 'medication_reminder',
+            'patientId': patientId,
+            'patientName': patientName,
+            'frequency': 'weekly',
+            'dayOfWeek': dayOfWeek,
+            'notificationId': notificationId,
+          },
+        );
+      }
+
+      // 2. Schedule PUSH notification for PATIENT
+      await _schedulePatientPushNotification(
+        patientId,
+        patientName,
+        selectedTime,
+        frequency,
+        dayOfWeek: frequency == ReminderFrequency.weekly ? _selectedDayOfWeek[patientId] : null,
+        medicationName: 'medication', // You can make this dynamic
+      );
+
+      // 3. Save to database
+      await userRepo.createMedicationNotification(
+        patientId,
+        'Medication Reminder',
+        '${frequency.name.toUpperCase()} reminder for $patientName at ${selectedTime.format(context)}',
+        DateTime.now().toIso8601String(),
+      );
+
+      // 4. Show success message
+      final dayText = frequency == ReminderFrequency.weekly 
+          ? ' on ${_getDayName(_selectedDayOfWeek[patientId]!)}'
+          : '';
+          
+      Get.snackbar(
+        "Success ✅",
+        "Both caregiver and patient notifications scheduled ${frequency.name}$dayText at ${selectedTime.format(context)}",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+        colorText: const Color(0xFFF6F3E7),
+      );
+
+    } catch (e) {
+      print('❌ Error scheduling enhanced notifications: $e');
+      Get.snackbar(
+        "Error",
+        "Failed to schedule notifications: ${e.toString()}",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.redAccent.withOpacity(0.1),
+        colorText: Colors.red,
+      );
+    }
+  }
+
+  // Helper method for day names
+  String _getDayName(int dayOfWeek) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return days[dayOfWeek - 1];
   }
 
   // Remove patient from caregiver's list
@@ -597,6 +799,66 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.redAccent.withOpacity(0.1),
         colorText: Colors.red,
+      );
+    }
+  }
+
+  // ✅ UPDATED: Send push notification to patient using HTTP
+  Future<void> _sendPushNotificationToPatient(
+    String patientId,
+    String patientName,
+    String medicationName,
+  ) async {
+    try {
+      // Get the current user's ID token for authentication
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+      
+      final idToken = await user.getIdToken();
+      
+      // Call your Firebase Function directly via HTTP
+      final response = await http.post(
+        Uri.parse('https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/sendMedicationReminderToPatient'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $idToken',
+        },
+        body: jsonEncode({
+          'data': {
+            'patientId': patientId,
+            'patientName': patientName,
+            'medicationName': medicationName,
+            'message': 'Time to take your medication!',
+          }
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        if (result['result']['success'] == true) {
+          Get.snackbar(
+            "Success ✅",
+            "Push notification sent to $patientName",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+            colorText: const Color(0xFFF6F3E7),
+          );
+        } else {
+          throw Exception(result['result']['message'] ?? 'Unknown error');
+        }
+      } else {
+        throw Exception('Failed to send notification: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error sending push notification: $e');
+      Get.snackbar(
+        "Error",
+        "Failed to send notification to patient: ${e.toString()}",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red.withOpacity(0.7),
+        colorText: Colors.white,
       );
     }
   }

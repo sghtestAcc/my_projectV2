@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -19,18 +20,39 @@ import 'package:my_project/utils/tutorial_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
   await dotenv.load();
+  
+  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  
+  // Initialize Notification Service (includes FCM setup)
+  await NotificationService.initialize();
+  
+  // ✅ NEW: Set up background message handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
   final prefs = await SharedPreferences.getInstance();
-  final savedLocaleCode =
-      prefs.getString('selectedLocale') ?? 'en'; // default to English
+  final savedLocaleCode = prefs.getString('selectedLocale') ?? 'en';
   final savedLocale = Locale(savedLocaleCode);
 
   Get.put(AccountController());
   Get.put(AuthenticationRepository());
 
   runApp(MyApp(savedLocale));
+}
+
+// ✅ NEW: Handle background messages
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('📨 Background message received: ${message.messageId}');
+  
+  // You can process the message here if needed
+  if (message.notification != null) {
+    print('🔔 Background notification: ${message.notification!.title}');
+  }
 }
 
 Future<void> checkFirstLaunch(
