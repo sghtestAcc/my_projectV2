@@ -11,6 +11,9 @@ class Medication {
   final String? name;
   final String? instructions;
   final String? details;
+  final DateTime? addedDate;
+  final DateTime? refillNotificationDate;
+  final bool? refillNotificationSent; 
 
   const Medication({
     this.id,
@@ -23,6 +26,9 @@ class Medication {
     this.name,
     this.instructions,
     this.details,
+    this.addedDate,
+    this.refillNotificationDate,
+    this.refillNotificationSent,
   });
 
   Medication copy({
@@ -36,6 +42,9 @@ class Medication {
     String? name,
     String? instructions,
     String? details,
+    DateTime? addedDate,
+    DateTime? refillNotificationDate,
+    bool? refillNotificationSent,
   }) =>
       Medication(
         id: id ?? this.id,
@@ -48,6 +57,9 @@ class Medication {
         name: name ?? this.name,
         instructions: instructions ?? this.instructions,
         details: details ?? this.details,
+        addedDate: addedDate ?? this.addedDate, 
+        refillNotificationDate: refillNotificationDate ?? this.refillNotificationDate,
+        refillNotificationSent: refillNotificationSent ?? this.refillNotificationSent,
       );
 
   toJson() {
@@ -61,6 +73,9 @@ class Medication {
       'Name' : name,
       'Instructions': instructions,
       'Details': details,
+      'AddedDate': addedDate?.toIso8601String(), 
+      'RefillNotificationDate': refillNotificationDate?.toIso8601String(),
+      'RefillNotificationSent': refillNotificationSent ?? false,
     };
   }
 
@@ -80,6 +95,9 @@ class Medication {
       name: data["Name"],
       instructions: data["Instructions"],
       details: data["Details"],
+      addedDate: data["AddedDate"] != null ? DateTime.parse(data["AddedDate"]) : null,
+      refillNotificationDate: data["RefillNotificationDate"] != null ? DateTime.parse(data["RefillNotificationDate"]) : null,
+      refillNotificationSent: data["RefillNotificationSent"] ?? false,
     );
   }
 }

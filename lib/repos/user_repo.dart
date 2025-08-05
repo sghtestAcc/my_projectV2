@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,19 +46,40 @@ class UserRepository extends GetxController {
 
   Future<GraceUser?> getUserByEmail(String email) async {
     try {
-      final snapshot = await FirebaseFirestore.instance
+      print('🔍 Searching for user with email: $email');
+      
+      // Convert to lowercase for consistent searching
+      final emailLower = email.toLowerCase().trim();
+      
+      // Query the users collection for matching email
+      final snapshot = await firestore
           .collection('users')
-          .where('Email', isEqualTo: email)
-          .limit(1)
+          .where('Email', isEqualTo: emailLower)  // Case-sensitive search first
           .get();
-
+      
       if (snapshot.docs.isNotEmpty) {
+        print('✅ Found user with exact email match');
         return GraceUser.fromSnapshot(snapshot.docs.first);
-      } else {
-        return null;
       }
+      
+      // If no exact match, try case-insensitive search
+      final allUsersSnapshot = await firestore.collection('users').get();
+      
+      for (var doc in allUsersSnapshot.docs) {
+        final userData = doc.data();
+        final userEmail = userData['Email']?.toString().toLowerCase().trim();
+        
+        if (userEmail == emailLower) {
+          print('✅ Found user with case-insensitive email match');
+          return GraceUser.fromSnapshot(doc);
+        }
+      }
+      
+      print('❌ No user found with email: $email');
+      return null;
+      
     } catch (e) {
-      print('Error fetching user by email: $e');
+      print('❌ Error searching for user by email: $e');
       return null;
     }
   }
@@ -433,6 +456,49 @@ class UserRepository extends GetxController {
     }
   }
 
+  // ✅ NEW: Schedule refill notification when medication is added
+Future<void> scheduleRefillNotification({
+  required String medicationId,
+  required String patientId,
+  required String quantity,
+  required String instructions,
+  required String medicationName,
+  required String caregiverUid,
+}) async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('User not authenticated');
+    
+    final idToken = await user.getIdToken();
+    
+    final response = await http.post(
+      Uri.parse('https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/scheduleRefillNotification'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode({
+        'medicationId': medicationId,
+        'patientId': patientId,
+        'quantity': quantity,
+        'instructions': instructions,
+        'medicationName': medicationName,
+        'caregiverUid': caregiverUid,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      print('✅ Refill notification scheduled: ${result['result']['message']}');
+    } else {
+      throw Exception('Failed to schedule refill notification: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('❌ Error scheduling refill notification: $e');
+    rethrow;
+  }
+}
+
   Future<void> deleteBothUserQuestions(
     BuildContext context,
     String email,
@@ -789,4 +855,47 @@ Future<void> createMedicationNotification(
   //     return Notifications.fromSnapshot(documentSnapshot);
   //   });
   // }
+  // ✅ NEW: Test refill notification
+Future<void> testRefillNotification() async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('User not authenticated');
+    
+    final idToken = await user.getIdToken();
+    
+    final response = await http.post(
+      Uri.parse('https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/testRefillNotification'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode({}),
+    );
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      print('✅ Test refill notification result: ${result['result']['message']}');
+      
+      Get.snackbar(
+        "🧪 Test Successful",
+        result['result']['message'],
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+        colorText: const Color(0xFFF6F3E7),
+        duration: Duration(seconds: 3),
+      );
+    } else {
+      throw Exception('Failed to test refill notification: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('❌ Error testing refill notification: $e');
+    Get.snackbar(
+      "❌ Test Failed",
+      "Error: ${e.toString()}",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.red.withOpacity(0.7),
+      colorText: Colors.white,
+    );
+  }
+}
 }

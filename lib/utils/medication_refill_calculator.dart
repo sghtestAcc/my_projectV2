@@ -45,7 +45,7 @@ class MedicationRefillCalculator {
     return null;
   }
 
-  /// Parse daily dosage from instructions
+  /// Parse daily dosage from instructions with enhanced patterns
   static double? _parseDailyDosage(String instructions) {
     final instructionsLower = instructions.toLowerCase();
     
@@ -84,7 +84,7 @@ class MedicationRefillCalculator {
       return double.tryParse(match.group(1)!);
     }
 
-    // Pattern 5: "once daily" or "twice daily"
+    // Pattern 5: Common phrases
     if (instructionsLower.contains('once daily') || instructionsLower.contains('once a day')) {
       return 1.0;
     }
@@ -93,6 +93,17 @@ class MedicationRefillCalculator {
     }
     if (instructionsLower.contains('three times daily') || instructionsLower.contains('thrice daily')) {
       return 3.0;
+    }
+    if (instructionsLower.contains('four times daily')) {
+      return 4.0;
+    }
+
+    // Pattern 6: "every X days" (less frequent dosing)
+    final pattern6 = RegExp(r'every\s+(\d+)\s+days?');
+    match = pattern6.firstMatch(instructionsLower);
+    if (match != null) {
+      final dayInterval = int.tryParse(match.group(1)!) ?? 1;
+      return 1.0 / dayInterval; // e.g., every 3 days = 0.33 per day
     }
 
     // Default: assume once daily if unclear
@@ -114,5 +125,18 @@ class MedicationRefillCalculator {
 
     final daysSupply = (quantityNumber / dailyDosage).floor();
     return 'With $quantity and taking $dailyDosage per day, medication will last $daysSupply days. Refill notification set for ${daysSupply - 2} days from now.';
+  }
+
+  /// Calculate exact days until medication runs out
+  static int? calculateDaysUntilEmpty({
+    required String quantity,
+    required String instructions,
+  }) {
+    final quantityNumber = _extractQuantityNumber(quantity);
+    final dailyDosage = _parseDailyDosage(instructions);
+    
+    if (quantityNumber == null || dailyDosage == null) return null;
+    
+    return (quantityNumber / dailyDosage).floor();
   }
 }

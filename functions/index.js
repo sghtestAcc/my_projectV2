@@ -6,6 +6,7 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
+const functions = require("firebase-functions");
 require("dotenv").config();
 
 console.log("🔧 Environment check:");
@@ -142,90 +143,79 @@ exports.processVerification = onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Headers", "Content-Type");
   
   if (!requestId || !action) {
-    return res.status(400).send(createErrorHTML("Invalid request parameters"));
+    return res.status(400).send(createErrorHTML("Missing required parameters."));
   }
 
   try {
-    const db = admin.firestore();
-    const doc = await db.collection("verification_requests").doc(requestId).get();
+    // Get the verification request
+    const requestDoc = await firestore
+      .collection("verification_requests")
+      .doc(requestId)
+      .get();
 
-    if (!doc.exists) {
-      return res.send(createErrorHTML("Verification request not found or has expired."));
+    if (!requestDoc.exists) {
+      return res.status(404).send(createErrorHTML("Verification request not found."));
     }
 
-    const data = doc.data();
-
-    if (data.status !== "pending") {
-      return res.send(createInfoHTML(`Request already ${data.status}`, 
-        `This verification request has already been ${data.status}.`));
-    }
+    const data = requestDoc.data();
 
     // Check if request has expired
-    const now = new Date();
-    const expiresAt = data.expiresAt?.toDate();
-    if (expiresAt && now > expiresAt) {
-      return res.send(createErrorHTML("This verification link has expired."));
+    const now = admin.firestore.Timestamp.now();
+    if (data.expiresAt && data.expiresAt < now) {
+      return res.status(410).send(createErrorHTML("This verification request has expired."));
+    }
+
+    // Check if already processed
+    if (data.status !== "pending") {
+      return res.status(409).send(createInfoHTML(
+        "Already Processed",
+        `This request has already been ${data.status}.`
+      ));
     }
 
     if (action === "accept") {
-      // ✅ Accept: Add patient to caregiver's list
-      await db.collection("users").doc(data.caregiverUid).collection("patients").add({
-        id: data.patientUid,
-        email: data.patientEmail,
-        name: data.patientName,
-        addedAt: admin.firestore.FieldValue.serverTimestamp(),
-        verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
-        verifiedViaEmail: true,
-      });
+      // Add patient to caregiver's patient list
+      await firestore
+        .collection("users")
+        .doc(data.caregiverUid)
+        .collection("patients")
+        .add({
+          id: data.patientUid,
+          name: data.patientName,
+          email: data.patientEmail,
+          addedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
-      // Update verification request status
-      await doc.ref.update({
+      // Update request status
+      await requestDoc.ref.update({
         status: "accepted",
-        acceptedAt: admin.firestore.FieldValue.serverTimestamp(),
+        processedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // 🔔 Create notification for caregiver
-      await createCaregiverNotification(data.caregiverUid, {
-        title: "✅ Patient Added Successfully",
-        body: `${data.patientName} has accepted your caregiver request and has been added to your patient list.`,
-        type: "patient_accepted",
-        patientId: data.patientUid,
-        patientName: data.patientName,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
-      });
-
-      console.log(`✅ Patient ${data.patientName} accepted caregiver ${data.caregiverName}`);
+      console.log(`Verification accepted: Patient ${data.patientName} added to caregiver ${data.caregiverName}`);
 
       return res.send(createSuccessHTML(
-        "✅ Verification Successful!",
-        `You have been successfully added as a patient under <strong>${data.caregiverName}</strong>'s care.<br><br>
-        Your caregiver can now help manage your medications through the Grace App.<br><br>
-        You can now close this window and use the Grace App together.`
+        "Verification Successful!",
+        "You have been successfully added as a patient under " + 
+        `<strong>${data.caregiverName}</strong>'s care.<br><br>` +
+        "Your caregiver can now help manage your medications through the Grace App.<br><br>" +
+        "You can now close this window and use the Grace App together."
       ));
 
     } else if (action === "reject") {
-      // ❌ Reject: Update status only
-      await doc.ref.update({
+      // Update request status
+      await requestDoc.ref.update({
         status: "rejected",
-        rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
+        processedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // 🔔 Create notification for caregiver
-      await createCaregiverNotification(data.caregiverUid, {
-        title: "❌ Patient Request Declined",
-        body: `${data.patientName} has declined your caregiver request.`,
-        type: "patient_rejected",
-        patientId: data.patientUid,
-        patientName: data.patientName,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
-      });
-
-      console.log(`❌ Patient ${data.patientName} rejected caregiver ${data.caregiverName}`);
+      console.log(`Verification rejected: ${data.patientName} declined caregiver ${data.caregiverName}`);
 
       return res.send(createInfoHTML(
-        "❌ Request Declined",
-        `You have declined the caregiver request from <strong>${data.caregiverName}</strong>.<br><br>
-        No changes have been made to your account. You can safely close this window.`
+        "Request Declined",
+        "You have declined the caregiver request from " +
+        `<strong>${data.caregiverName}</strong>.<br><br>` +
+        "No changes have been made to your account. You can safely close this window."
       ));
 
     } else {
@@ -233,7 +223,7 @@ exports.processVerification = onRequest(async (req, res) => {
     }
 
   } catch (error) {
-    console.error("❌ Error processing verification:", error);
+    console.error("Error processing verification:", error);
     return res.status(500).send(createErrorHTML(
       "An error occurred while processing your request. Please try again."
     ));
@@ -815,72 +805,85 @@ exports.sendVerificationEmail = onDocumentCreated(
 exports.processVerification = onRequest(async (req, res) => {
   const {requestId, action} = req.query;
 
+  // Set CORS headers
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, POST");
   res.set("Access-Control-Allow-Headers", "Content-Type");
   
   if (!requestId || !action) {
-    return res.status(400).send(createErrorHTML("Invalid request parameters"));
+    return res.status(400).send(createErrorHTML("Missing required parameters."));
   }
 
   try {
-    const doc = await firestore.collection("verification_requests").doc(requestId).get();
+    // Get the verification request
+    const requestDoc = await firestore
+      .collection("verification_requests")
+      .doc(requestId)
+      .get();
 
-    if (!doc.exists) {
-      return res.send(createErrorHTML("Verification request not found or has expired."));
+    if (!requestDoc.exists) {
+      return res.status(404).send(createErrorHTML("Verification request not found."));
     }
 
-    const data = doc.data();
+    const data = requestDoc.data();
 
+    // Check if request has expired
+    const now = admin.firestore.Timestamp.now();
+    if (data.expiresAt && data.expiresAt < now) {
+      return res.status(410).send(createErrorHTML("This verification request has expired."));
+    }
+
+    // Check if already processed
     if (data.status !== "pending") {
-      return res.send(createInfoHTML(`Request already ${data.status}`, 
-        `This verification request has already been ${data.status}.`));
-    }
-
-    const now = new Date();
-    const expiresAt = data.expiresAt?.toDate();
-    if (expiresAt && now > expiresAt) {
-      return res.send(createErrorHTML("This verification link has expired."));
+      return res.status(409).send(createInfoHTML(
+        "Already Processed",
+        `This request has already been ${data.status}.`
+      ));
     }
 
     if (action === "accept") {
-      await firestore.collection("users").doc(data.caregiverUid).collection("patients").add({
-        id: data.patientUid,
-        email: data.patientEmail,
-        name: data.patientName,
-        addedAt: admin.firestore.FieldValue.serverTimestamp(),
-        verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
-        verifiedViaEmail: true,
-      });
+      // Add patient to caregiver's patient list
+      await firestore
+        .collection("users")
+        .doc(data.caregiverUid)
+        .collection("patients")
+        .add({
+          id: data.patientUid,
+          name: data.patientName,
+          email: data.patientEmail,
+          addedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
-      await doc.ref.update({
+      // Update request status
+      await requestDoc.ref.update({
         status: "accepted",
-        acceptedAt: admin.firestore.FieldValue.serverTimestamp(),
+        processedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      console.log(`✅ Patient ${data.patientName} accepted caregiver ${data.caregiverName}`);
+      console.log(`Verification accepted: Patient ${data.patientName} added to caregiver ${data.caregiverName}`);
 
       return res.send(createSuccessHTML(
-        "✅ Verification Successful!",
+        "Verification Successful!",
         "You have been successfully added as a patient under " + 
-              `<strong>${data.caregiverName}</strong>'s care.<br><br>
-        Your caregiver can now help manage your medications through the Grace App.<br><br>
-        You can now close this window and use the Grace App together.`
+        `<strong>${data.caregiverName}</strong>'s care.<br><br>` +
+        "Your caregiver can now help manage your medications through the Grace App.<br><br>" +
+        "You can now close this window and use the Grace App together."
       ));
 
     } else if (action === "reject") {
-      await doc.ref.update({
+      // Update request status
+      await requestDoc.ref.update({
         status: "rejected",
-        rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
+        processedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      console.log(`❌ Patient ${data.patientName} rejected caregiver ${data.caregiverName}`);
+      console.log(`Verification rejected: ${data.patientName} declined caregiver ${data.caregiverName}`);
 
       return res.send(createInfoHTML(
-        "❌ Request Declined",
-        "You have declined the caregiver request from" +
-              `<strong>${data.caregiverName}</strong>.<br><br>
-        No changes have been made to your account. You can safely close this window.`
+        "Request Declined",
+        "You have declined the caregiver request from " +
+        `<strong>${data.caregiverName}</strong>.<br><br>` +
+        "No changes have been made to your account. You can safely close this window."
       ));
 
     } else {
@@ -888,7 +891,7 @@ exports.processVerification = onRequest(async (req, res) => {
     }
 
   } catch (error) {
-    console.error("❌ Error processing verification:", error);
+    console.error("Error processing verification:", error);
     return res.status(500).send(createErrorHTML(
       "An error occurred while processing your request. Please try again."
     ));
@@ -896,6 +899,7 @@ exports.processVerification = onRequest(async (req, res) => {
 });
 
 // Helper functions for HTML responses
+// ✅ UPDATED: Remove emojis from email HTML template
 function createEmailHTML({patientName, caregiverName, caregiverEmail, acceptLink, rejectLink}) {
   return `
     <!DOCTYPE html>
@@ -926,15 +930,15 @@ function createEmailHTML({patientName, caregiverName, caregiverEmail, acceptLink
     <body>
         <div class="container">
             <div class="header">
-                <h1>🏥 Grace App</h1>
+                <h1>Grace App</h1>
                 <h2>Caregiver Verification Request</h2>
             </div>
             <div class="content">
                 <h2>Hello ${patientName},</h2>
                 <p>You have received a caregiver verification request from <strong>${caregiverName}</strong> (${caregiverEmail}).</p>
                 <div class="button-container">
-                    <a href="${acceptLink}" class="button accept-button">✅ Accept Caregiver</a>
-                    <a href="${rejectLink}" class="button reject-button">❌ Reject Request</a>
+                    <a href="${acceptLink}" class="button accept-button">Accept Caregiver</a>
+                    <a href="${rejectLink}" class="button reject-button">Reject Request</a>
                 </div>
                 <p>Best regards,<br><strong>Grace App Team</strong></p>
             </div>
@@ -944,6 +948,7 @@ function createEmailHTML({patientName, caregiverName, caregiverEmail, acceptLink
   `;
 }
 
+// ✅ UPDATED: Remove emojis from success HTML template
 function createSuccessHTML(title, message) {
   return `
     <!DOCTYPE html>
@@ -953,17 +958,36 @@ function createSuccessHTML(title, message) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
         <style>
-            body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #0CE25C 0%, #9EE8BF 100%); margin: 0; padding: 50px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-            .container { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; max-width: 500px; }
-            .success-icon { font-size: 80px; color: #0CE25C; margin-bottom: 20px; }
+            body { 
+                font-family: Arial, sans-serif; 
+                background: linear-gradient(135deg, #0CE25C 0%, #9EE8BF 100%); 
+                margin: 0; padding: 50px; min-height: 100vh; 
+                display: flex; align-items: center; justify-content: center; 
+            }
+            .container { 
+                background: white; padding: 40px; border-radius: 20px; 
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; 
+                max-width: 500px; 
+            }
+            .success-icon { 
+                font-size: 80px; 
+                color: #0CE25C; 
+                margin-bottom: 20px; 
+                font-weight: bold;
+            }
             h1 { color: #333; margin-bottom: 20px; }
             p { color: #666; font-size: 16px; line-height: 1.6; }
-            .grace-logo { width: 80px; height: 80px; margin: 20px auto; background-color: #0CE25C; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; color: black; }
+            .grace-logo { 
+                width: 80px; height: 80px; margin: 20px auto; 
+                background-color: #0CE25C; border-radius: 50%; 
+                display: flex; align-items: center; justify-content: center; 
+                font-weight: bold; font-size: 24px; color: black; 
+            }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="success-icon">✅</div>
+            <div class="success-icon">SUCCESS</div>
             <div class="grace-logo">G</div>
             <h1>${title}</h1>
             <p>${message}</p>
@@ -973,6 +997,7 @@ function createSuccessHTML(title, message) {
   `;
 }
 
+// ✅ UPDATED: Remove emojis from error HTML template
 function createErrorHTML(message) {
   return `
     <!DOCTYPE html>
@@ -982,16 +1007,30 @@ function createErrorHTML(message) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Error - Grace App</title>
         <style>
-            body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%); margin: 0; padding: 50px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-            .container { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; max-width: 500px; }
-            .error-icon { font-size: 80px; color: #ff4757; margin-bottom: 20px; }
+            body { 
+                font-family: Arial, sans-serif; 
+                background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%); 
+                margin: 0; padding: 50px; min-height: 100vh; 
+                display: flex; align-items: center; justify-content: center; 
+            }
+            .container { 
+                background: white; padding: 40px; border-radius: 20px; 
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; 
+                max-width: 500px; 
+            }
+            .error-icon { 
+                font-size: 80px; 
+                color: #ff4757; 
+                margin-bottom: 20px; 
+                font-weight: bold;
+            }
             h1 { color: #333; margin-bottom: 20px; }
             p { color: #666; font-size: 16px; line-height: 1.6; }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="error-icon">❌</div>
+            <div class="error-icon">ERROR</div>
             <h1>Error</h1>
             <p>${message}</p>
         </div>
@@ -1000,6 +1039,7 @@ function createErrorHTML(message) {
   `;
 }
 
+// ✅ UPDATED: Remove emojis from info HTML template
 function createInfoHTML(title, message) {
   return `
     <!DOCTYPE html>
@@ -1009,16 +1049,30 @@ function createInfoHTML(title, message) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
         <style>
-            body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); margin: 0; padding: 50px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-            .container { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; max-width: 500px; }
-            .info-icon { font-size: 80px; color: #74b9ff; margin-bottom: 20px; }
+            body { 
+                font-family: Arial, sans-serif; 
+                background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); 
+                margin: 0; padding: 50px; min-height: 100vh; 
+                display: flex; align-items: center; justify-content: center; 
+            }
+            .container { 
+                background: white; padding: 40px; border-radius: 20px; 
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; 
+                max-width: 500px; 
+            }
+            .info-icon { 
+                font-size: 80px; 
+                color: #74b9ff; 
+                margin-bottom: 20px; 
+                font-weight: bold;
+            }
             h1 { color: #333; margin-bottom: 20px; }
             p { color: #666; font-size: 16px; line-height: 1.6; }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="info-icon">ℹ️</div>
+            <div class="info-icon">INFO</div>
             <h1>${title}</h1>
             <p>${message}</p>
         </div>
@@ -1100,7 +1154,83 @@ exports.testPatientNotification = onCall(async (request) => {
   }
 });
 
-// ✅ Add these helper functions at the end of your index.js file
+// ✅ FIXED: Test function with proper data
+exports.testRefillNotification = onCall(async (request) => {
+  if (!request.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
+  }
+
+  try {
+    console.log("🧪 Testing refill notification system...");
+
+    // ✅ Use actual authenticated user data
+    const currentUserUid = request.auth.uid;
+    
+    // Get the current user's data
+    const userDoc = await firestore.collection("users").doc(currentUserUid).get();
+    const userData = userDoc.data();
+    
+    if (!userData) {
+      throw new functions.https.HttpsError("not-found", "User data not found");
+    }
+
+    // ✅ Create test notification with real user data
+    const testNotification = {
+      medicationId: "test-med-123",
+      patientId: currentUserUid,
+      caregiverUid: currentUserUid, // ✅ Use same user for testing
+      medicationName: "Test Medication",
+      quantity: "2 tablets",
+      instructions: "take 1 tablet twice daily",
+      scheduledDate: admin.firestore.Timestamp.now(), // Immediate
+      sent: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      daysSupply: 1,
+      dailyDosage: 2
+    };
+
+    // Add to refill_notifications collection
+    const docRef = await firestore.collection("refill_notifications").add(testNotification);
+    
+    console.log("✅ Test refill notification created:", docRef.id);
+
+    // ✅ Try to send notifications (will fail gracefully if no FCM token)
+    try {
+      await sendRefillNotificationToPatient(testNotification);
+      console.log("✅ Patient notification sent");
+    } catch (error) {
+      console.log("⚠️ Patient notification failed (no FCM token?):", error.message);
+    }
+
+    try {
+      await sendRefillNotificationToCaregiver(testNotification);
+      console.log("✅ Caregiver notification sent");
+    } catch (error) {
+      console.log("⚠️ Caregiver notification failed (no FCM token?):", error.message);
+    }
+
+    // Mark as sent
+    await docRef.update({
+      sent: true,
+      sentAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    return {
+      success: true,
+      message: "Test refill notification created successfully! Check Firestore for the document.",
+      notificationId: docRef.id,
+      userId: currentUserUid,
+      userData: {
+        name: userData.FullName || "Unknown",
+        email: userData.Email || "Unknown"
+      }
+    };
+
+  } catch (error) {
+    console.error("❌ Error testing refill notification:", error);
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+});
 
 // Helper function to create caregiver notifications
 async function createCaregiverNotification(caregiverUid, notificationData) {
@@ -1130,4 +1260,257 @@ function calculateNextNotification(timeString) {
   }
   
   return nextNotification.toISOString();
+}
+
+// ✅ NEW: Schedule refill notification when medication is added
+exports.scheduleRefillNotification = onCall(async (request) => {
+  if (!request.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
+  }
+
+  const {medicationId, patientId, quantity, instructions, medicationName, caregiverUid} = request.data;
+
+  try {
+    // Calculate refill notification date using the same logic as Flutter
+    const quantityNumber = extractQuantityNumber(quantity);
+    const dailyDosage = parseDailyDosage(instructions);
+    
+    if (!quantityNumber || !dailyDosage) {
+      throw new functions.https.HttpsError("invalid-argument", "Could not parse medication dosage");
+    }
+
+    const daysSupply = Math.floor(quantityNumber / dailyDosage);
+    const notificationDays = daysSupply - 2; // 2 days before running out
+    
+    const refillDate = new Date();
+    refillDate.setDate(refillDate.getDate() + Math.max(notificationDays, 0));
+
+    // Schedule the refill notification
+    await firestore.collection("refill_notifications").add({
+      medicationId: medicationId,
+      patientId: patientId,
+      caregiverUid: caregiverUid,
+      medicationName: medicationName,
+      quantity: quantity,
+      instructions: instructions,
+      scheduledDate: admin.firestore.Timestamp.fromDate(refillDate),
+      sent: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      daysSupply: daysSupply,
+      dailyDosage: dailyDosage
+    });
+
+    console.log(`✅ Refill notification scheduled for ${medicationName} on ${refillDate.toISOString()}`);
+    
+    return {
+      success: true,
+      refillDate: refillDate.toISOString(),
+      daysSupply: daysSupply,
+      message: `Refill notification scheduled for ${daysSupply - 2} days from now`
+    };
+
+  } catch (error) {
+    console.error("❌ Error scheduling refill notification:", error);
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+});
+
+// ✅ NEW: Process refill notifications (runs every hour)
+exports.processRefillNotifications = onSchedule("every 1 hours", async () => {
+  const now = admin.firestore.Timestamp.now();
+  
+  console.log(`🔍 Checking for refill notifications at ${new Date().toISOString()}`);
+
+  try {
+    // Get all pending refill notifications that are due
+    const snapshot = await firestore
+      .collection("refill_notifications")
+      .where("sent", "==", false)
+      .where("scheduledDate", "<=", now)
+      .get();
+
+    console.log(`📋 Found ${snapshot.docs.length} pending refill notifications`);
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      
+      try {
+        // Send notification to patient
+        await sendRefillNotificationToPatient(data);
+        
+        // Send notification to caregiver
+        await sendRefillNotificationToCaregiver(data);
+        
+        // Mark as sent
+        await doc.ref.update({
+          sent: true,
+          sentAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log(`✅ Refill notification sent for medication: ${data.medicationName}`);
+
+      } catch (error) {
+        console.error(`❌ Error sending refill notification for ${data.medicationName}:`, error);
+        
+        // Mark as failed but don't delete - will retry next hour
+        await doc.ref.update({
+          lastError: error.message,
+          errorCount: (data.errorCount || 0) + 1
+        });
+      }
+    }
+
+  } catch (error) {
+    console.error("❌ Error processing refill notifications:", error);
+  }
+});
+
+// Helper function to send refill notification to patient
+async function sendRefillNotificationToPatient(notificationData) {
+  try {
+    // Get patient's FCM token
+    const patientDoc = await firestore.collection("users").doc(notificationData.patientId).get();
+    const patientData = patientDoc.data();
+    
+    if (!patientData) {
+      throw new Error(`Patient not found: ${notificationData.patientId}`);
+    }
+    
+    if (!patientData.fcmToken) {
+      console.log(`⚠️ No FCM token found for patient: ${notificationData.patientId}`);
+      return { success: false, reason: "No FCM token" };
+    }
+
+    const message = {
+      token: patientData.fcmToken,
+      notification: {
+        title: `💊 Time to Refill ${notificationData.medicationName}`,
+        body: `Your ${notificationData.medicationName} is running low and needs to be refilled soon!`
+      },
+      data: {
+        type: "medication_refill",
+        medicationId: notificationData.medicationId,
+        medicationName: notificationData.medicationName,
+        patientId: notificationData.patientId
+      },
+      android: {
+        priority: "high",
+        notification: {
+          channelId: "medication_channel",
+          priority: "high",
+          defaultSound: true,
+          defaultVibrateTimings: true
+        }
+      }
+    };
+
+    await messaging.send(message);
+    console.log(`✅ Refill notification sent to patient: ${notificationData.patientId}`);
+    return { success: true };
+
+  } catch (error) {
+    console.error(`❌ Error sending refill notification to patient:`, error);
+    throw error;
+  }
+}
+
+// Helper function to send refill notification to caregiver
+async function sendRefillNotificationToCaregiver(notificationData) {
+  try {
+    // Get caregiver's FCM token
+    const caregiverDoc = await firestore.collection("users").doc(notificationData.caregiverUid).get();
+    const caregiverData = caregiverDoc.data();
+    
+    if (!caregiverData) {
+      throw new Error(`Caregiver not found: ${notificationData.caregiverUid}`);
+    }
+    
+    if (!caregiverData.fcmToken) {
+      console.log(`⚠️ No FCM token found for caregiver: ${notificationData.caregiverUid}`);
+      return { success: false, reason: "No FCM token" };
+    }
+
+    // Get patient name
+    const patientDoc = await firestore.collection("users").doc(notificationData.patientId).get();
+    const patientData = patientDoc.data();
+    const patientName = patientData?.FullName || "Patient";
+
+    const message = {
+      token: caregiverData.fcmToken,
+      notification: {
+        title: `🔔 ${patientName} Needs Medication Refill`,
+        body: `${patientName}'s ${notificationData.medicationName} is running low and needs to be refilled!`
+      },
+      data: {
+        type: "patient_medication_refill",
+        medicationId: notificationData.medicationId,
+        medicationName: notificationData.medicationName,
+        patientId: notificationData.patientId,
+        patientName: patientName
+      },
+      android: {
+        priority: "high",
+        notification: {
+          channelId: "medication_channel",
+          priority: "high",
+          defaultSound: true,
+          defaultVibrateTimings: true
+        }
+      }
+    };
+
+    await messaging.send(message);
+    console.log(`✅ Refill notification sent to caregiver: ${notificationData.caregiverUid}`);
+    return { success: true };
+
+  } catch (error) {
+    console.error(`❌ Error sending refill notification to caregiver:`, error);
+    throw error;
+  }
+}
+
+// Helper functions for parsing medication data
+function extractQuantityNumber(quantity) {
+  const regex = /(\d+)/;
+  const match = regex.exec(quantity.toLowerCase());
+  if (match) {
+    return parseInt(match[1]);
+  }
+  return null;
+}
+
+function parseDailyDosage(instructions) {
+  const instructionsLower = instructions.toLowerCase();
+  
+  // Pattern 1: "take X tablet(s) Y times a day"
+  let regex = /take\s+(\d+)\s+.*?(\d+)\s+times?\s+(?:a\s+)?day/;
+  let match = regex.exec(instructionsLower);
+  if (match) {
+    const tabletsPerDose = parseInt(match[1]) || 1;
+    const timesPerDay = parseInt(match[2]) || 1;
+    return tabletsPerDose * timesPerDay;
+  }
+
+  // Pattern 2: "X tablet(s) Y times daily"
+  regex = /(\d+)\s+.*?(\d+)\s+times?\s+daily/;
+  match = regex.exec(instructionsLower);
+  if (match) {
+    const tabletsPerDose = parseInt(match[1]) || 1;
+    const timesPerDay = parseInt(match[2]) || 1;
+    return tabletsPerDose * timesPerDay;
+  }
+
+  // Pattern 3: Common phrases
+  if (instructionsLower.includes("once daily") || instructionsLower.includes("once a day")) {
+    return 1;
+  }
+  if (instructionsLower.includes("twice daily") || instructionsLower.includes("twice a day")) {
+    return 2;
+  }
+  if (instructionsLower.includes("three times daily") || instructionsLower.includes("thrice daily")) {
+    return 3;
+  }
+
+  // Default
+  return 1;
 }

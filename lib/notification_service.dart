@@ -452,7 +452,7 @@ class NotificationService {
     }
   }
 
-  // ✅ NEW: Save FCM token to user's profile
+  // ✅ FIXED: Complete FCM token saving in notification_service.dart
   static Future<void> _saveFCMTokenToUser(String token) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -462,9 +462,9 @@ class NotificationService {
             .doc(user.uid)
             .update({
           'fcmToken': token,
-          'lastTokenUpdate': FieldValue.serverTimestamp(),
+          'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
         });
-        print('✅ FCM token saved to user profile');
+        print('✅ FCM token saved to Firestore for user: ${user.uid}');
       }
     } catch (e) {
       print('❌ Error saving FCM token: $e');

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../components/navigation_drawer_new.dart';
 import 'package:my_project/utils/tutorial_manager.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+
+import '../../utils/medication_refill_calculator.dart';
 
 class PatientUploadMedsScreen extends StatefulWidget {
   final TextEditingController? imagetakenText;
@@ -296,6 +299,57 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
   void initState() {
     super.initState();
     _maybeStartTutorial();
+  }
+
+  Future<void> _scheduleRefillNotificationForMedication({
+    required String medicationId,
+    required String medicationName,
+    required String quantity,
+    required String instructions,
+  }) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+
+      // Find caregiver for this patient
+      final caregiverSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('patients', arrayContains: currentUser.uid)
+          .get();
+
+      String? caregiverUid;
+      if (caregiverSnapshot.docs.isNotEmpty) {
+        caregiverUid = caregiverSnapshot.docs.first.id;
+      }
+
+      if (caregiverUid != null) {
+        await userRepo.scheduleRefillNotification(
+          medicationId: medicationId,
+          patientId: currentUser.uid,
+          quantity: quantity,
+          instructions: instructions,
+          medicationName: medicationName,
+          caregiverUid: caregiverUid,
+        );
+        
+        // Show calculation info to user
+        final calculator = MedicationRefillCalculator.getCalculationDescription(
+          quantity: quantity,
+          instructions: instructions,
+        );
+        
+        Get.snackbar(
+          "🔔 Refill Notification Scheduled",
+          calculator,
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+          colorText: const Color(0xFFF6F3E7),
+          duration: Duration(seconds: 5),
+        );
+      }
+    } catch (e) {
+      print('❌ Error scheduling refill notification: $e');
+    }
   }
 
   @override

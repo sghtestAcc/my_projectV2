@@ -199,29 +199,56 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     );
   }
 
-  // ✅ Updated method to send email instead of in-app notification
+  // ✅ FIXED: Add currentUserUid definition
   Future<void> _sendVerificationEmail() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final email = _emailController.text.trim().toLowerCase();
-      final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+      // ✅ ADD THIS: Get current user UID
+      final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+      if (currentUserUid == null) {
+        throw Exception('User not authenticated');
+      }
 
+      final email = _emailController.text.trim().toLowerCase();
+      print('🔍 Searching for patient with email: $email');
+      
+      // ✅ Add manual Firestore query for debugging
+      final debugSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .get();
+      
+      print('📊 Total users in database: ${debugSnapshot.docs.length}');
+      
+      // Print all emails for debugging
+      for (var doc in debugSnapshot.docs) {
+        final userData = doc.data();
+        final userEmail = userData['Email'];
+        final loginType = userData['LoginType'];
+        print('👤 User: $userEmail, Type: $loginType');
+      }
+      
       // Check if patient exists with this email
       final patient = await userRepo.getUserByEmail(email);
       
       if (patient == null) {
+        print('❌ Patient not found with email: $email');
+        
         Get.snackbar(
-          "Error",
-          "No patient found with this email address.",
+          "Patient Not Found",
+          "No patient found with email: $email. Please check the email address and try again.",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red.withOpacity(0.7),
           colorText: Colors.white,
+          duration: Duration(seconds: 5),
         );
         return;
       }
+      
+      print('✅ Found patient: ${patient.name} (${patient.email})');
+      print('🔍 Patient login type: ${patient.loginType}');
 
       if (patient.loginType != LoginType.patient && patient.loginType != LoginType.dualAccount) {
         Get.snackbar(
@@ -250,7 +277,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       // Get caregiver info
       final caregiverDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(currentUserUid)
+          .doc(currentUserUid) // ✅ Now this is defined
           .get();
       
       final caregiverData = caregiverDoc.data();
@@ -262,7 +289,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       final verificationDoc = await FirebaseFirestore.instance
           .collection('verification_requests')
           .add({
-        'caregiverUid': currentUserUid,
+        'caregiverUid': currentUserUid, // ✅ Now this is defined
         'caregiverName': caregiverName,
         'caregiverEmail': caregiverEmail,
         'patientUid': patient.id,
