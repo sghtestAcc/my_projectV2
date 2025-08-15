@@ -46,7 +46,7 @@ class UserRepository extends GetxController {
 
   Future<GraceUser?> getUserByEmail(String email) async {
     try {
-      print('🔍 Searching for user with email: $email');
+      print('Searching for user with email: $email');
       
       // Convert to lowercase for consistent searching
       final emailLower = email.toLowerCase().trim();
@@ -58,7 +58,7 @@ class UserRepository extends GetxController {
           .get();
       
       if (snapshot.docs.isNotEmpty) {
-        print('✅ Found user with exact email match');
+        print('Found user with exact email match');
         return GraceUser.fromSnapshot(snapshot.docs.first);
       }
       
@@ -70,16 +70,16 @@ class UserRepository extends GetxController {
         final userEmail = userData['Email']?.toString().toLowerCase().trim();
         
         if (userEmail == emailLower) {
-          print('✅ Found user with case-insensitive email match');
+          print('Found user with case-insensitive email match');
           return GraceUser.fromSnapshot(doc);
         }
       }
       
-      print('❌ No user found with email: $email');
+      print('No user found with email: $email');
       return null;
       
     } catch (e) {
-      print('❌ Error searching for user by email: $e');
+      print('Error searching for user by email: $e');
       return null;
     }
   }
@@ -103,7 +103,7 @@ class UserRepository extends GetxController {
     }
     try {
       await firestore.collection("users").doc(uid).set(user.toJson());
-      print("✅ Firestore set completed");
+      print("Firestore set completed");
       Get.snackbar(AppLocalizations.of(context)!.snackbarCongrats,
           AppLocalizations.of(context)!.accountCreatedSuccess,
           snackPosition: SnackPosition.TOP,
@@ -393,7 +393,7 @@ class UserRepository extends GetxController {
         "RefillNotificationScheduled": true,
       });
 
-      // ✅ Schedule automatic refill notification
+      // Schedule automatic refill notification
       await _scheduleRefillNotificationForMedication(
         medicationId: medicationRef.id,
         medicationName: labels ?? 'Unknown Medication',
@@ -403,7 +403,7 @@ class UserRepository extends GetxController {
       );
 
       Get.snackbar(
-        "Success ✅",
+        "Success",
         "Medication added and refill notification scheduled!",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Color(0xFF35365D).withOpacity(0.5),
@@ -421,7 +421,6 @@ class UserRepository extends GetxController {
     }
   }
 
-  // ✅ Add this helper method to UserRepository
   Future<void> _scheduleRefillNotificationForMedication({
     required String medicationId,
     required String medicationName,
@@ -449,14 +448,14 @@ class UserRepository extends GetxController {
         quantity: quantity,
         instructions: instructions,
       );
-      print('📊 Refill calculation: $description');
+      print('Refill calculation: $description');
 
     } catch (e) {
-      print('❌ Error scheduling refill notification: $e');
+      print('Error scheduling refill notification: $e');
     }
   }
 
-  // ✅ NEW: Schedule refill notification when medication is added
+  // UPDATED: Complete scheduleRefillNotification method
 Future<void> scheduleRefillNotification({
   required String medicationId,
   required String patientId,
@@ -470,6 +469,10 @@ Future<void> scheduleRefillNotification({
     if (user == null) throw Exception('User not authenticated');
     
     final idToken = await user.getIdToken();
+    
+    print('Scheduling refill notification for: $medicationName');
+    print('Quantity: $quantity, Instructions: $instructions');
+    print('Patient: $patientId, Caregiver: $caregiverUid');
     
     final response = await http.post(
       Uri.parse('https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/scheduleRefillNotification'),
@@ -489,13 +492,37 @@ Future<void> scheduleRefillNotification({
 
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
-      print('✅ Refill notification scheduled: ${result['result']['message']}');
+      
+      // Log the scheduled time for verification
+      print('Refill notification scheduled successfully!');
+      print('Scheduled for: ${result['result']['scheduledFor']}');
+      print('Days supply: ${result['result']['daysSupply']}');
+      print('Current time: ${result['result']['currentTime']}');
+      
+      // Convert UTC time to local time for display
+      final scheduledUtc = DateTime.parse(result['result']['scheduledFor']);
+      final scheduledLocal = scheduledUtc.toLocal();
+      
+      Get.snackbar(
+        "Refill Reminder Set",
+        "Notification scheduled for ${scheduledLocal.toString().split('.')[0]} (local time)",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
+        colorText: const Color(0xFFF6F3E7),
+        duration: Duration(seconds: 4),
+      );
     } else {
       throw Exception('Failed to schedule refill notification: ${response.statusCode}');
     }
   } catch (e) {
-    print('❌ Error scheduling refill notification: $e');
-    rethrow;
+    print('Error scheduling refill notification: $e');
+    Get.snackbar(
+      "Scheduling Failed",
+      "Error: ${e.toString()}",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.red.withOpacity(0.7),
+      colorText: Colors.white,
+    );
   }
 }
 
@@ -711,11 +738,10 @@ Future<void> scheduleRefillNotification({
       final patientData =
           querySnapshot.docs.map((e) => Notifications.fromSnapshot(e)).toList();
       return patientData;
-    }).asStream(); // Convert the Future to a Stream
+    }).asStream(); 
   }
 
   //function to create notification
-  // Add this method to your UserRepository class
 Future<void> createMedicationNotification(
   String patientId,
   String title,
@@ -855,7 +881,7 @@ Future<void> createMedicationNotification(
   //     return Notifications.fromSnapshot(documentSnapshot);
   //   });
   // }
-  // ✅ NEW: Test refill notification
+  // NEW: Test refill notification
 Future<void> testRefillNotification() async {
   try {
     final user = FirebaseAuth.instance.currentUser;
@@ -874,10 +900,10 @@ Future<void> testRefillNotification() async {
 
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
-      print('✅ Test refill notification result: ${result['result']['message']}');
+      print('Test refill notification result: ${result['result']['message']}');
       
       Get.snackbar(
-        "🧪 Test Successful",
+        "Test Successful",
         result['result']['message'],
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
@@ -888,9 +914,9 @@ Future<void> testRefillNotification() async {
       throw Exception('Failed to test refill notification: ${response.statusCode}');
     }
   } catch (e) {
-    print('❌ Error testing refill notification: $e');
+    print('Error testing refill notification: $e');
     Get.snackbar(
-      "❌ Test Failed",
+      "Test Failed",
       "Error: ${e.toString()}",
       snackPosition: SnackPosition.TOP,
       backgroundColor: Colors.red.withOpacity(0.7),

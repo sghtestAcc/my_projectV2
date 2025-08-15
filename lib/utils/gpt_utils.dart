@@ -8,10 +8,10 @@ Future<String> translateWithGPT(String text,
     {String targetLanguage = "English"}) async {
   final String? apiKey = dotenv.env['OPENAI_API_KEY'];
   if (apiKey == null || apiKey.isEmpty) {
-    throw Exception('❌ OpenAI API key not found in .env file');
+    throw Exception('OpenAI API key not found in .env file');
   }
 
-  print("📤 Calling GPT to translate to $targetLanguage: $text");
+  print("Calling GPT to translate to $targetLanguage: $text");
 
   final response = await http.post(
     Uri.parse('https://api.openai.com/v1/chat/completions'),
@@ -36,10 +36,10 @@ Future<String> translateWithGPT(String text,
         utf8.decode(response.bodyBytes); // Handle UTF8 characters like Chinese
     final data = jsonDecode(decoded);
     final translatedText = data['choices'][0]['message']['content'].trim();
-    print("✅ Translated result: $translatedText");
+    print("Translated result: $translatedText");
     return translatedText;
   } else {
-    print("❌ Translation failed: ${response.statusCode} - ${response.body}");
+    print("Translation failed: ${response.statusCode} - ${response.body}");
     return text; // Fallback to original
   }
 }

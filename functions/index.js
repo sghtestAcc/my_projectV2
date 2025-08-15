@@ -8,6 +8,7 @@
  */
 const functions = require("firebase-functions");
 require("dotenv").config();
+const moment = require("moment-timezone");
 
 console.log("🔧 Environment check:");
 console.log("📧 GMAIL_EMAIL:", process.env.GMAIL_EMAIL ? "SET" : "MISSING");
@@ -21,21 +22,21 @@ const {setGlobalOptions} = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 
-// ✅ Initialize admin
+// Initialize admin
 if (admin.apps.length === 0) {
   admin.initializeApp();
 }
 
-// ✅ Direct firestore reference
+// Direct firestore reference
 const firestore = admin.firestore();
 const messaging = admin.messaging();
 
-// ✅ FIXED: Configure email transporter with better error handling
+// Configure email transporter with better error handling
 let transporter = null;
 
 try {
   if (!process.env.GMAIL_EMAIL || !process.env.GMAIL_PASSWORD) {
-    console.error("❌ Missing Gmail credentials in environment variables");
+    console.error("Missing Gmail credentials in environment variables");
   } else {
     transporter = nodemailer.createTransport({
       service: "gmail",
@@ -116,7 +117,7 @@ exports.sendVerificationEmail = onDocumentCreated(
       }
       
       await transporter.sendMail(mailOptions);
-      console.log("✅ Verification email sent to:", data.patientEmail);
+      console.log("Verification email sent to:", data.patientEmail);
       
       await event.data.ref.update({
         emailSent: true,
@@ -124,7 +125,7 @@ exports.sendVerificationEmail = onDocumentCreated(
       });
       
     } catch (error) {
-      console.error("❌ Error sending email:", error);
+      console.error("Error sending email:", error);
       await event.data.ref.update({
         emailSent: false,
         emailError: error.message
@@ -255,7 +256,7 @@ exports.scheduleMedicationNotification = onCall(async (request) => {
     // Create notification document
     const notificationId = admin.firestore().collection("notifications").doc().id;
     
-    await admin.firestore().collection("scheduled_notifications").doc(notificationId).set({
+    await admin.firestore().collection("scheduled_patient_notifications").doc(notificationId).set({
       id: notificationId,
       type: "medication_reminder",
       caregiverUid: caregiverUid,
@@ -269,7 +270,22 @@ exports.scheduleMedicationNotification = onCall(async (request) => {
       nextNotification: calculateNextNotification(notificationTime)
     });
 
-    console.log(`🔔 Medication reminder scheduled for ${patientName} at ${notificationTime}`);
+    // Immediately log the scheduling event
+    await firestore.collection("notification_logs").add({
+      notificationId: notificationId,
+      type: "medication_reminder",
+      caregiverUid: caregiverUid,
+      patientId: patientId,
+      patientName: patientName,
+      title: `Medication Reminder for ${patientName}`,
+      message: `Time to remind ${patientName} to take their medication!`,
+      scheduledTime: notificationTime,
+      status: "scheduled",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAtISO: new Date().toISOString()
+    });
+
+    console.log(`Medication reminder scheduled for ${patientName} at ${notificationTime}`);
 
     return { 
       success: true, 
@@ -283,48 +299,7 @@ exports.scheduleMedicationNotification = onCall(async (request) => {
   }
 });
 
-// 4. Trigger scheduled notifications (runs every minute)
-exports.triggerScheduledNotifications = onSchedule("every 1 minutes", async () => {
-  const now = new Date();
-  const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-  
-  console.log(`🕐 Checking for notifications at ${currentTime}`);
 
-  try {
-    // Find notifications that should be triggered
-    const snapshot = await admin.firestore()
-      .collection("scheduled_notifications")
-      .where("isActive", "==", true)
-      .where("scheduledTime", "==", currentTime)
-      .get();
-
-    const promises = [];
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      
-      // Create notification for caregiver
-      promises.push(
-        createCaregiverNotification(data.caregiverUid, {
-          title: data.title,
-          body: data.body,
-          type: "medication_reminder",
-          patientId: data.patientId,
-          patientName: data.patientName,
-          timestamp: admin.firestore.FieldValue.serverTimestamp()
-        })
-      );
-
-      console.log(`🔔 Triggered notification for ${data.patientName} to caregiver ${data.caregiverUid}`);
-    });
-
-    await Promise.all(promises);
-    console.log(`✅ Processed ${promises.length} notifications`);
-
-  } catch (error) {
-    console.error("❌ Error triggering notifications:", error);
-  }
-});
 
 // 5. Clean up expired verification requests (runs daily)
 exports.cleanupExpiredRequests = onSchedule("every 24 hours", async () => {
@@ -354,7 +329,7 @@ exports.cleanupExpiredRequests = onSchedule("every 24 hours", async () => {
   }
 });
 
-// ✅ NEW: Send push notification to patient
+//Send push notification to patient
 exports.sendMedicationReminderToPatient = onCall(async (request) => {
   if (!request.auth) {
     throw new Error("User must be authenticated");
@@ -384,7 +359,7 @@ exports.sendMedicationReminderToPatient = onCall(async (request) => {
     const notificationPayload = {
       token: fcmToken,
       notification: {
-        title: "💊 Medication Reminder",
+        title: "Medication Reminder",
         body: message || `Time to take your ${medicationName}!`,
       },
       data: {
@@ -410,7 +385,7 @@ exports.sendMedicationReminderToPatient = onCall(async (request) => {
     };
 
     const response = await messaging.send(notificationPayload);
-    console.log("✅ Push notification sent to patient:", response);
+    console.log("Push notification sent to patient:", response);
 
     return {
       success: true,
@@ -419,16 +394,16 @@ exports.sendMedicationReminderToPatient = onCall(async (request) => {
     };
 
   } catch (error) {
-    console.error("❌ Error sending push notification:", error);
+    console.error("Error sending push notification:", error);
     throw new Error(`Failed to send notification: ${error.message}`);
   }
 });
 
-// ✅ TEMPORARY: Update your Firebase Function for testing
+// Update your Firebase Function for testing
 exports.schedulePatientNotification = onCall(async (request) => {
-  // ✅ RESTORED: Require authentication
+  // Require authentication
   if (!request.auth) {
-    throw new Error("User must be authenticated");
+    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
   }
 
   const caregiverUid = request.auth.uid;
@@ -441,465 +416,373 @@ exports.schedulePatientNotification = onCall(async (request) => {
     frequency, 
     dayOfWeek,
     title,
-    message 
+    message,
+    timezone = "Asia/Singapore" // Default to Singapore timezone
   } = request.data;
 
   try {
-    console.log(`🔔 Creating scheduled notification for patient: ${patientName}`);
+    console.log(`Scheduling ${frequency} notification for patient: ${patientName}`);
+    console.log(`Scheduled time: ${scheduledTime} in timezone: ${timezone}`);
+    console.log(`Current UTC time: ${new Date().toISOString()}`);
+
+    // Use moment-timezone for proper timezone handling
+    const now = moment.utc();
+    const nextExecution = calculateNextExecutionWithTimezone(scheduledTime, frequency, dayOfWeek, timezone);
     
-    // ✅ RESTORED: Verify caregiver has access to this patient
-    const patientDoc = await firestore
-      .collection("users")
-      .doc(caregiverUid)
-      .collection("patients")
-      .where("id", "==", patientId)
-      .get();
+    console.log(`Next execution calculated: ${nextExecution.toISOString()}`);
+    console.log(`Time difference: ${(nextExecution.valueOf() - now.valueOf()) / (1000 * 60)} minutes`);
 
-    if (patientDoc.empty) {
-      throw new Error("Patient not found or access denied");
-    }
-
-    // Create scheduled notification document
-    const notificationData = {
+    console.log("📝 Creating notification document in collection: scheduled_patient_notifications");
+    
+    // Create notification document
+    const notificationDoc = await firestore.collection("scheduled_patient_notifications").add({
       caregiverUid: caregiverUid,
       patientId: patientId,
       patientName: patientName,
-      medicationName: medicationName || "medication",
-      scheduledTime: scheduledTime,
-      frequency: frequency,
-      dayOfWeek: dayOfWeek,
-      title: title || "💊 Medication Reminder",
+      medicationName: medicationName || "Medication",
+      title: title || `Medication Reminder for ${patientName}`,
       message: message || `Time to take your ${medicationName || "medication"}!`,
+      scheduledTime: scheduledTime, // Keep original time string
+      timezone: timezone, // Store the timezone
+      nextExecution: admin.firestore.Timestamp.fromDate(nextExecution.toDate()), // Use calculated UTC time
+      frequency: frequency,
+      dayOfWeek: dayOfWeek || null,
       isActive: true,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      nextExecution: calculateNextExecution(scheduledTime, frequency, dayOfWeek)
-    };
+      // Add debugging fields
+      createdAtISO: now.toISOString(),
+      nextExecutionISO: nextExecution.toISOString(),
+      timezoneInfo: timezone
+    });
 
-    console.log("📝 Notification data prepared:", JSON.stringify(notificationData, null, 2));
+    // Immediately log the scheduling event
+    await firestore.collection("notification_logs").add({
+      notificationId: notificationDoc.id,
+      type: "medication_reminder",
+      caregiverUid: caregiverUid,
+      patientId: patientId,
+      patientName: patientName,
+      title: title || `Medication Reminder for ${patientName}`,
+      message: message || `Time to take your ${medicationName || "medication"}!`,
+      scheduledTime: scheduledTime,
+      timezone: timezone,
+      frequency: frequency,
+      dayOfWeek: dayOfWeek || null,
+      status: "scheduled",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAtISO: now.toISOString(),
+      nextExecution: admin.firestore.Timestamp.fromDate(nextExecution.toDate()),
+      nextExecutionISO: nextExecution.toISOString()
+    });
 
-    const docRef = await firestore
-      .collection("scheduled_patient_notifications")
-      .add(notificationData);
-
-    console.log(`🔔 Scheduled notification created: ${docRef.id}`);
+    console.log(`Notification scheduled successfully with ID: ${notificationDoc.id}`);
+    console.log(`   Next execution: ${nextExecution.toISOString()}`);
+    console.log(`   Timezone: ${timezone}`);
+    console.log("✅ Document created in Firestore collection: scheduled_patient_notifications");
 
     return {
       success: true,
-      notificationId: docRef.id,
-      message: `${frequency} reminder scheduled for ${patientName} at ${scheduledTime}`,
-      nextExecution: notificationData.nextExecution
+      notificationId: notificationDoc.id,
+      nextExecution: nextExecution.toISOString(),
+      message: `${frequency} notification scheduled for ${patientName}`,
+      scheduledFor: nextExecution.toISOString(),
+      currentTime: now.toISOString(),
+      timezone: timezone
     };
 
   } catch (error) {
-    console.error("❌ Error scheduling patient notification:", error);
-    throw new Error(`Failed to schedule notification: ${error.message}`);
+    console.error("Error scheduling patient notification:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
-// calculateNextExecution function
-function calculateNextExecution(timeString, frequency, dayOfWeek) {
+// calculateNextExecution with proper timezone handling
+function calculateNextExecutionWithTimezone(timeString, frequency, dayOfWeek, timezone) {
   try {
-    const [hours, minutes] = timeString.split(":").map(Number);
-    const now = new Date();
-    const nextRun = new Date();
+    const now = moment.utc(); // Current UTC time
+    console.log(`Calculating next execution from current UTC time: ${now.toISOString()}`);
+    console.log(`Target timezone: ${timezone}`);
     
-    nextRun.setHours(hours, minutes, 0, 0);
+    // Parse time (assuming format "HH:MM")
+    const [hours, minutes] = timeString.split(":").map(num => parseInt(num, 10));
     
     if (frequency === "daily") {
-      if (nextRun <= now) {
-        nextRun.setDate(nextRun.getDate() + 1);
-      }
-    } else if (frequency === "weekly" && dayOfWeek) {
-      const currentDay = now.getDay() || 7;
-      let daysUntilTarget = (dayOfWeek - currentDay) % 7;
+      // Create a moment object in the target timezone for today
+      let nextExecution = moment.tz(timezone).set({hour: hours, minute: minutes, second: 0, millisecond: 0});
       
-      if (daysUntilTarget === 0 && nextRun <= now) {
+      // Convert to UTC for storage
+      let nextExecutionUTC = nextExecution.utc();
+      
+      // If the time has passed today in the target timezone, schedule for tomorrow
+      if (nextExecutionUTC.isSameOrBefore(now)) {
+        nextExecution = moment.tz(timezone).add(1, "day").set({hour: hours, minute: minutes, second: 0, millisecond: 0});
+        nextExecutionUTC = nextExecution.utc();
+      }
+      
+      console.log("Daily notification calculated:");
+      console.log(`   Local time (${timezone}): ${nextExecution.format("YYYY-MM-DD HH:mm:ss")}`);
+      console.log(`   UTC time: ${nextExecutionUTC.toISOString()}`);
+      return nextExecutionUTC;
+      
+    } else if (frequency === "weekly") {
+      // Create a moment object in the target timezone for today
+      let nextExecution = moment.tz(timezone).set({hour: hours, minute: minutes, second: 0, millisecond: 0});
+      
+      // Calculate days until target day (1=Monday, 7=Sunday)
+      const currentDay = nextExecution.day() || 7; // Convert 0 (Sunday) to 7
+      const targetDay = dayOfWeek;
+      
+      let daysUntilTarget = (targetDay - currentDay + 7) % 7;
+      
+      // If it's the same day but time has passed, schedule for next week
+      if (daysUntilTarget === 0 && nextExecution.utc().isSameOrBefore(now)) {
         daysUntilTarget = 7;
       }
       
-      nextRun.setDate(nextRun.getDate() + daysUntilTarget);
+      nextExecution = moment.tz(timezone).add(daysUntilTarget, "days").set({hour: hours, minute: minutes, second: 0, millisecond: 0});
+      const nextExecutionUTC = nextExecution.utc();
+      
+      console.log("Weekly notification calculated:");
+      console.log(`   Local time (${timezone}): ${nextExecution.format("YYYY-MM-DD HH:mm:ss")}`);
+      console.log(`   UTC time: ${nextExecutionUTC.toISOString()}`);
+      return nextExecutionUTC;
     }
     
-    return admin.firestore.Timestamp.fromDate(nextRun);
+    throw new Error(`Unsupported frequency: ${frequency}`);
   } catch (error) {
-    console.error("❌ Error calculating next execution:", error);
-    return admin.firestore.Timestamp.fromDate(new Date(Date.now() + 24 * 60 * 60 * 1000));
+    console.error("Error calculating next execution:", error);
+    // Fallback: schedule for 1 hour from now
+    const fallback = moment.utc().add(1, "hour");
+    return fallback;
   }
 }
 
-// processScheduledNotifications function
+// Missing processScheduledNotifications function
 exports.processScheduledNotifications = onSchedule("every 1 minutes", async () => {
   const now = new Date();
-  const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-  const currentDay = now.getDay() || 7;
+  const currentTimestamp = admin.firestore.Timestamp.fromDate(now);
   
-  console.log(`🕐 Checking scheduled notifications at ${currentTime}, day: ${currentDay}`);
+  console.log(`Processing scheduled notifications at: ${now.toISOString()}`);
+  console.log(`Current timestamp seconds: ${currentTimestamp.seconds}`);
 
   try {
+    // Get all active notifications that are due
+    console.log("🔍 Querying for notifications...");
+    console.log(`   Current time: ${now.toISOString()}`);
+    console.log(`   Current timestamp: ${currentTimestamp.seconds}`);
+    
+    // First, let's see all active notifications
+    const allActiveSnapshot = await firestore
+      .collection("scheduled_patient_notifications")
+      .where("isActive", "==", true)
+      .get();
+    
+    console.log(`📋 Found ${allActiveSnapshot.docs.length} total active notifications`);
+    
+    // Log each notification's details
+    allActiveSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const nextExecMs = data.nextExecution ? data.nextExecution.toDate().getTime() : null;
+      console.log(`   📝 Notification: ${data.patientName}`);
+      console.log(`      ID: ${doc.id}`);
+      console.log(`      Next execution: ${data.nextExecution ? data.nextExecution.toDate().toISOString() : "NULL"}`);
+      console.log(`      Next execution ms: ${nextExecMs ?? "NULL"}`);
+      console.log(`      Is due: ${nextExecMs !== null ? (nextExecMs <= now.getTime()) : "NO TIMESTAMP"}`);
+    });
+    
+    // Get all active notifications that are due
+    // Note: This query requires a composite index on (isActive, nextExecution)
+    // For now, we'll get all active notifications and filter in code
     const snapshot = await firestore
       .collection("scheduled_patient_notifications")
       .where("isActive", "==", true)
-      .where("scheduledTime", "==", currentTime)
       .get();
 
-    const promises = [];
-
-    snapshot.docs.forEach(doc => {
+    // Filter notifications that are due
+    const dueNotifications = snapshot.docs.filter(doc => {
       const data = doc.data();
-      
-      let shouldRun = false;
-      
-      if (data.frequency === "daily") {
-        shouldRun = true;
-      } else if (data.frequency === "weekly" && data.dayOfWeek === currentDay) {
-        shouldRun = true;
-      }
-
-      if (shouldRun) {
-        console.log(`📱 Triggering notification for patient: ${data.patientName}`);
-        promises.push(sendNotificationToPatient(data, doc.id));
-      }
+      if (!data.nextExecution) return false;
+      const execMs = data.nextExecution.toDate().getTime();
+      return execMs <= now.getTime();
     });
 
-    await Promise.all(promises);
-    console.log(`✅ Processed ${promises.length} notifications`);
+    console.log(`✅ Found ${dueNotifications.length} notifications ready to send out of ${snapshot.docs.length} total active`);
+
+    for (const doc of dueNotifications) {
+      const data = doc.data();
+      const nextExecutionDate = data.nextExecution.toDate();
+      
+      console.log(`Processing notification for ${data.patientName}:`);
+      console.log(`   Scheduled: ${nextExecutionDate.toISOString()}`);
+      console.log(`   Current:   ${now.toISOString()}`);
+      console.log(`   Difference: ${(now.getTime() - nextExecutionDate.getTime()) / (1000 * 60)} minutes`);
+
+      try {
+        // Send the notification
+        const result = await sendNotificationToPatient(data, doc.id);
+        
+        if (result.success) {
+          // Calculate next execution time using timezone-aware function
+          const nextExecution = calculateNextExecutionWithTimezone(
+            data.scheduledTime,
+            data.frequency,
+            data.dayOfWeek,
+            data.timezone || "Asia/Singapore" // Default fallback
+          );
+          
+          // Create notification log entry
+          await firestore.collection("notification_logs").add({
+            notificationId: doc.id,
+            type: "medication_reminder",
+            caregiverUid: data.caregiverUid,
+            patientId: data.patientId,
+            patientName: data.patientName,
+            title: data.title,
+            message: data.message,
+            scheduledTime: data.scheduledTime,
+            timezone: data.timezone,
+            frequency: data.frequency,
+            dayOfWeek: data.dayOfWeek,
+            sentAt: admin.firestore.FieldValue.serverTimestamp(),
+            sentAtISO: now.toISOString(),
+            nextExecution: admin.firestore.Timestamp.fromDate(nextExecution.toDate()),
+            nextExecutionISO: nextExecution.toISOString(),
+            status: "sent"
+          });
+
+          // Caregiver push disabled: ensure only the patient receives the medication reminder
+          
+          // Update for next occurrence
+          await doc.ref.update({
+            nextExecution: admin.firestore.Timestamp.fromDate(nextExecution.toDate()),
+            lastSent: admin.firestore.FieldValue.serverTimestamp(),
+            lastSentISO: now.toISOString(),
+            nextExecutionISO: nextExecution.toISOString(),
+            sentCount: (data.sentCount || 0) + 1
+          });
+
+          console.log(`Notification sent and rescheduled for: ${nextExecution.toISOString()}`);
+          console.log("📝 Notification log created in notification_logs collection");
+        } else {
+          console.log(`Notification failed: ${result.error}`);
+          
+          // Log failed notification
+          await firestore.collection("notification_logs").add({
+            notificationId: doc.id,
+            type: "medication_reminder",
+            caregiverUid: data.caregiverUid,
+            patientId: data.patientId,
+            patientName: data.patientName,
+            title: data.title,
+            message: data.message,
+            scheduledTime: data.scheduledTime,
+            timezone: data.timezone,
+            frequency: data.frequency,
+            dayOfWeek: data.dayOfWeek,
+            sentAt: admin.firestore.FieldValue.serverTimestamp(),
+            sentAtISO: now.toISOString(),
+            status: "failed",
+            error: result.error
+          });
+        }
+
+      } catch (error) {
+        console.error(`Error sending notification for ${data.patientName}:`, error);
+        
+        // Log error notification
+        await firestore.collection("notification_logs").add({
+          notificationId: doc.id,
+          type: "medication_reminder",
+          caregiverUid: data.caregiverUid,
+          patientId: data.patientId,
+          patientName: data.patientName,
+          title: data.title,
+          message: data.message,
+          scheduledTime: data.scheduledTime,
+          timezone: data.timezone,
+          frequency: data.frequency,
+          dayOfWeek: data.dayOfWeek,
+          sentAt: admin.firestore.FieldValue.serverTimestamp(),
+          sentAtISO: now.toISOString(),
+          status: "error",
+          error: error.message
+        });
+        
+        // Mark error but don't deactivate - will retry next time
+        await doc.ref.update({
+          lastError: error.message,
+          errorCount: (data.errorCount || 0) + 1,
+          lastErrorAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }
 
   } catch (error) {
-    console.error("❌ Error processing scheduled notifications:", error);
+    console.error("Error processing scheduled notifications:", error);
   }
 });
 
-// sendNotificationToPatient function
+// Helper function to send notification to patient
 async function sendNotificationToPatient(notificationData, notificationId) {
   try {
-    const patientDoc = await firestore
-      .collection("users")
-      .doc(notificationData.patientId)
-      .get();
-
-    if (!patientDoc.exists) {
-      console.error(`Patient ${notificationData.patientId} not found`);
-      return;
-    }
-
-    const patientData = patientDoc.data();
-    const fcmToken = patientData.fcmToken;
-
-    if (!fcmToken) {
-      console.log(`No FCM token for patient ${notificationData.patientName}`);
-      return;
-    }
-
-    const payload = {
-      token: fcmToken,
-      notification: {
-        title: notificationData.title,
-        body: notificationData.message,
-      },
-      data: {
-        type: "scheduled_medication_reminder",
-        patientId: notificationData.patientId,
-        medicationName: notificationData.medicationName,
-        notificationId: notificationId,
-        timestamp: new Date().toISOString(),
-      },
-      android: {
-        notification: {
-          icon: "ic_notification",
-          color: "#0CE25C",
-          sound: "default",
-          priority: "high",
-        },
-      },
-      apns: {
-        payload: {
-          aps: {
-            sound: "default",
-            badge: 1,
-          },
-        },
-      },
-    };
-
-    const response = await messaging.send(payload);
-    console.log(`✅ Push notification sent to ${notificationData.patientName}:`, response);
-
-    await firestore
-      .collection("notification_logs")
-      .add({
-        notificationId: notificationId,
-        patientId: notificationData.patientId,
-        patientName: notificationData.patientName,
-        sentAt: admin.firestore.FieldValue.serverTimestamp(),
-        messageId: response,
-        status: "sent"
-      });
-
-  } catch (error) {
-    console.error(`❌ Error sending notification to ${notificationData.patientName}:`, error);
-    
-    await firestore
-      .collection("notification_logs")
-      .add({
-        notificationId: notificationId,
-        patientId: notificationData.patientId,
-        patientName: notificationData.patientName,
-        sentAt: admin.firestore.FieldValue.serverTimestamp(),
-        error: error.message,
-        status: "failed"
-      });
-  }
-}
-
-// cancelPatientNotification function
-exports.cancelPatientNotification = onCall(async (request) => {
-  if (!request.auth) {
-    throw new Error("User must be authenticated");
-  }
-
-  const {notificationId} = request.data;
-
-  try {
-    await firestore
-      .collection("scheduled_patient_notifications")
-      .doc(notificationId)
-      .update({
-        isActive: false,
-        cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
-        cancelledBy: request.auth.uid
-      });
-
-    return {success: true, message: "Notification cancelled successfully"};
-
-  } catch (error) {
-    console.error("❌ Error cancelling notification:", error);
-    throw new Error(`Failed to cancel notification: ${error.message}`);
-  }
-});
-
-// ✅ RESTORED: sendMedicationReminderToPatient with proper authentication
-exports.sendMedicationReminderToPatient = onCall(async (request) => {
-  if (!request.auth) {
-    throw new Error("User must be authenticated");
-  }
-
-  const {patientId, patientName, medicationName, message} = request.data;
-
-  try {
     // Get patient's FCM token
-    const patientDoc = await admin.firestore()
-      .collection("users")
-      .doc(patientId)
-      .get();
-
-    if (!patientDoc.exists) {
-      throw new Error("Patient not found");
-    }
-
+    const patientDoc = await firestore.collection("users").doc(notificationData.patientId).get();
     const patientData = patientDoc.data();
-    const fcmToken = patientData.fcmToken;
-
-    if (!fcmToken) {
-      throw new Error("Patient does not have notification token");
+    
+    if (!patientData) {
+      throw new Error(`Patient not found: ${notificationData.patientId}`);
+    }
+    
+    if (!patientData.fcmToken) {
+      console.log(`No FCM token found for patient: ${notificationData.patientId}`);
+      return {success: false, error: "No FCM token"};
     }
 
-    // Send push notification
-    const notificationPayload = {
-      token: fcmToken,
+    const message = {
+      token: patientData.fcmToken,
       notification: {
-        title: "💊 Medication Reminder",
-        body: message || `Time to take your ${medicationName}!`,
+        title: notificationData.title || "Medication Reminder",
+        body: notificationData.message || `Time to take your ${notificationData.medicationName || "medication"}!`
       },
       data: {
         type: "medication_reminder",
-        patientId: patientId,
-        medicationName: medicationName || "medication",
-        timestamp: new Date().toISOString(),
+        medicationName: notificationData.medicationName || "medication",
+        patientId: notificationData.patientId,
+        caregiverUid: notificationData.caregiverUid,
+        notificationId: notificationId,
+        timestamp: new Date().toISOString()
       },
       android: {
+        priority: "high",
         notification: {
-          icon: "ic_notification",
-          color: "#0CE25C",
-          sound: "default",
-        },
-      },
-      apns: {
-        payload: {
-          aps: {
-            sound: "default",
-          },
-        },
-      },
-    };
-
-    const response = await messaging.send(notificationPayload);
-    console.log("✅ Push notification sent to patient:", response);
-
-    return {
-      success: true,
-      messageId: response,
-      message: `Notification sent to ${patientName}`,
-    };
-
-  } catch (error) {
-    console.error("❌ Error sending push notification:", error);
-    throw new Error(`Failed to send notification: ${error.message}`);
-  }
-});
-
-// Keep all your existing functions (email verification, etc.)
-exports.sendVerificationEmail = onDocumentCreated(
-  "verification_requests/{requestId}",
-  async (event) => {
-    const data = event.data && event.data.data();
-    const requestId = event.params.requestId;
-    
-    if (!data) {
-      console.log("No data found");
-      return;
-    }
-    
-    console.log("📩 Sending verification email for request:", requestId);
-    
-    const acceptLink = "https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/processVerification" +
-      `?requestId=${requestId}&action=accept`;
-    const rejectLink = "https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/processVerification" +
-      `?requestId=${requestId}&action=reject`;
-
-    const mailOptions = {
-      from: process.env.GMAIL_EMAIL,
-      to: data.patientEmail,
-      subject: "Caregiver Verification Request - Grace App",
-      html: createEmailHTML({
-        patientName: data.patientName,
-        caregiverName: data.caregiverName,
-        caregiverEmail: data.caregiverEmail,
-        acceptLink: acceptLink,
-        rejectLink: rejectLink
-      })
-    };
-
-    try {
-      if (!transporter) {
-        throw new Error("Email transporter not initialized");
+          channelId: "medication_channel",
+          priority: "high",
+          defaultSound: true,
+          defaultVibrateTimings: true
+        }
       }
-      
-      await transporter.sendMail(mailOptions);
-      console.log("✅ Verification email sent to:", data.patientEmail);
-      
-      await event.data.ref.update({
-        emailSent: true,
-        emailSentAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-      
-    } catch (error) {
-      console.error("❌ Error sending email:", error);
-      await event.data.ref.update({
-        emailSent: false,
-        emailError: error.message
-      });
-    }
-  }
-);
+    };
 
-exports.processVerification = onRequest(async (req, res) => {
-  const {requestId, action} = req.query;
+    const response = await messaging.send(message);
+    console.log(`Push notification sent to patient: ${response}`);
 
-  // Set CORS headers
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, POST");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-  
-  if (!requestId || !action) {
-    return res.status(400).send(createErrorHTML("Missing required parameters."));
-  }
-
-  try {
-    // Get the verification request
-    const requestDoc = await firestore
-      .collection("verification_requests")
-      .doc(requestId)
-      .get();
-
-    if (!requestDoc.exists) {
-      return res.status(404).send(createErrorHTML("Verification request not found."));
-    }
-
-    const data = requestDoc.data();
-
-    // Check if request has expired
-    const now = admin.firestore.Timestamp.now();
-    if (data.expiresAt && data.expiresAt < now) {
-      return res.status(410).send(createErrorHTML("This verification request has expired."));
-    }
-
-    // Check if already processed
-    if (data.status !== "pending") {
-      return res.status(409).send(createInfoHTML(
-        "Already Processed",
-        `This request has already been ${data.status}.`
-      ));
-    }
-
-    if (action === "accept") {
-      // Add patient to caregiver's patient list
-      await firestore
-        .collection("users")
-        .doc(data.caregiverUid)
-        .collection("patients")
-        .add({
-          id: data.patientUid,
-          name: data.patientName,
-          email: data.patientEmail,
-          addedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-      // Update request status
-      await requestDoc.ref.update({
-        status: "accepted",
-        processedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      console.log(`Verification accepted: Patient ${data.patientName} added to caregiver ${data.caregiverName}`);
-
-      return res.send(createSuccessHTML(
-        "Verification Successful!",
-        "You have been successfully added as a patient under " + 
-        `<strong>${data.caregiverName}</strong>'s care.<br><br>` +
-        "Your caregiver can now help manage your medications through the Grace App.<br><br>" +
-        "You can now close this window and use the Grace App together."
-      ));
-
-    } else if (action === "reject") {
-      // Update request status
-      await requestDoc.ref.update({
-        status: "rejected",
-        processedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      console.log(`Verification rejected: ${data.patientName} declined caregiver ${data.caregiverName}`);
-
-      return res.send(createInfoHTML(
-        "Request Declined",
-        "You have declined the caregiver request from " +
-        `<strong>${data.caregiverName}</strong>.<br><br>` +
-        "No changes have been made to your account. You can safely close this window."
-      ));
-
-    } else {
-      return res.status(400).send(createErrorHTML("Invalid action specified."));
-    }
+    return {success: true, messageId: response};
 
   } catch (error) {
-    console.error("Error processing verification:", error);
-    return res.status(500).send(createErrorHTML(
-      "An error occurred while processing your request. Please try again."
-    ));
+    console.error("Error sending push notification to patient:", error);
+    return {success: false, error: error.message};
   }
-});
+}
 
-// Helper functions for HTML responses
-// ✅ UPDATED: Remove emojis from email HTML template
+// Caregiver notification intentionally removed
+
+
+
+
+
+
+
+// Missing HTML template functions
 function createEmailHTML({patientName, caregiverName, caregiverEmail, acceptLink, rejectLink}) {
   return `
     <!DOCTYPE html>
@@ -936,10 +819,12 @@ function createEmailHTML({patientName, caregiverName, caregiverEmail, acceptLink
             <div class="content">
                 <h2>Hello ${patientName},</h2>
                 <p>You have received a caregiver verification request from <strong>${caregiverName}</strong> (${caregiverEmail}).</p>
+                <p>If you trust this person to help manage your medications, please click "Accept Caregiver" below. If you do not know this person or do not want them to access your medication information, please click "Reject Request".</p>
                 <div class="button-container">
                     <a href="${acceptLink}" class="button accept-button">Accept Caregiver</a>
                     <a href="${rejectLink}" class="button reject-button">Reject Request</a>
                 </div>
+                <p><strong>Important:</strong> Only accept caregivers you trust with your medical information.</p>
                 <p>Best regards,<br><strong>Grace App Team</strong></p>
             </div>
         </div>
@@ -948,7 +833,6 @@ function createEmailHTML({patientName, caregiverName, caregiverEmail, acceptLink
   `;
 }
 
-// ✅ UPDATED: Remove emojis from success HTML template
 function createSuccessHTML(title, message) {
   return `
     <!DOCTYPE html>
@@ -997,7 +881,6 @@ function createSuccessHTML(title, message) {
   `;
 }
 
-// ✅ UPDATED: Remove emojis from error HTML template
 function createErrorHTML(message) {
   return `
     <!DOCTYPE html>
@@ -1039,7 +922,6 @@ function createErrorHTML(message) {
   `;
 }
 
-// ✅ UPDATED: Remove emojis from info HTML template
 function createInfoHTML(title, message) {
   return `
     <!DOCTYPE html>
@@ -1081,436 +963,73 @@ function createInfoHTML(title, message) {
   `;
 }
 
-// Add your other existing functions here (scheduleMedicationNotification, triggerScheduledNotifications, cleanupExpiredRequests, etc.)
-
-// ✅ NEW: Test function to send push notification directly to patient
-exports.testPatientNotification = onCall(async (request) => {
-  if (!request.auth) {
-    throw new Error("User must be authenticated");
-  }
-
-  const {patientId, title, message} = request.data;
-
+// Missing notification helper functions
+function calculateNextNotification(notificationTime, timezone = "Asia/Singapore") {
   try {
-    // Get patient's FCM token
-    const patientDoc = await firestore
-      .collection("users")
-      .doc(patientId)
-      .get();
-
-    if (!patientDoc.exists) {
-      throw new Error("Patient not found");
+    const now = moment.utc();
+    const [hours, minutes] = notificationTime.split(":").map(num => parseInt(num, 10));
+    
+    // Create a moment object in the target timezone for today
+    let nextNotification = moment.tz(timezone).set({hour: hours, minute: minutes, second: 0, millisecond: 0});
+    
+    // Convert to UTC for storage
+    let nextNotificationUTC = nextNotification.utc();
+    
+    // If the time has passed today in the target timezone, schedule for tomorrow
+    if (nextNotificationUTC.isSameOrBefore(now)) {
+      nextNotification = moment.tz(timezone).add(1, "day").set({hour: hours, minute: minutes, second: 0, millisecond: 0});
+      nextNotificationUTC = nextNotification.utc();
     }
-
-    const patientData = patientDoc.data();
-    const fcmToken = patientData.fcmToken;
-
-    if (!fcmToken) {
-      throw new Error("Patient does not have notification token");
-    }
-
-    // Send push notification directly
-    const payload = {
-      token: fcmToken,
-      notification: {
-        title: title || "💊 Test Medication Reminder",
-        body: message || "Time to take your medication!",
-      },
-      data: {
-        type: "test_medication_reminder",
-        patientId: patientId,
-        timestamp: new Date().toISOString(),
-      },
-      android: {
-        notification: {
-          icon: "ic_notification",
-          color: "#0CE25C",
-          sound: "default",
-          priority: "high",
-        },
-      },
-      apns: {
-        payload: {
-          aps: {
-            sound: "default",
-            badge: 1,
-          },
-        },
-      },
-    };
-
-    const response = await messaging.send(payload);
-    console.log("✅ Test push notification sent:", response);
-
-    return {
-      success: true,
-      messageId: response,
-      message: "Test notification sent successfully",
-    };
-
+    
+    return admin.firestore.Timestamp.fromDate(nextNotificationUTC.toDate());
   } catch (error) {
-    console.error("❌ Error sending test notification:", error);
-    throw new Error(`Failed to send test notification: ${error.message}`);
+    console.error("Error calculating next notification:", error);
+    // Fallback: schedule for 1 hour from now
+    const fallback = moment.utc().add(1, "hour");
+    return admin.firestore.Timestamp.fromDate(fallback.toDate());
   }
-});
+}
 
-// ✅ FIXED: Test function with proper data
-exports.testRefillNotification = onCall(async (request) => {
-  if (!request.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  try {
-    console.log("🧪 Testing refill notification system...");
-
-    // ✅ Use actual authenticated user data
-    const currentUserUid = request.auth.uid;
-    
-    // Get the current user's data
-    const userDoc = await firestore.collection("users").doc(currentUserUid).get();
-    const userData = userDoc.data();
-    
-    if (!userData) {
-      throw new functions.https.HttpsError("not-found", "User data not found");
-    }
-
-    // ✅ Create test notification with real user data
-    const testNotification = {
-      medicationId: "test-med-123",
-      patientId: currentUserUid,
-      caregiverUid: currentUserUid, // ✅ Use same user for testing
-      medicationName: "Test Medication",
-      quantity: "2 tablets",
-      instructions: "take 1 tablet twice daily",
-      scheduledDate: admin.firestore.Timestamp.now(), // Immediate
-      sent: false,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      daysSupply: 1,
-      dailyDosage: 2
-    };
-
-    // Add to refill_notifications collection
-    const docRef = await firestore.collection("refill_notifications").add(testNotification);
-    
-    console.log("✅ Test refill notification created:", docRef.id);
-
-    // ✅ Try to send notifications (will fail gracefully if no FCM token)
+// Log on schedule creation as a safety net
+exports.logScheduleCreation = onDocumentCreated(
+  "scheduled_patient_notifications/{notificationId}",
+  async (event) => {
     try {
-      await sendRefillNotificationToPatient(testNotification);
-      console.log("✅ Patient notification sent");
-    } catch (error) {
-      console.log("⚠️ Patient notification failed (no FCM token?):", error.message);
+      const notificationId = event.params.notificationId;
+      const data = event.data && event.data.data();
+      if (!data) return;
+
+      // Avoid duplicate logs
+      const existing = await firestore
+        .collection("notification_logs")
+        .where("notificationId", "==", notificationId)
+        .limit(1)
+        .get();
+      if (!existing.empty) return;
+
+      await firestore.collection("notification_logs").add({
+        notificationId: notificationId,
+        type: "medication_reminder",
+        caregiverUid: data.caregiverUid,
+        patientId: data.patientId,
+        patientName: data.patientName,
+        title: data.title,
+        message: data.message,
+        scheduledTime: data.scheduledTime,
+        timezone: data.timezone,
+        frequency: data.frequency,
+        dayOfWeek: data.dayOfWeek || null,
+        status: "scheduled",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAtISO: new Date().toISOString(),
+        nextExecution: data.nextExecution || null,
+        nextExecutionISO: data.nextExecutionISO || null
+      });
+    } catch (e) {
+      console.error("Error logging schedule creation:", e);
     }
-
-    try {
-      await sendRefillNotificationToCaregiver(testNotification);
-      console.log("✅ Caregiver notification sent");
-    } catch (error) {
-      console.log("⚠️ Caregiver notification failed (no FCM token?):", error.message);
-    }
-
-    // Mark as sent
-    await docRef.update({
-      sent: true,
-      sentAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    return {
-      success: true,
-      message: "Test refill notification created successfully! Check Firestore for the document.",
-      notificationId: docRef.id,
-      userId: currentUserUid,
-      userData: {
-        name: userData.FullName || "Unknown",
-        email: userData.Email || "Unknown"
-      }
-    };
-
-  } catch (error) {
-    console.error("❌ Error testing refill notification:", error);
-    throw new functions.https.HttpsError("internal", error.message);
   }
-});
+);
 
-// Helper function to create caregiver notifications
-async function createCaregiverNotification(caregiverUid, notificationData) {
-  try {
-    await firestore.collection("users").doc(caregiverUid).collection("notifications").add({
-      ...notificationData,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      read: false,
-    });
-    console.log("✅ Caregiver notification created");
-  } catch (error) {
-    console.error("❌ Error creating caregiver notification:", error);
-  }
-}
 
-// Helper function to calculate next notification time
-function calculateNextNotification(timeString) {
-  const now = new Date();
-  const [hours, minutes] = timeString.split(":").map(Number);
-  
-  const nextNotification = new Date();
-  nextNotification.setHours(hours, minutes, 0, 0);
-  
-  // If time has passed today, schedule for tomorrow
-  if (nextNotification <= now) {
-    nextNotification.setDate(nextNotification.getDate() + 1);
-  }
-  
-  return nextNotification.toISOString();
-}
 
-// ✅ NEW: Schedule refill notification when medication is added
-exports.scheduleRefillNotification = onCall(async (request) => {
-  if (!request.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  const {medicationId, patientId, quantity, instructions, medicationName, caregiverUid} = request.data;
-
-  try {
-    // Calculate refill notification date using the same logic as Flutter
-    const quantityNumber = extractQuantityNumber(quantity);
-    const dailyDosage = parseDailyDosage(instructions);
-    
-    if (!quantityNumber || !dailyDosage) {
-      throw new functions.https.HttpsError("invalid-argument", "Could not parse medication dosage");
-    }
-
-    const daysSupply = Math.floor(quantityNumber / dailyDosage);
-    const notificationDays = daysSupply - 2; // 2 days before running out
-    
-    const refillDate = new Date();
-    refillDate.setDate(refillDate.getDate() + Math.max(notificationDays, 0));
-
-    // Schedule the refill notification
-    await firestore.collection("refill_notifications").add({
-      medicationId: medicationId,
-      patientId: patientId,
-      caregiverUid: caregiverUid,
-      medicationName: medicationName,
-      quantity: quantity,
-      instructions: instructions,
-      scheduledDate: admin.firestore.Timestamp.fromDate(refillDate),
-      sent: false,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      daysSupply: daysSupply,
-      dailyDosage: dailyDosage
-    });
-
-    console.log(`✅ Refill notification scheduled for ${medicationName} on ${refillDate.toISOString()}`);
-    
-    return {
-      success: true,
-      refillDate: refillDate.toISOString(),
-      daysSupply: daysSupply,
-      message: `Refill notification scheduled for ${daysSupply - 2} days from now`
-    };
-
-  } catch (error) {
-    console.error("❌ Error scheduling refill notification:", error);
-    throw new functions.https.HttpsError("internal", error.message);
-  }
-});
-
-// ✅ NEW: Process refill notifications (runs every hour)
-exports.processRefillNotifications = onSchedule("every 1 hours", async () => {
-  const now = admin.firestore.Timestamp.now();
-  
-  console.log(`🔍 Checking for refill notifications at ${new Date().toISOString()}`);
-
-  try {
-    // Get all pending refill notifications that are due
-    const snapshot = await firestore
-      .collection("refill_notifications")
-      .where("sent", "==", false)
-      .where("scheduledDate", "<=", now)
-      .get();
-
-    console.log(`📋 Found ${snapshot.docs.length} pending refill notifications`);
-
-    for (const doc of snapshot.docs) {
-      const data = doc.data();
-      
-      try {
-        // Send notification to patient
-        await sendRefillNotificationToPatient(data);
-        
-        // Send notification to caregiver
-        await sendRefillNotificationToCaregiver(data);
-        
-        // Mark as sent
-        await doc.ref.update({
-          sent: true,
-          sentAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        console.log(`✅ Refill notification sent for medication: ${data.medicationName}`);
-
-      } catch (error) {
-        console.error(`❌ Error sending refill notification for ${data.medicationName}:`, error);
-        
-        // Mark as failed but don't delete - will retry next hour
-        await doc.ref.update({
-          lastError: error.message,
-          errorCount: (data.errorCount || 0) + 1
-        });
-      }
-    }
-
-  } catch (error) {
-    console.error("❌ Error processing refill notifications:", error);
-  }
-});
-
-// Helper function to send refill notification to patient
-async function sendRefillNotificationToPatient(notificationData) {
-  try {
-    // Get patient's FCM token
-    const patientDoc = await firestore.collection("users").doc(notificationData.patientId).get();
-    const patientData = patientDoc.data();
-    
-    if (!patientData) {
-      throw new Error(`Patient not found: ${notificationData.patientId}`);
-    }
-    
-    if (!patientData.fcmToken) {
-      console.log(`⚠️ No FCM token found for patient: ${notificationData.patientId}`);
-      return { success: false, reason: "No FCM token" };
-    }
-
-    const message = {
-      token: patientData.fcmToken,
-      notification: {
-        title: `💊 Time to Refill ${notificationData.medicationName}`,
-        body: `Your ${notificationData.medicationName} is running low and needs to be refilled soon!`
-      },
-      data: {
-        type: "medication_refill",
-        medicationId: notificationData.medicationId,
-        medicationName: notificationData.medicationName,
-        patientId: notificationData.patientId
-      },
-      android: {
-        priority: "high",
-        notification: {
-          channelId: "medication_channel",
-          priority: "high",
-          defaultSound: true,
-          defaultVibrateTimings: true
-        }
-      }
-    };
-
-    await messaging.send(message);
-    console.log(`✅ Refill notification sent to patient: ${notificationData.patientId}`);
-    return { success: true };
-
-  } catch (error) {
-    console.error(`❌ Error sending refill notification to patient:`, error);
-    throw error;
-  }
-}
-
-// Helper function to send refill notification to caregiver
-async function sendRefillNotificationToCaregiver(notificationData) {
-  try {
-    // Get caregiver's FCM token
-    const caregiverDoc = await firestore.collection("users").doc(notificationData.caregiverUid).get();
-    const caregiverData = caregiverDoc.data();
-    
-    if (!caregiverData) {
-      throw new Error(`Caregiver not found: ${notificationData.caregiverUid}`);
-    }
-    
-    if (!caregiverData.fcmToken) {
-      console.log(`⚠️ No FCM token found for caregiver: ${notificationData.caregiverUid}`);
-      return { success: false, reason: "No FCM token" };
-    }
-
-    // Get patient name
-    const patientDoc = await firestore.collection("users").doc(notificationData.patientId).get();
-    const patientData = patientDoc.data();
-    const patientName = patientData?.FullName || "Patient";
-
-    const message = {
-      token: caregiverData.fcmToken,
-      notification: {
-        title: `🔔 ${patientName} Needs Medication Refill`,
-        body: `${patientName}'s ${notificationData.medicationName} is running low and needs to be refilled!`
-      },
-      data: {
-        type: "patient_medication_refill",
-        medicationId: notificationData.medicationId,
-        medicationName: notificationData.medicationName,
-        patientId: notificationData.patientId,
-        patientName: patientName
-      },
-      android: {
-        priority: "high",
-        notification: {
-          channelId: "medication_channel",
-          priority: "high",
-          defaultSound: true,
-          defaultVibrateTimings: true
-        }
-      }
-    };
-
-    await messaging.send(message);
-    console.log(`✅ Refill notification sent to caregiver: ${notificationData.caregiverUid}`);
-    return { success: true };
-
-  } catch (error) {
-    console.error(`❌ Error sending refill notification to caregiver:`, error);
-    throw error;
-  }
-}
-
-// Helper functions for parsing medication data
-function extractQuantityNumber(quantity) {
-  const regex = /(\d+)/;
-  const match = regex.exec(quantity.toLowerCase());
-  if (match) {
-    return parseInt(match[1]);
-  }
-  return null;
-}
-
-function parseDailyDosage(instructions) {
-  const instructionsLower = instructions.toLowerCase();
-  
-  // Pattern 1: "take X tablet(s) Y times a day"
-  let regex = /take\s+(\d+)\s+.*?(\d+)\s+times?\s+(?:a\s+)?day/;
-  let match = regex.exec(instructionsLower);
-  if (match) {
-    const tabletsPerDose = parseInt(match[1]) || 1;
-    const timesPerDay = parseInt(match[2]) || 1;
-    return tabletsPerDose * timesPerDay;
-  }
-
-  // Pattern 2: "X tablet(s) Y times daily"
-  regex = /(\d+)\s+.*?(\d+)\s+times?\s+daily/;
-  match = regex.exec(instructionsLower);
-  if (match) {
-    const tabletsPerDose = parseInt(match[1]) || 1;
-    const timesPerDay = parseInt(match[2]) || 1;
-    return tabletsPerDose * timesPerDay;
-  }
-
-  // Pattern 3: Common phrases
-  if (instructionsLower.includes("once daily") || instructionsLower.includes("once a day")) {
-    return 1;
-  }
-  if (instructionsLower.includes("twice daily") || instructionsLower.includes("twice a day")) {
-    return 2;
-  }
-  if (instructionsLower.includes("three times daily") || instructionsLower.includes("thrice daily")) {
-    return 3;
-  }
-
-  // Default
-  return 1;
-}

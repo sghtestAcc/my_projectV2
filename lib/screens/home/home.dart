@@ -913,7 +913,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             if (snapshot.hasData) {
                               List<GraceUser> patients = snapshot.data!;
                               debugPrint(
-                                  "✅ Fetched ${patients.length} patients under caregiver");
+                                  "Fetched ${patients.length} patients under caregiver");
 
                               List<GraceUser> filteredPatients =
                                   patients.where((patient) {
@@ -946,7 +946,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   final isExpanded =
                                       isExpandedMap[uid] ?? false;
 
-                                  debugPrint("👤 Showing: $name <$email>");
+                                  debugPrint("Showing: $name <$email>");
 
                                   return Container(
                                     padding: const EdgeInsets.fromLTRB(
@@ -957,7 +957,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       color: const Color(0xDDF6F6F6),
                                       border: Border.all(
                                           color: Colors.green,
-                                          width: 2), // ✅ Green border
+                                          width: 2), // Green border
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Color.fromRGBO(0, 0, 0, 0.5),
@@ -1204,7 +1204,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 },
                               );
                             } else if (snapshot.hasError) {
-                              debugPrint("❌ Error: ${snapshot.error}");
+                              debugPrint("Error: ${snapshot.error}");
                               return Center(
                                 child: Text(
                                   AppLocalizations.of(context)!
@@ -1234,7 +1234,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     await userRepo.testRefillNotification();
                   },
                   child: Text(
-                    "🧪 Test Refill Notification",
+                    "Test Refill Notification",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -1247,7 +1247,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         ),
         endDrawer: const AppDrawerNavigation(),
 
-        // --- Add this floatingActionButton ---
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(context,

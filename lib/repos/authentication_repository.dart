@@ -164,7 +164,7 @@ class AuthenticationRepository extends GetxController {
   Future<void> loginUser(String email, String password, LoginType loginType,
       BuildContext context) async {
     try {
-      // 🔍 Fetch user (regardless of login type)
+      // Fetch user (regardless of login type)
       final user = await userRepo.getUserByEmail(email);
 
       if (user == null) {

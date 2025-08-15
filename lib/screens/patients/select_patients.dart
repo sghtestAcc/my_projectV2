@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/components/navigation_drawer.dart';
-import 'package:my_project/controllers/select_patient_controller.dart';
-import 'package:my_project/models/grace_user.dart';
 import 'package:my_project/models/login_type.dart';
 import 'package:my_project/repos/user_repo.dart';
-import 'package:my_project/utils/email_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:my_project/notification_service.dart';
-import 'package:http/http.dart' as http; // ✅ Add this import
-import 'dart:convert'; // ✅ Add this import
-import '../../models/medications.dart';
+import 'package:http/http.dart' as http; 
+import 'dart:convert'; 
+import 'package:flutter_timezone/flutter_timezone.dart';
 import '../home/patient_card.dart';
 
 
@@ -32,7 +29,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
   Map<String, bool> _isTimeDropdownOpen = {};
   Map<String, TimeOfDay?> _selectedTimes = {};
 
-  // ✅ NEW: Add frequency and day selection state
+  // NEW: Add frequency and day selection state
   Map<String, ReminderFrequency> _selectedFrequency = {};
   Map<String, int> _selectedDayOfWeek = {}; // For weekly reminders
 
@@ -199,42 +196,42 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     );
   }
 
-  // ✅ FIXED: Add currentUserUid definition
+  // currentUserUid definition
   Future<void> _sendVerificationEmail() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      // ✅ ADD THIS: Get current user UID
+      // Get current user UID
       final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
       if (currentUserUid == null) {
         throw Exception('User not authenticated');
       }
 
       final email = _emailController.text.trim().toLowerCase();
-      print('🔍 Searching for patient with email: $email');
+      print('Searching for patient with email: $email');
       
-      // ✅ Add manual Firestore query for debugging
+      // Add manual Firestore query for debugging
       final debugSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .get();
       
-      print('📊 Total users in database: ${debugSnapshot.docs.length}');
+      print('Total users in database: ${debugSnapshot.docs.length}');
       
       // Print all emails for debugging
       for (var doc in debugSnapshot.docs) {
         final userData = doc.data();
         final userEmail = userData['Email'];
         final loginType = userData['LoginType'];
-        print('👤 User: $userEmail, Type: $loginType');
+        print('User: $userEmail, Type: $loginType');
       }
       
       // Check if patient exists with this email
       final patient = await userRepo.getUserByEmail(email);
       
       if (patient == null) {
-        print('❌ Patient not found with email: $email');
+        print('Patient not found with email: $email');
         
         Get.snackbar(
           "Patient Not Found",
@@ -247,8 +244,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         return;
       }
       
-      print('✅ Found patient: ${patient.name} (${patient.email})');
-      print('🔍 Patient login type: ${patient.loginType}');
+      print('Found patient: ${patient.name} (${patient.email})');
+      print('Patient login type: ${patient.loginType}');
 
       if (patient.loginType != LoginType.patient && patient.loginType != LoginType.dualAccount) {
         Get.snackbar(
@@ -277,19 +274,19 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       // Get caregiver info
       final caregiverDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(currentUserUid) // ✅ Now this is defined
+          .doc(currentUserUid) // Now this is defined
           .get();
       
       final caregiverData = caregiverDoc.data();
       final caregiverName = caregiverData?['FullName'] ?? 'Unknown Caregiver';
       final caregiverEmail = caregiverData?['Email'] ?? 'Unknown Email';
 
-      // ✅ Create verification request in Firestore
+      // Create verification request in Firestore
       // This will automatically trigger the Firebase Function to send email
       final verificationDoc = await FirebaseFirestore.instance
           .collection('verification_requests')
           .add({
-        'caregiverUid': currentUserUid, // ✅ Now this is defined
+        'caregiverUid': currentUserUid, // Now this is defined
         'caregiverName': caregiverName,
         'caregiverEmail': caregiverEmail,
         'patientUid': patient.id,
@@ -303,7 +300,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       print('Verification request created: ${verificationDoc.id}');
       print('Firebase Function will automatically send email to: ${patient.email}');
 
-      // ✅ Show success message
+      // Show success message
       Get.snackbar(
         "Email Sent!",
         "Verification email sent to ${patient.name} (${patient.email}). They need to check their email and click the verification link.",
@@ -358,7 +355,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     ),
   );
 
-  // ✅ UPDATE: Enhanced patient card with frequency options
+  // UPDATE: Enhanced patient card with frequency options
   Widget _buildPatientCard(String id, String name, String email, bool isDropdownOpen, TimeOfDay? time) {
     return Container(
       padding: const EdgeInsets.all(15),
@@ -411,7 +408,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
           ),
           const SizedBox(height: 15),
           
-          // ✅ NEW: Frequency Selection
+          // NEW: Frequency Selection
           Text(
             "Reminder Frequency:",
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -448,7 +445,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             ],
           ),
 
-          // ✅ NEW: Day of Week Selection (only for weekly)
+          // NEW: Day of Week Selection (only for weekly)
           if (_selectedFrequency[id] == ReminderFrequency.weekly) ...[
             const SizedBox(height: 10),
             Text(
@@ -530,7 +527,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     );
   }
 
-  // ✅ NEW: Schedule push notification to patient
+  // NEW: Schedule push notification to patient
   Future<void> _schedulePatientPushNotification(
     String patientId,
     String patientName,
@@ -545,6 +542,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       }
       
       final idToken = await user.getIdToken();
+      // Get device timezone to send to backend for correct scheduling
+      final String timezoneName = await FlutterTimezone.getLocalTimezone();
       
       // Call Firebase Function to schedule push notification
       final response = await http.post(
@@ -561,8 +560,9 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
             'scheduledTime': '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
             'frequency': frequency.name,
             'dayOfWeek': dayOfWeek,
-            'title': '💊 Medication Reminder',
-            'message': 'Time to take your ${medicationName ?? 'medication'}!',
+            'timezone': timezoneName,
+          'title': 'Medication Reminder',
+          'message': 'Time to take your ${medicationName ?? 'medication'}!',
           }
         }),
       );
@@ -570,10 +570,10 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body);
         if (result['result']['success'] == true) {
-          final nextExecution = result['result']['nextExecution'];
+          // final nextExecution = result['result']['nextExecution'];
           
           Get.snackbar(
-            "Push Notification Scheduled ✅",
+            "Push Notification Scheduled",
             "Patient will receive push notifications ${frequency.name} at ${selectedTime.format(context)}",
             snackPosition: SnackPosition.TOP,
             backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
@@ -587,7 +587,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         throw Exception('Failed to schedule notification: ${response.statusCode}');
       }
     } catch (e) {
-      print('❌ Error scheduling push notification: $e');
+      print('Error scheduling push notification: $e');
       Get.snackbar(
         "Error",
         "Failed to schedule push notification: ${e.toString()}",
@@ -598,7 +598,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     }
   }
 
-  // ✅ UPDATE: Enhanced scheduling method that includes both local AND push notifications
+  // UPDATE: Enhanced scheduling method that includes both local AND push notifications
   Future<void> _scheduleEnhancedNotificationForPatient(
     String patientId,
     String patientName,
@@ -608,9 +608,9 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       final frequency = _selectedFrequency[patientId] ?? ReminderFrequency.daily;
       final notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       
-      print('🔔 Scheduling ${frequency.name} notifications for patient: $patientName');
+      print('Scheduling ${frequency.name} notifications for patient: $patientName');
       
-      // 1. Schedule LOCAL notification for CAREGIVER
+      // 1. Schedule LOCAL notification for CAREGIVER (no emojis)
       if (frequency == ReminderFrequency.daily) {
         await NotificationService.scheduleDailyNotification(
           id: notificationId,
@@ -679,7 +679,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
           : '';
           
       Get.snackbar(
-        "Success ✅",
+        "Success",
         "Both caregiver and patient notifications scheduled ${frequency.name}$dayText at ${selectedTime.format(context)}",
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
@@ -687,7 +687,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       );
 
     } catch (e) {
-      print('❌ Error scheduling enhanced notifications: $e');
+      print('Error scheduling enhanced notifications: $e');
       Get.snackbar(
         "Error",
         "Failed to schedule notifications: ${e.toString()}",
@@ -787,7 +787,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     TimeOfDay selectedTime,
   ) async {
     try {
-      print('🔔 Scheduling notification for patient: $patientName');
+      print('Scheduling notification for patient: $patientName');
       
       final notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       
@@ -812,14 +812,14 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       );
 
       Get.snackbar(
-        "Success ✅",
+        "Success",
         "Daily medication reminder set for $patientName at ${selectedTime.format(context)}",
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
         colorText: const Color(0xFFF6F3E7),
       );
     } catch (e) {
-      print('❌ Error scheduling notification: $e');
+      print('Error scheduling notification: $e');
       Get.snackbar(
         "Error",
         "Failed to schedule notification: ${e.toString()}",
@@ -830,7 +830,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     }
   }
 
-  // ✅ UPDATED: Send push notification to patient using HTTP
+  // UPDATED: Send push notification to patient using HTTP
   Future<void> _sendPushNotificationToPatient(
     String patientId,
     String patientName,
@@ -866,7 +866,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         final result = jsonDecode(response.body);
         if (result['result']['success'] == true) {
           Get.snackbar(
-            "Success ✅",
+            "Success",
             "Push notification sent to $patientName",
             snackPosition: SnackPosition.TOP,
             backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
@@ -879,7 +879,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
         throw Exception('Failed to send notification: ${response.statusCode}');
       }
     } catch (e) {
-      print('❌ Error sending push notification: $e');
+      print('Error sending push notification: $e');
       Get.snackbar(
         "Error",
         "Failed to send notification to patient: ${e.toString()}",

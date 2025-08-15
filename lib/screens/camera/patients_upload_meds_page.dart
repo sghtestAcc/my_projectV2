@@ -339,7 +339,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
         );
         
         Get.snackbar(
-          "🔔 Refill Notification Scheduled",
+          "Refill Notification Scheduled",
           calculator,
           snackPosition: SnackPosition.TOP,
           backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
@@ -348,7 +348,7 @@ class _PatientUploadMedsScreenState extends State<PatientUploadMedsScreen> {
         );
       }
     } catch (e) {
-      print('❌ Error scheduling refill notification: $e');
+      print('Error scheduling refill notification: $e');
     }
   }
 

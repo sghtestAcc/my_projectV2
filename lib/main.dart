@@ -30,7 +30,7 @@ Future<void> main() async {
   // Initialize Notification Service (includes FCM setup)
   await NotificationService.initialize();
   
-  // ✅ NEW: Set up background message handler
+  // NEW: Set up background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   
   final prefs = await SharedPreferences.getInstance();
@@ -43,15 +43,15 @@ Future<void> main() async {
   runApp(MyApp(savedLocale));
 }
 
-// ✅ NEW: Handle background messages
+// NEW: Handle background messages
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('📨 Background message received: ${message.messageId}');
+  print('Background message received: ${message.messageId}');
   
   // You can process the message here if needed
   if (message.notification != null) {
-    print('🔔 Background notification: ${message.notification!.title}');
+    print('Background notification: ${message.notification!.title}');
   }
 }
 

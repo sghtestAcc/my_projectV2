@@ -31,7 +31,7 @@ class NotificationService {
       final String timeZoneName = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(timeZoneName));
       
-      print('✅ Timezone initialized: $timeZoneName');
+      print('Timezone initialized: $timeZoneName');
       
       // Android settings
       const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -54,7 +54,7 @@ class NotificationService {
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
-      // ✅ NEW: Initialize Firebase Messaging
+      // Initialize Firebase Messaging
       await _initializeFirebaseMessaging();
       
       // Request permissions for Android 13+
@@ -65,10 +65,10 @@ class NotificationService {
       await _createRefillNotificationChannel();
       
       _isInitialized = true;
-      print('✅ NotificationService initialized successfully');
+      print('NotificationService initialized successfully');
       
     } catch (e) {
-      print('❌ Error initializing NotificationService: $e');
+      print('Error initializing NotificationService: $e');
       // Set a fallback timezone if device timezone fails
       tz.setLocalLocation(tz.UTC);
       _isInitialized = true;
@@ -133,9 +133,9 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time, // This makes it daily
       );
       
-      print('✅ Daily notification scheduled for: ${time.format(Get.context!)} (${scheduledTime.toString()})');
+      print('Daily notification scheduled for: ${time.format(Get.context!)} (${scheduledTime.toString()})');
     } catch (e) {
-      print('❌ Error scheduling daily notification: $e');
+      print('Error scheduling daily notification: $e');
       rethrow;
     }
   }
@@ -176,9 +176,9 @@ class NotificationService {
         payload: data != null ? jsonEncode(data) : null,
       );
       
-      print('✅ Notification scheduled for: $scheduledTZTime');
+      print('Notification scheduled for: $scheduledTZTime');
     } catch (e) {
-      print('❌ Error scheduling notification: $e');
+      print('Error scheduling notification: $e');
       rethrow;
     }
   }
@@ -213,9 +213,9 @@ class NotificationService {
         payload: data != null ? jsonEncode(data) : null,
       );
       
-      print('✅ Immediate notification shown: $title');
+      print('Immediate notification shown: $title');
     } catch (e) {
-      print('❌ Error showing notification: $e');
+      print('Error showing notification: $e');
       rethrow;
     }
   }
@@ -272,13 +272,13 @@ class NotificationService {
   // Cancel specific notification
   static Future<void> cancelNotification(int id) async {
     await _localNotifications.cancel(id);
-    print('✅ Notification $id cancelled');
+    print('Notification $id cancelled');
   }
 
   // Cancel all notifications
   static Future<void> cancelAllNotifications() async {
     await _localNotifications.cancelAll();
-    print('✅ All notifications cancelled');
+    print('All notifications cancelled');
   }
 
   // Get all pending notifications
@@ -290,7 +290,7 @@ class NotificationService {
   static Future<void> showTestNotification() async {
     await showNotification(
       id: 999,
-      title: '🧪 Test Notification',
+      title: 'Test Notification',
       body: 'This is a test notification!',
       data: {'type': 'test', 'message': 'Hello World!'},
     );
@@ -314,12 +314,12 @@ class NotificationService {
       );
 
       if (refillDate == null) {
-        print('❌ Could not calculate refill date for $medicationName');
+        print('Could not calculate refill date for $medicationName');
         return;
       }
 
       if (refillDate.isBefore(DateTime.now())) {
-        print('⚠️ Refill date is in the past for $medicationName, scheduling for 1 hour from now');
+        print('Warning: Refill date is in the past for $medicationName, scheduling for 1 hour from now');
         final immediateRefillDate = DateTime.now().add(Duration(hours: 1));
         await _scheduleRefillNotificationAt(
           medicationId: medicationId,
@@ -339,9 +339,9 @@ class NotificationService {
         isUrgent: false,
       );
 
-      print('✅ Refill notification scheduled for $medicationName on ${refillDate.toString()}');
+      print('Refill notification scheduled for $medicationName on ${refillDate.toString()}');
     } catch (e) {
-      print('❌ Error scheduling refill notification: $e');
+      print('Error scheduling refill notification: $e');
       rethrow;
     }
   }
@@ -357,8 +357,8 @@ class NotificationService {
     final notificationId = int.parse(medicationId.hashCode.toString().substring(0, 8));
     
     final title = isUrgent 
-        ? '🚨 Urgent: Refill $medicationName'
-        : '💊 Time to Refill $medicationName';
+        ? 'Urgent: Refill $medicationName'
+        : 'Time to Refill $medicationName';
         
     final body = isUrgent
         ? '$patientName needs to refill $medicationName immediately!'
@@ -372,7 +372,6 @@ class NotificationService {
       icon: '@mipmap/ic_launcher',
       enableVibration: true,
       playSound: true,
-      color: Colors.orange,
     );
     
     const notificationDetails = NotificationDetails(android: androidDetails);
@@ -401,7 +400,7 @@ class NotificationService {
   static Future<void> cancelRefillNotification(String medicationId) async {
     final notificationId = int.parse(medicationId.hashCode.toString().substring(0, 8));
     await _localNotifications.cancel(notificationId);
-    print('✅ Refill notification cancelled for medication: $medicationId');
+    print('Refill notification cancelled for medication: $medicationId');
   }
 
   // Create a separate channel for refill notifications
@@ -420,7 +419,7 @@ class NotificationService {
         ?.createNotificationChannel(channel);
   }
 
-  // ✅ NEW: Initialize Firebase Cloud Messaging
+  // Initialize Firebase Cloud Messaging
   static Future<void> _initializeFirebaseMessaging() async {
     // Request permission for notifications
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
@@ -430,11 +429,11 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('✅ FCM permission granted');
+      print('FCM permission granted');
       
       // Get FCM token for this device
       String? token = await _firebaseMessaging.getToken();
-      print('📱 FCM Token: $token');
+      print('FCM Token: $token');
       
       // Save token to user's profile in Firestore
       if (token != null) {
@@ -448,11 +447,11 @@ class NotificationService {
       FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
       
     } else {
-      print('❌ FCM permission denied');
+      print('FCM permission denied');
     }
   }
 
-  // ✅ FIXED: Complete FCM token saving in notification_service.dart
+  // Complete FCM token saving in notification_service.dart
   static Future<void> _saveFCMTokenToUser(String token) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -464,16 +463,16 @@ class NotificationService {
           'fcmToken': token,
           'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
         });
-        print('✅ FCM token saved to Firestore for user: ${user.uid}');
+        print('FCM token saved to Firestore for user: ${user.uid}');
       }
     } catch (e) {
-      print('❌ Error saving FCM token: $e');
+      print('Error saving FCM token: $e');
     }
   }
 
-  // ✅ NEW: Handle messages when app is in foreground
+  // Handle messages when app is in foreground
   static void _handleForegroundMessage(RemoteMessage message) {
-    print('📨 Foreground message received: ${message.notification?.title}');
+    print('Foreground message received: ${message.notification?.title}');
     
     // Show local notification for foreground messages
     if (message.notification != null) {
@@ -486,9 +485,9 @@ class NotificationService {
     }
   }
 
-  // ✅ NEW: Handle notification taps
+  // Handle notification taps
   static void _handleNotificationTap(RemoteMessage message) {
-    print('🔔 Notification tapped: ${message.data}');
+    print('Notification tapped: ${message.data}');
     
     // Navigate to specific screen based on notification data
     final type = message.data['type'];
@@ -498,7 +497,7 @@ class NotificationService {
     }
   }
 
-  // ✅ NEW: Schedule notification with frequency option
+  // Schedule notification with frequency option
   static Future<void> scheduleRecurringNotification({
     required int id,
     required String title,
@@ -555,7 +554,7 @@ class NotificationService {
           matchDateTimeComponents: DateTimeComponents.time, // Daily repeat
         );
 
-        print('✅ Daily notification scheduled for: ${time.format(Get.context!)}');
+        print('Daily notification scheduled for: ${time.format(Get.context!)}');
 
       } else if (frequency == ReminderFrequency.weekly && dayOfWeek != null) {
         // Weekly reminder
@@ -575,16 +574,16 @@ class NotificationService {
         );
 
         final dayName = _getDayName(dayOfWeek);
-        print('✅ Weekly notification scheduled for: $dayName at ${time.format(Get.context!)}');
+        print('Weekly notification scheduled for: $dayName at ${time.format(Get.context!)}');
       }
 
     } catch (e) {
-      print('❌ Error scheduling recurring notification: $e');
+      print('Error scheduling recurring notification: $e');
       rethrow;
     }
   }
 
-  // ✅ NEW: Helper method to get next weekly occurrence
+  // Helper method to get next weekly occurrence
   static tz.TZDateTime _getNextWeeklyTime(TimeOfDay time, int dayOfWeek) {
     final now = tz.TZDateTime.now(tz.local);
     var scheduledTime = tz.TZDateTime(
@@ -605,13 +604,13 @@ class NotificationService {
     return scheduledTime.add(Duration(days: daysUntilTarget));
   }
 
-  // ✅ NEW: Helper method to get day name
+  // Helper method to get day name
   static String _getDayName(int dayOfWeek) {
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     return days[dayOfWeek - 1];
   }
 
-  // ✅ NEW: Schedule weekly notification
+  // Schedule weekly notification
   static Future<void> scheduleWeeklyNotification({
     required int id,
     required String title,
