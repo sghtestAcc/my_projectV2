@@ -1223,24 +1223,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           }
                         },
                       ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () async {
-                    await userRepo.testRefillNotification();
-                  },
-                  child: Text(
-                    "Test Refill Notification",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+
               ],
             ),
           ),

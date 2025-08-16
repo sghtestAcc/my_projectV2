@@ -90,7 +90,7 @@ exports.sendVerificationEmail = onDocumentCreated(
       return;
     }
     
-    console.log("📩 Sending verification email for request:", requestId);
+    console.log("Sending verification email for request:", requestId);
     
     // Create action links using your actual project info
     const acceptLink = "https://asia-southeast1-sgh-project-e1afb.cloudfunctions.net/processVerification" +
@@ -432,7 +432,7 @@ exports.schedulePatientNotification = onCall(async (request) => {
     console.log(`Next execution calculated: ${nextExecution.toISOString()}`);
     console.log(`Time difference: ${(nextExecution.valueOf() - now.valueOf()) / (1000 * 60)} minutes`);
 
-    console.log("📝 Creating notification document in collection: scheduled_patient_notifications");
+    console.log("Creating notification document in collection: scheduled_patient_notifications");
     
     // Create notification document
     const notificationDoc = await firestore.collection("scheduled_patient_notifications").add({
@@ -478,7 +478,7 @@ exports.schedulePatientNotification = onCall(async (request) => {
     console.log(`Notification scheduled successfully with ID: ${notificationDoc.id}`);
     console.log(`   Next execution: ${nextExecution.toISOString()}`);
     console.log(`   Timezone: ${timezone}`);
-    console.log("✅ Document created in Firestore collection: scheduled_patient_notifications");
+    console.log("Document created in Firestore collection: scheduled_patient_notifications");
 
     return {
       success: true,
@@ -567,7 +567,7 @@ exports.processScheduledNotifications = onSchedule("every 1 minutes", async () =
 
   try {
     // Get all active notifications that are due
-    console.log("🔍 Querying for notifications...");
+    console.log("Querying for notifications...");
     console.log(`   Current time: ${now.toISOString()}`);
     console.log(`   Current timestamp: ${currentTimestamp.seconds}`);
     
@@ -577,17 +577,17 @@ exports.processScheduledNotifications = onSchedule("every 1 minutes", async () =
       .where("isActive", "==", true)
       .get();
     
-    console.log(`📋 Found ${allActiveSnapshot.docs.length} total active notifications`);
+    console.log(`Found ${allActiveSnapshot.docs.length} total active notifications`);
     
     // Log each notification's details
     allActiveSnapshot.docs.forEach(doc => {
       const data = doc.data();
       const nextExecMs = data.nextExecution ? data.nextExecution.toDate().getTime() : null;
-      console.log(`   📝 Notification: ${data.patientName}`);
-      console.log(`      ID: ${doc.id}`);
-      console.log(`      Next execution: ${data.nextExecution ? data.nextExecution.toDate().toISOString() : "NULL"}`);
-      console.log(`      Next execution ms: ${nextExecMs ?? "NULL"}`);
-      console.log(`      Is due: ${nextExecMs !== null ? (nextExecMs <= now.getTime()) : "NO TIMESTAMP"}`);
+      console.log(`Notification: ${data.patientName}`);
+      console.log(`ID: ${doc.id}`);
+      console.log(`Next execution: ${data.nextExecution ? data.nextExecution.toDate().toISOString() : "NULL"}`);
+      console.log(`Next execution ms: ${nextExecMs ?? "NULL"}`);
+      console.log(`Is due: ${nextExecMs !== null ? (nextExecMs <= now.getTime()) : "NO TIMESTAMP"}`);
     });
     
     // Get all active notifications that are due
@@ -606,16 +606,16 @@ exports.processScheduledNotifications = onSchedule("every 1 minutes", async () =
       return execMs <= now.getTime();
     });
 
-    console.log(`✅ Found ${dueNotifications.length} notifications ready to send out of ${snapshot.docs.length} total active`);
+    console.log(`Found ${dueNotifications.length} notifications ready to send out of ${snapshot.docs.length} total active`);
 
     for (const doc of dueNotifications) {
       const data = doc.data();
       const nextExecutionDate = data.nextExecution.toDate();
       
       console.log(`Processing notification for ${data.patientName}:`);
-      console.log(`   Scheduled: ${nextExecutionDate.toISOString()}`);
-      console.log(`   Current:   ${now.toISOString()}`);
-      console.log(`   Difference: ${(now.getTime() - nextExecutionDate.getTime()) / (1000 * 60)} minutes`);
+      console.log(`Scheduled: ${nextExecutionDate.toISOString()}`);
+      console.log(`Current:   ${now.toISOString()}`);
+      console.log(`Difference: ${(now.getTime() - nextExecutionDate.getTime()) / (1000 * 60)} minutes`);
 
       try {
         // Send the notification
@@ -662,7 +662,7 @@ exports.processScheduledNotifications = onSchedule("every 1 minutes", async () =
           });
 
           console.log(`Notification sent and rescheduled for: ${nextExecution.toISOString()}`);
-          console.log("📝 Notification log created in notification_logs collection");
+          console.log("Notification log created in notification_logs collection");
         } else {
           console.log(`Notification failed: ${result.error}`);
           

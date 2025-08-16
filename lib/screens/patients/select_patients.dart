@@ -508,7 +508,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
               const SizedBox(width: 10),
               if (time != null)
                 ElevatedButton(
-                  onPressed: () => _scheduleEnhancedNotificationForPatient(id, name, time),
+                  onPressed: () => _scheduleNotificationForPatient(id, name, time),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -598,8 +598,8 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     }
   }
 
-  // UPDATE: Enhanced scheduling method that includes both local AND push notifications
-  Future<void> _scheduleEnhancedNotificationForPatient(
+  // Enhanced scheduling method that includes both local AND push notifications
+  Future<void> _scheduleNotificationForPatient(
     String patientId,
     String patientName,
     TimeOfDay selectedTime,
@@ -610,7 +610,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
       
       print('Scheduling ${frequency.name} notifications for patient: $patientName');
       
-      // 1. Schedule LOCAL notification for CAREGIVER (no emojis)
+      // 1. Schedule LOCAL notification for CAREGIVER
       if (frequency == ReminderFrequency.daily) {
         await NotificationService.scheduleDailyNotification(
           id: notificationId,
@@ -780,57 +780,7 @@ class _SelectPatientScreenState extends State<SelectPatientScreen> {
     return Stream.value([]);
   }
 
-  // Schedule notification for patient (unchanged)
-  Future<void> _scheduleNotificationForPatient(
-    String patientId,
-    String patientName,
-    TimeOfDay selectedTime,
-  ) async {
-    try {
-      print('Scheduling notification for patient: $patientName');
-      
-      final notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-      
-      await NotificationService.scheduleDailyNotification(
-        id: notificationId,
-        title: 'Medication Reminder for $patientName',
-        body: 'Time to remind $patientName to take their medication!',
-        time: selectedTime,
-        data: {
-          'type': 'medication_reminder',
-          'patientId': patientId,
-          'patientName': patientName,
-          'notificationId': notificationId,
-        },
-      );
-
-      await userRepo.createMedicationNotification(
-        patientId,
-        'Medication Reminder',
-        'Daily reminder for $patientName at ${selectedTime.format(context)}',
-        DateTime.now().toIso8601String(),
-      );
-
-      Get.snackbar(
-        "Success",
-        "Daily medication reminder set for $patientName at ${selectedTime.format(context)}",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: const Color(0xFF35365D).withOpacity(0.5),
-        colorText: const Color(0xFFF6F3E7),
-      );
-    } catch (e) {
-      print('Error scheduling notification: $e');
-      Get.snackbar(
-        "Error",
-        "Failed to schedule notification: ${e.toString()}",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.red,
-      );
-    }
-  }
-
-  // UPDATED: Send push notification to patient using HTTP
+  // Send push notification to patient using HTTP
   Future<void> _sendPushNotificationToPatient(
     String patientId,
     String patientName,

@@ -295,7 +295,7 @@ class NotificationService {
       data: {'type': 'test', 'message': 'Hello World!'},
     );
   }
-  // Schedule automatic refill notification
+  // Schedule automatic refill notification with AI-powered calculation
   static Future<void> scheduleRefillNotification({
     required String medicationId,
     required String medicationName,
@@ -307,7 +307,8 @@ class NotificationService {
     try {
       await _ensureInitialized(); // Ensure initialization
       
-      final refillDate = MedicationRefillCalculator.calculateRefillNotificationDate(
+      // Use AI-powered calculation first
+      final refillDate = await MedicationRefillCalculator.calculateRefillNotificationDateWithAI(
         quantity: quantity,
         instructions: instructions,
         startDate: medicationStartDate,
@@ -317,6 +318,13 @@ class NotificationService {
         print('Could not calculate refill date for $medicationName');
         return;
       }
+
+      // Get AI description for logging
+      final description = await MedicationRefillCalculator.getAICalculationDescription(
+        quantity: quantity,
+        instructions: instructions,
+      );
+      print('AI Refill Calculation: $description');
 
       if (refillDate.isBefore(DateTime.now())) {
         print('Warning: Refill date is in the past for $medicationName, scheduling for 1 hour from now');

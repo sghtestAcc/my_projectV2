@@ -59,7 +59,6 @@ class SelectPatientController extends GetxController {
     }
   }
 
-  // Add this line below
   User? get currentUser => _authRepo.firebaseUser.value;
 }
 

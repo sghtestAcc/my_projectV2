@@ -443,12 +443,12 @@ class UserRepository extends GetxController {
         medicationStartDate: DateTime.now(),
       );
 
-      // Log the calculation for debugging
-      final description = MedicationRefillCalculator.getCalculationDescription(
+      // Log the AI calculation for debugging
+      final description = await MedicationRefillCalculator.getAICalculationDescription(
         quantity: quantity,
         instructions: instructions,
       );
-      print('Refill calculation: $description');
+      print('AI Refill calculation: $description');
 
     } catch (e) {
       print('Error scheduling refill notification: $e');
